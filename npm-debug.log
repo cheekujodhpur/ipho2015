@@ -1,0 +1,85 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'urlencoded' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.35
+4 verbose cache add [ 'urlencoded', null ]
+5 verbose cache add name=undefined spec="urlencoded" args=["urlencoded",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'urlencoded',
+6 verbose parsed url   path: 'urlencoded',
+6 verbose parsed url   href: 'urlencoded' }
+7 silly lockFile b4dc94eb-urlencoded urlencoded
+8 verbose lock urlencoded /home/sandesh/.npm/b4dc94eb-urlencoded.lock
+9 silly lockFile b4dc94eb-urlencoded urlencoded
+10 silly lockFile b4dc94eb-urlencoded urlencoded
+11 verbose addNamed [ 'urlencoded', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile 930de895-urlencoded urlencoded@
+14 verbose lock urlencoded@ /home/sandesh/.npm/930de895-urlencoded.lock
+15 silly addNameRange { name: 'urlencoded', range: '*', hasData: false }
+16 verbose request where is /urlencoded
+17 verbose request registry http://registry.npmjs.org/
+18 verbose request id a2eca93fece30b64
+19 verbose url raw /urlencoded
+20 verbose url resolving [ 'http://registry.npmjs.org/', './urlencoded' ]
+21 verbose url resolved http://registry.npmjs.org/urlencoded
+22 verbose request where is http://registry.npmjs.org/urlencoded
+23 info trying registry request attempt 1 at 22:03:12
+24 http GET http://registry.npmjs.org/urlencoded
+25 http 404 http://registry.npmjs.org/urlencoded
+26 verbose headers { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+26 verbose headers   'content-type': 'application/json',
+26 verbose headers   'cache-control': 'max-age=0',
+26 verbose headers   'content-length': '52',
+26 verbose headers   'accept-ranges': 'bytes',
+26 verbose headers   date: 'Fri, 30 Jan 2015 16:33:06 GMT',
+26 verbose headers   age: '0',
+26 verbose headers   'x-served-by': 'cache-fra1225-FRA',
+26 verbose headers   'x-cache': 'MISS, MISS from nm11.iitb.ac.in',
+26 verbose headers   'x-cache-hits': '0',
+26 verbose headers   'x-timer': 'S1422635586.616195,VS0,VE171',
+26 verbose headers   'x-cache-lookup': 'MISS from nm11.iitb.ac.in:80',
+26 verbose headers   via: '1.1 varnish, 1.1 nm11.iitb.ac.in (squid/3.3.9)',
+26 verbose headers   connection: 'close' }
+27 silly registry.get cb [ 404,
+27 silly registry.get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+27 silly registry.get     'content-type': 'application/json',
+27 silly registry.get     'cache-control': 'max-age=0',
+27 silly registry.get     'content-length': '52',
+27 silly registry.get     'accept-ranges': 'bytes',
+27 silly registry.get     date: 'Fri, 30 Jan 2015 16:33:06 GMT',
+27 silly registry.get     age: '0',
+27 silly registry.get     'x-served-by': 'cache-fra1225-FRA',
+27 silly registry.get     'x-cache': 'MISS, MISS from nm11.iitb.ac.in',
+27 silly registry.get     'x-cache-hits': '0',
+27 silly registry.get     'x-timer': 'S1422635586.616195,VS0,VE171',
+27 silly registry.get     'x-cache-lookup': 'MISS from nm11.iitb.ac.in:80',
+27 silly registry.get     via: '1.1 varnish, 1.1 nm11.iitb.ac.in (squid/3.3.9)',
+27 silly registry.get     connection: 'close' } ]
+28 silly lockFile 930de895-urlencoded urlencoded@
+29 silly lockFile 930de895-urlencoded urlencoded@
+30 error 404 404 Not Found: urlencoded
+30 error 404
+30 error 404 'urlencoded' is not in the npm registry.
+30 error 404 You should bug the author to publish it
+30 error 404
+30 error 404 Note that you can also install from a
+30 error 404 tarball, folder, or http url, or git url.
+31 error System Linux 3.16.0-29-generic
+32 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "urlencoded"
+33 error cwd /home/sandesh/ipho2015/backend
+34 error node -v v0.10.35
+35 error npm -v 1.4.28
+36 error code E404
+37 verbose exit [ 1, true ]
