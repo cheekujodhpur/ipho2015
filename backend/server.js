@@ -1,22 +1,38 @@
 var express = require('express')
   , app = express()
   , http = require('http')
+  , MongoClient = require('mongodb').MongoClient
   , server = http.createServer(app)
 
 var bodyParser = require('body-parser');
 app.use(bodyParser());
+
+
 //tell node to send the required files when requested
 app.get('/', function (req, res)
 {
-    var html = '<script>   var password = prompt("Enter the password","ipho2015"); </script> ';
-    res.send(html);
-    console.log(req.body);
+    res.sendFile(__dirname + '/auth.html');
 });
 app.post('/', function(req, res)
-{    
-    console.log(req.body.password);
-    var html = req.body.password;
-    res.send(html);
+{
+	// Connect to the db
+	MongoClient.connect("mongodb://localhost:27017/test",function(err,db){
+		if(err)
+		{
+			console.log(err);
+			return 0;
+		}
+		var collection = db.collection('users');
+		collection.find({"ip":req.ip}).toArray(function(err,items)
+		{
+			var truePass = items[0].pass;
+			if(truePass == req.body.pass)
+				res.sendFile(__dirname + '/index.html');
+			else
+				res.sendFile(__dirname + '/auth.html');
+
+		});
+	});
 });
 app.get('/index.html', function (req, res)
 {
