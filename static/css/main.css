@@ -2,12 +2,20 @@
 .right{float:right;}
 .clear{clear:both;}
 
+.nav
+{
+	position:relative;
+	top:-65px;
+	left:23%;
+	z-index:2;
+	width:40%;
+}
+
 #form-auth
 {
 	width:300px;
 	margin:10px auto;
 	position:relative;
-	top:200px
 }
 
 #form-auth-submit
@@ -16,10 +24,34 @@
 	margin:0 auto;
 }
 
+#sp-header-wrapper
+{
+	background-image:linear-gradient(to bottom,#ADD8E6,#FFF);
+	height:150px;
+	position:relative;
+	z-index:1;
+}
+
+#tifr-mast
+{
+	margin-right:10px;
+}
+
+#tifr-logo
+{
+	float:right;
+	margin-left:10px;
+}
+
+#hbc-tifr
+{
+	float:right;
+	text-align:right;
+	line-height:1.2em;
+}
+
 #sp-footer-wrapper
 {
-	position:fixed;
-	bottom:0px;
 	width:100%;
 	height:auto;
 	background-color:#464277;
@@ -27,7 +59,7 @@
 
 #sp-footer-wrapper .container
 {
-	font-size:16px;
+	font-size:14px;
 	color:white;
 	padding:0px 10px;
 }

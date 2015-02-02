@@ -1,33 +1,64 @@
-<!doctype html>
-<head>
-    <title>Home</title>
-	<script src = "/socket.io/socket.io.js"></script>
-	<script>
-		var socket = io();
-	</script>
-</head>
-<body>
-Hello junta!<br />
-<a href = "../logout.html">logout</a>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset = "utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Authentication</title>
 
-<div id = "vote">
-
-</div>
-
-<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-<script src = "/socket.io/socket.io.js"></script>
-<script>
-	var socket = io();
-	socket.on('castvote',function(body,opt1,opt2,opt3,opt4,time){
-		var rhtml = '<p>' + body + '</p>';
-		rhtml += '<input type = "radio" id = "opt1" value = "'+opt1+'" /><br />'; 
-		rhtml += '<input type = "radio" id = "opt2" value = "'+opt2+'" /><br />'; 
-		rhtml += '<input type = "radio" id = "opt3" value = "'+opt3+'" /><br />'; 
-		rhtml += '<input type = "radio" id = "opt4" value = "'+opt4+'" /><br />';
-		rhtml += 'You get ' + time + ' seconds to cast your vote!';
-		$("#vote").html(rhtml); 
-	});
-</script>
-
-</body>
-
+		<!--Bootstrap-->
+		<link href = "static/css/bootstrap.min.css" rel = "stylesheet" />
+		<!!--Custom CSS-->
+		<link href = "static/css/main.css" rel = "stylesheet" />
+	</head>
+	<body>
+		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
+			<div class = "container-fluid">
+				<div class = "navbar-header">
+					<a class="navbar-brand" href = "http://www.ipho2015.in">
+						<img alt="logo" src = "media/ipho-logo1.png" />
+					</a>
+				</div>
+			</div>
+			<div id = "tifr-mast">
+				<div id = "tifr-logo"><img alt="tifr-logo" src = "/media/tifr-logo-s.png" /></div>
+				<div id = "hbc-tifr">
+					<div id = "hbc">Homi Bhabha Centre for Education</div>
+					<div id = "tifr">Tata Institute of Fundamental Research</div>
+				</div>
+			</div>
+		</div>
+		<div id = "document">
+			<div role = "tabpanel">
+				<ul class = "nav nav-pills" id = "nemo">
+					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+					<li role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
+					<li role = "presentation"><a href = "#trans" aria-controls="vote" role="tab" data-toggle="tab">Translation</a></li>
+				</ul>
+			</div>
+			<div class = "tab-content">
+				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
+				<div role="tabpanel" class="tab-pane" id = "vote">Vote</div>
+				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
+			</div>
+		</div>
+		<footer id="sp-footer-wrapper">
+                	<div class="container">
+                        	<div class="row-fluid" id="footer">
+					 <div id="sp-footer1" class="span6"><span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+					<br /><span>Mumbai - India </span> </div>
+                        	</div>
+                	</div>
+        	</footer>   	
+		<!-- jQuery -->
+		<script src = "static/js/jquery.min.js"></script>
+		<script src = "static/js/bootstrap.min.js"></script>
+		<script src = "/socket.io/socket.io.js"></script>
+		<script>
+			var socket = io();
+			$(function() {
+				$('#nemo a:last').tab('show');
+			});
+		</script>
+	</body>
+</html>
