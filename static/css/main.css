@@ -1,0 +1,44 @@
+.left{float:left;}
+.right{float:right;}
+.clear{clear:both;}
+
+#form-auth
+{
+	width:300px;
+	margin:10px auto;
+	position:relative;
+	top:200px
+}
+
+#form-auth-submit
+{
+	width:100px;
+	margin:0 auto;
+}
+
+#sp-footer-wrapper
+{
+	position:fixed;
+	bottom:0px;
+	width:100%;
+	height:auto;
+	background-color:#464277;
+}
+
+#sp-footer-wrapper .container
+{
+	font-size:16px;
+	color:white;
+	padding:0px 10px;
+}
+
+#sp-footer-wrapper a:not(.btn)
+{
+	color:lightyellow;
+}
+
+#tifr-logo
+{
+	float:right;
+	margin-left:10px;
+}
