@@ -1,0 +1,36 @@
+<!doctype html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+Hello junta! You are an admin.<br />
+
+<div id = "voting">
+	<h3>Set a question</h3>
+	<form id = "setvote" action = "">
+		Question:<br />
+		<textarea id = "body">
+		</textarea>
+		Option 1 : <input type = "text" id = "opt1" />
+		Option 2 : <input type = "text" id = "opt2" />
+		Option 3 : <input type = "text" id = "opt3" />
+		Option 4 : <input type = "text" id = "opt4" />
+		<br />
+		Time : <input type = "number" id = "time" />
+		<br />
+		<input type = "submit" />
+	</form>
+</div>
+
+<a href = "../logout.html">logout</a>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src = "/socket.io/socket.io.js"></script>
+<script>
+	var socket = io();
+	$("#setvote").submit(function(){
+	socket.emit('setvote',$("#body").val(),$("#opt1").val(),$("#opt2").val(),$("#opt3").val(),$("#opt4").val(),$("#time").val());
+	return false;
+	});
+</script>
+</body>
+
