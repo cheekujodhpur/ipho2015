@@ -22,6 +22,8 @@ app.get('/static/js/jquery.min.js', function(req,res){res.sendFile(__dirname+'/s
 app.get('/static/js/bootstrap.min.js', function(req,res){res.sendFile(__dirname+'/static/js/bootstrap.min.js');});
 app.get('/media/ipho-logo1.png', function(req,res){res.sendFile(__dirname+'/media/ipho-logo1.png');});
 app.get('/media/tifr-logo-s.png', function(req,res){res.sendFile(__dirname+'/media/tifr-logo-s.png');});
+app.get('/static/fonts/glyphicons-halflings-regular.woff2', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff2');});
+app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff');});
 
 app.get('/', function (req, res)
 {
@@ -52,36 +54,10 @@ app.get('/', function (req, res)
 	});
 });
 
-
-//logout and redirect to auth
-app.get('/logout.html',function(req,res)
-{
-	MongoClient.connect("mongodb://localhost:27017/test",function(err,db){
-		if(err)
-		{
-			console.log(err);
-			return 0;
-		}
-		var collection = db.collection('users');
-		collection.update({"ip":req.ip},{$set:{"logged":false}},function(err,result){});
-		res.sendFile(__dirname + '/auth.html');
-	});
-});
-
 //io
 io.on('connection',function(socket){
-	socket.on('setvote',function(body,opt1,opt2,opt3,opt4,time){
-		MongoClient.connect("mongodb://localhost:27017/test",function(err,db){
-		if(err)
-		{
-			console.log(err);
-			return 0;
-		}
-		var collection = db.collection('voteq');
-		collection.insert({"body":body,"opt1":opt1,"opt2":opt2,"opt3":opt3,"opt4":opt4,"time":time},function(err,result){});
-		io.emit('castvote',body,opt1,opt2,opt3,opt4,time);
-		});
-	});
+	
+	//login
 	socket.on('syn',function(pass){
 		var ip = socket.request.connection.remoteAddress;
 		// Connect to the db
@@ -105,7 +81,22 @@ io.on('connection',function(socket){
 				socket.emit('syn-err');
 			}
 		});
-	});
+		});
 
+	});
+	
+	//logout
+	socket.on('end',function(){
+		var ip = socket.request.connection.remoteAddress;
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db){
+		if(err)
+		{
+			console.log(err);
+			return 0;
+		}
+		var collection = db.collection('users');
+		collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){});
+		socket.emit('end-ack');
+		});
 	});
 });

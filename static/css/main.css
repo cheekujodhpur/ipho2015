@@ -11,6 +11,12 @@
 	width:40%;
 }
 
+#out-button
+{
+	position:relative;
+	top:15px;
+}
+
 #form-auth
 {
 	width:300px;

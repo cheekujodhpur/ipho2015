@@ -4,7 +4,7 @@
 		<meta charset = "utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Authentication</title>
+		<title>IPhO 2015 - Mumbai, India</title>
 
 		<!--Bootstrap-->
 		<link href = "static/css/bootstrap.min.css" rel = "stylesheet" />
@@ -21,7 +21,12 @@
 				</div>
 			</div>
 			<div id = "tifr-mast">
-				<div id = "tifr-logo"><img alt="tifr-logo" src = "/media/tifr-logo-s.png" /></div>
+				<div id = "tifr-logo"><img alt="tifr-logo" src = "/media/tifr-logo-s.png" />
+				<br />
+				<button type = "button" id = "out-button" class = "btn btn-default btn-sm right">
+					<span class="glyphicon glyphicon-log-out"></span> Log out
+				</button>
+				</div>
 				<div id = "hbc-tifr">
 					<div id = "hbc">Homi Bhabha Centre for Education</div>
 					<div id = "tifr">Tata Institute of Fundamental Research</div>
@@ -58,6 +63,12 @@
 			var socket = io();
 			$(function() {
 				$('#nemo a:last').tab('show');
+			});
+			$("#out-button").click(function(){
+				socket.emit('end');
+			});
+			socket.on('end-ack',function(){
+				window.location = '/';
 			});
 		</script>
 	</body>
