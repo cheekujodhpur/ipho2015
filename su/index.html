@@ -43,7 +43,34 @@
 			</div>
 			<div class = "tab-content">
 				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
-				<div role="tabpanel" class="tab-pane" id = "vote">Vote</div>
+				<div role="tabpanel" class="tab-pane" id = "vote">
+				
+<!--Section for Vote on Administrator End///starts here-->
+<h3>Create Vote question</h3>
+<form style = "width:500px;" id = "form-vote">
+	<div class = "form-group">
+		<label for="vote-body">Body</label>
+		<textarea class = "form-control" id = "vote-body" placeholder = "Enter question body" style = "height:180px;"></textarea>
+	</div>
+	<input type = "hidden" name = "count" value = "1" />
+	<div class = "control-group" id = "vote-opts">
+		<label class = "control-label" for = "opt1">Options</label>
+		<div class = "controls" id = "options">
+			<div id = "option">
+				<input autocomplete="off" class = "input form-control" id = "opt1" name = "vote-opt-1" type = "text" placeholder = "Enter option" />
+				<button id = "b1" class = "btn add-more" type = "button">+</button>
+			</div>	
+		</div>
+	</div>
+	<div class = "form-group">
+		<label for = "vote-time">Time(s)</label>
+		<input class = "form-control" id = "vote-time" placeholder = "Enter duration of vote" type = "number" style = "width:200px;" />
+	</div>
+	<button type = "submit" class = "btn btn-default">Submit</button>
+</form>
+<!--Section for Vote on Administrator End///ends here-->
+
+				</div>
 				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
 			</div>
 		</div>
@@ -61,14 +88,54 @@
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
 			var socket = io();
-			$(function() {
-				$('#nemo a:last').tab('show');
-			});
-			$("#out-button").click(function(){
-				socket.emit('end');
-			});
 			socket.on('end-ack',function(){
 				window.location = '/';
+			});
+			
+			//document ready script
+			$(document).ready(function(){
+				//for adding options
+				var next = 1;
+				$(".add-more").click(function(e){
+					e.preventDefault();
+					var addto = "#opt" + (next);
+					var addRemove = "#opt" + (next);
+					next = next + 1;
+					var newIn = '<input autocomplete = "off" class = "input form-control" id = "opt' + next + '" name = "vote-opt-' + next + '" type = "text" placeholder = "Enter option">';
+					var newInput = $(newIn);
+					var removeBtn = '<button id = "remove' + (next - 1) + '" class = "btn btn-danger remove-me" >-</button><div></div>';
+					var removeButton = $(removeBtn);
+					$(addto).after(newInput);
+					$(addRemove).after(removeButton);
+					$("#count").val(next);
+					$('.remove-me').click(function(e){
+						e.preventDefault();
+						var fieldNum = this.id.substr(6); //length of "remove" + 1 = 6
+						var fieldID = "#opt" + fieldNum;	
+						$(this).remove();
+						$(fieldID).remove();						
+					});
+				});
+
+
+				//show tab
+				$('#nemo a:first').tab('show');
+
+				//socket.io controls
+				$("#out-button").click(function(){
+					socket.emit('end');
+				});
+				
+				//vote form submit
+				$("#form-vote").submit(function(e){
+					e.preventDefault();
+					var body = $("#vote-body").val();
+					var options = [];
+					$("#option").find("input").each(function(){
+						options.push($(this).val());
+					});
+					var time = $("#vote-time").val();
+				});
 			});
 		</script>
 	</body>

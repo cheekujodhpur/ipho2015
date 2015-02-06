@@ -80,3 +80,35 @@
 	float:right;
 	margin-left:10px;
 }
+
+.tab-content
+{
+	position:relative;
+	top:-40px;
+	padding:0px 25px;
+}
+
+#option input
+{
+	display:inline;
+	width:auto;
+	border-top-right-radius:0px;
+	border-bottom-right-radius:0px;
+}
+
+.remove-me
+{
+	border-top-left-radius:0px;
+	border-bottom-left-radius:0px;
+}
+
+.add-more
+{
+	margin-left:-5px;
+}
+
+.add-more,.remove-me
+{
+	position:relative;
+	top:-1px;
+}
