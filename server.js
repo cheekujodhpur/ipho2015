@@ -36,6 +36,7 @@ app.get('/', function (req, res)
 		var collection = db.collection('users');
 		collection.find({"ip":req.ip}).toArray(function(err,items)
 		{
+			if(items.length==0)return;
 			if(items[0].logged)
 			{
 				var type = items[0].type;

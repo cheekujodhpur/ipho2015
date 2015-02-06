@@ -43,7 +43,6 @@
 			</div>
 			<div class = "tab-content">
 				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
-				<div role="tabpanel" class="tab-pane" id = "vote">Vote</div>
 				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
 			</div>
 		</div>
@@ -61,14 +60,19 @@
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
 			var socket = io();
-			$(function() {
-				$('#nemo a:last').tab('show');
-			});
-			$("#out-button").click(function(){
-				socket.emit('end');
-			});
 			socket.on('end-ack',function(){
 				window.location = '/';
+			});
+			
+			//document ready script
+			$(document).ready(function(){
+				//show tab
+				$('#nemo a:first').tab('show');
+
+				//socket.io controls
+				$("#out-button").click(function(){
+					socket.emit('end');
+				});
 			});
 		</script>
 	</body>
