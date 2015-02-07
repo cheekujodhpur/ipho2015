@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset = "utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Authentication</title>
+
+		<!--Bootstrap-->
+		<link href = "static/css/bootstrap.min.css" rel = "stylesheet" />
+		<!!--Custom CSS-->
+		<link href = "static/css/main.css" rel = "stylesheet" />
+	</head>
+	<body>
+		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
+			<div class = "container-fluid">
+				<div class = "navbar-header">
+					<a class="navbar-brand" href = "http://www.ipho2015.in">
+						<img alt="logo" src = "media/ipho-logo1.png" />
+					</a>
+				</div>
+			</div>
+			<div id = "tifr-mast">
+				<div id = "tifr-logo"><img alt="tifr-logo" src = "/media/tifr-logo-s.png" /></div>
+				<div id = "hbc-tifr">
+					<div id = "hbc">Homi Bhabha Centre for Education</div>
+					<div id = "tifr">Tata Institute of Fundamental Research</div>
+				</div>
+			</div>
+		</div>
+		<div id = "document">
+			<form id="form-auth">
+				<div class="form-group">
+					<label for="pass" class = "control-label">Password</label>
+					<input type = "password" name="pass" class="form-control" id = "form-auth-pass" /><br />
+				</div>
+				<div id = "form-auth-submit">
+					<button type="submit" class="btn btn-default">Log In</button>
+				</div>
+			</form>
+		</div>
+		<footer id="sp-footer-wrapper" style="position:absolute;bottom:0px;">
+                	<div class="container">
+                        	<div class="row-fluid" id="footer">
+					 <div id="sp-footer1" class="span6"><span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+					<br /><span>Mumbai - India </span> </div>
+                        	</div>
+                	</div>
+        	</footer>   	
+		<!-- jQuery -->
+		<script src = "static/js/jquery.min.js"></script>
+		<script src = "static/js/bootstrap.min.js"></script>
+		<script src = "/socket.io/socket.io.js"></script>
+		<script>
+			var socket = io();
+
+			socket.on('syn-err',function(){
+				$("#form-auth-pass").parent().addClass("has-error");
+			});
+
+			socket.on('fin',function(){
+				window.location = "/";
+			});
+			
+			$("#form-auth").submit(function(){
+				$("#form-auth-pass").parent().removeClass("has-error");
+				socket.emit('syn',$("#form-auth-pass").val());
+				$("#form-auth-pass").val('');
+				return false;
+			});
+		</script>
+	</body>
+</html>
