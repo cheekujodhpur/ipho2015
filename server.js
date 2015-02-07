@@ -57,7 +57,6 @@ app.get('/', function (req, res)
 
 //io
 io.on('connection',function(socket){
-	
 	//login
 	socket.on('syn',function(pass){
 		var ip = socket.request.connection.remoteAddress;
@@ -98,6 +97,42 @@ io.on('connection',function(socket){
 		var collection = db.collection('users');
 		collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){});
 		socket.emit('end-ack');
+		});
+	});
+
+	//set vote question
+	socket.on('setvote',function(body,options,time){
+		var id = Math.random().toString(36).substr(2,5);
+		//TODO: check for valid id
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db){
+		if(err)
+		{
+			console.log(err);
+			return 0;
+		}
+		var collection = db.collection('voteq');
+		collection.insert({"id":id,"body":body},function(err,result){});
+		for(var i = 1;i<=options.length;i++){
+			var query = {};
+			query['opt'+i] = 0;
+			collection.update({"id":id},{$set:query},function(err,result){});
+		}
+		});
+		socket.broadcast.emit('govote',id,body,options,time);
+	});
+	
+	//receive vote inputs
+	socket.on('logvote',function(id,option){
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db){
+		if(err)
+		{
+			console.log(err);
+			return 0;
+		}
+		var collection = db.collection('voteq');
+		var query = {};
+		query[option] = 1;
+		collection.update({"id":id},{$inc:query},function(err,result){});
 		});
 	});
 });

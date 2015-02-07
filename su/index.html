@@ -138,6 +138,7 @@
 					});
 					var time = $("#vote-time").val();
 					$("#vote-time").val('');
+					socket.emit('setvote',body,options,time);
 				});
 			});
 		</script>

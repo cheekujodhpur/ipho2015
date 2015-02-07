@@ -57,7 +57,9 @@
 }
 
 #sp-footer-wrapper
-{
+{	
+	position:fixed;
+	bottom:0px;
 	width:100%;
 	height:auto;
 	background-color:#464277;
@@ -111,4 +113,10 @@
 {
 	position:relative;
 	top:-1px;
+}
+
+#timer
+{
+	color:red;
+	font-size:22px;
 }

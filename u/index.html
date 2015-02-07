@@ -37,13 +37,26 @@
 			<div role = "tabpanel">
 				<ul class = "nav nav-pills" id = "nemo">
 					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-					<li role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
-					<li role = "presentation"><a href = "#trans" aria-controls="vote" role="tab" data-toggle="tab">Translation</a></li>
+					<li role = "presentation"><a href = "#trans" aria-controls="trans" role="tab" data-toggle="tab">Translation</a></li>
+					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 				</ul>
 			</div>
 			<div class = "tab-content">
 				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
 				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
+				<div role="tabpanel" class="tab-pane" id = "cvote">
+<!--Cast Vote starts here-->
+<p id = "vote-body"></p>
+<form>
+	<div class="form-group" id = "vote-opts">
+		
+	</div>	
+</form>
+<br />
+<font>Time to vote: <span id = "timer"></span> seconds</font>
+
+<!--Cast Vote ends here-->
+				</div>
 			</div>
 		</div>
 		<footer id="sp-footer-wrapper">
@@ -74,6 +87,37 @@
 					socket.emit('end');
 				});
 			});
+
+			//on receiving vote request
+			socket.on('govote',function(id,body,options,time){
+				var option,Option;
+				$("#vote-opts").html('');
+				for(var i = 1;i<=options.length;i++){
+					option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+					Option = $(option);
+					$("#vote-opts").append(Option);
+				}
+				var Body = $('<font style="font-size:18px;">'+body+'</font>');
+				$("#vote-body").append(Body);
+				$("#cvoteb").show();
+				clearInterval(timer);
+				var timer = setInterval(function(){
+					$("#timer").html(time);
+					if(time==0) {
+					logVote(id);
+					clearInterval(timer);
+					}	
+					time = time-1;
+				},1000);
+			});
+			
+			function logVote(id)
+			{
+				var option = $('input[name=vote-options]:checked').val();
+				socket.emit('logvote',id,option);
+				$('input[name=vote-options]').attr('disabled',true);
+				$("#timer").parent().hide();
+			}
 		</script>
 	</body>
 </html>
