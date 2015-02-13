@@ -2,84 +2,89 @@
 1 verbose cli [ '/usr/local/bin/node',
 1 verbose cli   '/usr/local/bin/npm',
 1 verbose cli   'install',
-1 verbose cli   'urlencoded' ]
+1 verbose cli   'socket-io' ]
 2 info using npm@1.4.28
 3 info using node@v0.10.35
-4 verbose cache add [ 'urlencoded', null ]
-5 verbose cache add name=undefined spec="urlencoded" args=["urlencoded",null]
-6 verbose parsed url { protocol: null,
-6 verbose parsed url   slashes: null,
-6 verbose parsed url   auth: null,
-6 verbose parsed url   host: null,
-6 verbose parsed url   port: null,
-6 verbose parsed url   hostname: null,
-6 verbose parsed url   hash: null,
-6 verbose parsed url   search: null,
-6 verbose parsed url   query: null,
-6 verbose parsed url   pathname: 'urlencoded',
-6 verbose parsed url   path: 'urlencoded',
-6 verbose parsed url   href: 'urlencoded' }
-7 silly lockFile b4dc94eb-urlencoded urlencoded
-8 verbose lock urlencoded /home/sandesh/.npm/b4dc94eb-urlencoded.lock
-9 silly lockFile b4dc94eb-urlencoded urlencoded
-10 silly lockFile b4dc94eb-urlencoded urlencoded
-11 verbose addNamed [ 'urlencoded', '' ]
-12 verbose addNamed [ null, '*' ]
-13 silly lockFile 930de895-urlencoded urlencoded@
-14 verbose lock urlencoded@ /home/sandesh/.npm/930de895-urlencoded.lock
-15 silly addNameRange { name: 'urlencoded', range: '*', hasData: false }
-16 verbose request where is /urlencoded
-17 verbose request registry http://registry.npmjs.org/
-18 verbose request id a2eca93fece30b64
-19 verbose url raw /urlencoded
-20 verbose url resolving [ 'http://registry.npmjs.org/', './urlencoded' ]
-21 verbose url resolved http://registry.npmjs.org/urlencoded
-22 verbose request where is http://registry.npmjs.org/urlencoded
-23 info trying registry request attempt 1 at 22:03:12
-24 http GET http://registry.npmjs.org/urlencoded
-25 http 404 http://registry.npmjs.org/urlencoded
-26 verbose headers { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
-26 verbose headers   'content-type': 'application/json',
-26 verbose headers   'cache-control': 'max-age=0',
-26 verbose headers   'content-length': '52',
-26 verbose headers   'accept-ranges': 'bytes',
-26 verbose headers   date: 'Fri, 30 Jan 2015 16:33:06 GMT',
-26 verbose headers   age: '0',
-26 verbose headers   'x-served-by': 'cache-fra1225-FRA',
-26 verbose headers   'x-cache': 'MISS, MISS from nm11.iitb.ac.in',
-26 verbose headers   'x-cache-hits': '0',
-26 verbose headers   'x-timer': 'S1422635586.616195,VS0,VE171',
-26 verbose headers   'x-cache-lookup': 'MISS from nm11.iitb.ac.in:80',
-26 verbose headers   via: '1.1 varnish, 1.1 nm11.iitb.ac.in (squid/3.3.9)',
-26 verbose headers   connection: 'close' }
-27 silly registry.get cb [ 404,
-27 silly registry.get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
-27 silly registry.get     'content-type': 'application/json',
-27 silly registry.get     'cache-control': 'max-age=0',
-27 silly registry.get     'content-length': '52',
-27 silly registry.get     'accept-ranges': 'bytes',
-27 silly registry.get     date: 'Fri, 30 Jan 2015 16:33:06 GMT',
-27 silly registry.get     age: '0',
-27 silly registry.get     'x-served-by': 'cache-fra1225-FRA',
-27 silly registry.get     'x-cache': 'MISS, MISS from nm11.iitb.ac.in',
-27 silly registry.get     'x-cache-hits': '0',
-27 silly registry.get     'x-timer': 'S1422635586.616195,VS0,VE171',
-27 silly registry.get     'x-cache-lookup': 'MISS from nm11.iitb.ac.in:80',
-27 silly registry.get     via: '1.1 varnish, 1.1 nm11.iitb.ac.in (squid/3.3.9)',
-27 silly registry.get     connection: 'close' } ]
-28 silly lockFile 930de895-urlencoded urlencoded@
-29 silly lockFile 930de895-urlencoded urlencoded@
-30 error 404 404 Not Found: urlencoded
-30 error 404
-30 error 404 'urlencoded' is not in the npm registry.
-30 error 404 You should bug the author to publish it
-30 error 404
-30 error 404 Note that you can also install from a
-30 error 404 tarball, folder, or http url, or git url.
-31 error System Linux 3.16.0-29-generic
-32 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "urlencoded"
-33 error cwd /home/sandesh/ipho2015/backend
-34 error node -v v0.10.35
-35 error npm -v 1.4.28
-36 error code E404
-37 verbose exit [ 1, true ]
+4 warn package.json fs@0.0.2 fs is also the name of a node core module.
+5 warn package.json fs@0.0.2 No description
+6 warn package.json fs@0.0.2 No repository field.
+7 warn package.json multipart@0.1.5 No repository field.
+8 warn package.json multipart@0.1.5 No README data
+9 verbose cache add [ 'socket-io', null ]
+10 verbose cache add name=undefined spec="socket-io" args=["socket-io",null]
+11 verbose parsed url { protocol: null,
+11 verbose parsed url   slashes: null,
+11 verbose parsed url   auth: null,
+11 verbose parsed url   host: null,
+11 verbose parsed url   port: null,
+11 verbose parsed url   hostname: null,
+11 verbose parsed url   hash: null,
+11 verbose parsed url   search: null,
+11 verbose parsed url   query: null,
+11 verbose parsed url   pathname: 'socket-io',
+11 verbose parsed url   path: 'socket-io',
+11 verbose parsed url   href: 'socket-io' }
+12 silly lockFile 2c2f14e9-socket-io socket-io
+13 verbose lock socket-io /home/sandesh/.npm/2c2f14e9-socket-io.lock
+14 silly lockFile 2c2f14e9-socket-io socket-io
+15 silly lockFile 2c2f14e9-socket-io socket-io
+16 verbose addNamed [ 'socket-io', '' ]
+17 verbose addNamed [ null, '*' ]
+18 silly lockFile d2f5c91d-socket-io socket-io@
+19 verbose lock socket-io@ /home/sandesh/.npm/d2f5c91d-socket-io.lock
+20 silly addNameRange { name: 'socket-io', range: '*', hasData: false }
+21 verbose request where is /socket-io
+22 verbose request registry http://registry.npmjs.org/
+23 verbose request id ce297031794470d9
+24 verbose url raw /socket-io
+25 verbose url resolving [ 'http://registry.npmjs.org/', './socket-io' ]
+26 verbose url resolved http://registry.npmjs.org/socket-io
+27 verbose request where is http://registry.npmjs.org/socket-io
+28 info trying registry request attempt 1 at 20:57:54
+29 http GET http://registry.npmjs.org/socket-io
+30 http 404 http://registry.npmjs.org/socket-io
+31 verbose headers { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+31 verbose headers   'content-type': 'application/json',
+31 verbose headers   'cache-control': 'max-age=0',
+31 verbose headers   'content-length': '52',
+31 verbose headers   'accept-ranges': 'bytes',
+31 verbose headers   date: 'Sat, 07 Feb 2015 15:27:46 GMT',
+31 verbose headers   age: '0',
+31 verbose headers   'x-served-by': 'cache-fra1222-FRA',
+31 verbose headers   'x-cache': 'MISS, MISS from nm11.iitb.ac.in',
+31 verbose headers   'x-cache-hits': '0',
+31 verbose headers   'x-timer': 'S1423322865.686324,VS0,VE713',
+31 verbose headers   'x-cache-lookup': 'MISS from nm11.iitb.ac.in:80',
+31 verbose headers   via: '1.1 varnish, 1.1 nm11.iitb.ac.in (squid/3.3.9)',
+31 verbose headers   connection: 'close' }
+32 silly registry.get cb [ 404,
+32 silly registry.get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+32 silly registry.get     'content-type': 'application/json',
+32 silly registry.get     'cache-control': 'max-age=0',
+32 silly registry.get     'content-length': '52',
+32 silly registry.get     'accept-ranges': 'bytes',
+32 silly registry.get     date: 'Sat, 07 Feb 2015 15:27:46 GMT',
+32 silly registry.get     age: '0',
+32 silly registry.get     'x-served-by': 'cache-fra1222-FRA',
+32 silly registry.get     'x-cache': 'MISS, MISS from nm11.iitb.ac.in',
+32 silly registry.get     'x-cache-hits': '0',
+32 silly registry.get     'x-timer': 'S1423322865.686324,VS0,VE713',
+32 silly registry.get     'x-cache-lookup': 'MISS from nm11.iitb.ac.in:80',
+32 silly registry.get     via: '1.1 varnish, 1.1 nm11.iitb.ac.in (squid/3.3.9)',
+32 silly registry.get     connection: 'close' } ]
+33 silly lockFile d2f5c91d-socket-io socket-io@
+34 silly lockFile d2f5c91d-socket-io socket-io@
+35 error 404 404 Not Found: socket-io
+35 error 404
+35 error 404 'socket-io' is not in the npm registry.
+35 error 404 You should bug the author to publish it
+35 error 404
+35 error 404 Note that you can also install from a
+35 error 404 tarball, folder, or http url, or git url.
+36 error System Linux 3.16.0-30-generic
+37 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "socket-io"
+38 error cwd /home/sandesh/ipho2015
+39 error node -v v0.10.35
+40 error npm -v 1.4.28
+41 error code E404
+42 verbose exit [ 1, true ]

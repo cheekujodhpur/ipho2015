@@ -7,9 +7,9 @@
 		<title>IPhO 2015 - Mumbai, India</title>
 
 		<!--Bootstrap-->
-		<link href = "static/css/bootstrap.min.css" rel = "stylesheet" />
+		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
 		<!!--Custom CSS-->
-		<link href = "static/css/main.css" rel = "stylesheet" />
+		<link href = "/static/css/main.css" rel = "stylesheet" />
 	</head>
 	<body>
 		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
@@ -83,13 +83,13 @@
                 	</div>
         	</footer>   	
 		<!-- jQuery -->
-		<script src = "static/js/jquery.min.js"></script>
-		<script src = "static/js/bootstrap.min.js"></script>
+		<script src = "/static/js/jquery.min.js"></script>
+		<script src = "/static/js/bootstrap.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
 			var socket = io();
 			socket.on('end-ack',function(){
-				window.location = '/';
+				window.location = '/auth.html';
 			});
 			
 			//document ready script

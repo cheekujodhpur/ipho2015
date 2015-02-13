@@ -12,3 +12,10 @@ remove bind-address form /etc/mysql/my.cnf
 we are just using mongodb as of now
 apt-get install mongodb
 npm install mongodb
+
+
+
+===Issues===
+1. User must not log in via two tabs or windows
+2. Make no. of options 1 after setvote
+3. Do superusers have uplaod privilieges?

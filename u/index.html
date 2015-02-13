@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		
 		<meta charset = "utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>IPhO 2015 - Mumbai, India</title>
 
 		<!--Bootstrap-->
-		<link href = "static/css/bootstrap.min.css" rel = "stylesheet" />
+		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
 		<!!--Custom CSS-->
-		<link href = "static/css/main.css" rel = "stylesheet" />
+		<link href = "/static/css/main.css" rel = "stylesheet" />
 	</head>
 	<body>
 		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
 			<div class = "container-fluid">
 				<div class = "navbar-header">
 					<a class="navbar-brand" href = "http://www.ipho2015.in">
-						<img alt="logo" src = "media/ipho-logo1.png" />
+						<img alt="logo" src = "/media/ipho-logo1.png" />
 					</a>
 				</div>
 			</div>
@@ -39,47 +40,62 @@
 					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
 					<li role = "presentation"><a href = "#trans" aria-controls="trans" role="tab" data-toggle="tab">Translation</a></li>
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
+					<li role = "presentation"><a href = "#upload" aria-controls="upload" role="tab" data-toggle="tab">Upload</a></li>
+	
 				</ul>
 			</div>
 			<div class = "tab-content">
 				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
 				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
 				<div role="tabpanel" class="tab-pane" id = "cvote">
-<!--Cast Vote starts here-->
-<p id = "vote-body"></p>
-<form>
-	<div class="form-group" id = "vote-opts">
-		
-	</div>	
-</form>
-<br />
-<font>Time to vote: <span id = "timer"></span> seconds</font>
-
-<!--Cast Vote ends here-->
+					<!--Cast Vote starts here-->
+					<p id = "vote-body"></p>
+					<form>
+						<div class="form-group" id = "vote-opts">
+						</div>	
+					</form>
+					<br />
+					<font>Time to vote: <span id = "timer"></span> seconds</font>
+					<!--Cast Vote ends here-->
 				</div>
-			</div>
-		</div>
-		<footer id="sp-footer-wrapper">
-                	<div class="container">
-                        	<div class="row-fluid" id="footer">
-					 <div id="sp-footer1" class="span6"><span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
-					<br /><span>Mumbai - India </span> </div>
-                        	</div>
-                	</div>
-        	</footer>   	
-		<!-- jQuery -->
-		<script src = "static/js/jquery.min.js"></script>
-		<script src = "static/js/bootstrap.min.js"></script>
+				<div role="tabpanel" class="tab-pane" id = "upload">
+					<!--Upload starts here-->
+					<p id = "upload-body">Upload</p> 					
+					<form id        =  "upload_form"
+          				enctype   =  "multipart/form-data"
+          				action    =  "/uploaded"
+         				method    =  "post"
+					>
+    				<input id = 'file_upload' type="file" name="user_file" />
+    				<input type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check();'/>
+    				</form>
+                    		<h1><a href="/">~</a>{linked-path}</h1>
+      				{files}                		
+				<!--Upload ends here-->
+            			</div>
+				
+				 </div>
+    </div>
+    <footer id="sp-footer-wrapper">
+                <div class="container">
+                        <div class="row-fluid" id="footer">
+                 <div id="sp-footer1" class="span6"><span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                <br /><span>Mumbai - India </span> </div>
+                        </div>
+                </div>
+        </footer>   	
+    <!-- jQuery -->
+    <script src = "/static/js/jquery.min.js"></script>
+		<script src = "/static/js/bootstrap.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
 			var socket = io();
 			socket.on('end-ack',function(){
-				window.location = '/';
+				window.location = '/auth.html';
 			});
 			
 			//document ready script
 			$(document).ready(function(){
-				//show tab
 				$('#nemo a:first').tab('show');
 
 				//socket.io controls
@@ -87,7 +103,6 @@
 					socket.emit('end');
 				});
 			});
-
 			//on receiving vote request
 			socket.on('govote',function(id,body,options,time){
 				var option,Option;
@@ -110,14 +125,35 @@
 					time = time-1;
 				},1000);
 			});
+		
+           		
+						
 			
-			function logVote(id)
+            function logVote(id)
 			{
 				var option = $('input[name=vote-options]:checked').val();
 				socket.emit('logvote',id,option);
 				$('input[name=vote-options]').attr('disabled',true);
 				$("#timer").parent().hide();
 			}
-		</script>
+
+            function emptyfile_check()
+            {
+                var file = document.getElementById('file_upload');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully");
+                    return true;
+                }
+            }
+
+    </script>
+
+	   
 	</body>
 </html>
