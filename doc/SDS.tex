@@ -21,12 +21,12 @@
 \section{Introduction}
 The server system is used to present an ip based website on which tasks such as
 setting a question and voting over it can be performed.It also includes features 
-to upload files to a user specific directory from where the user can also print the
+to upload files to a user specific directory from where the user has the liberty to print the
 files.
 
 \section{Database}
 MongoDB was used as data server for the server system.The data is stored in the server
-in two collections:
+in collections:
 \begin{itemize}
  \item \textbf{users}
  This collection contains the user data which is used for authentication during login.
@@ -39,11 +39,18 @@ in two collections:
   who can set questions;$1$ for normal user who can vote and upload files as well as print them.
  \end{itemize}
  \item \textbf{voteq}
- This collection contains the body of the questions asked and the number of votes received for each option.
+ This collection contains the body of the questions asked and the options.
  The data is organised as the following fields:
  \begin{itemize}
   \item \texttt{id}: A 5 lettered randomly generated id of the question.
-  \item \texttt{op\_i}: The number of votes received for the option $i$.
+  \item \texttt{op\_i}: The body of the ith option.
+ \end{itemize}
+ \item \textbf{votec}
+ This collection contains the id of the questions asked and number of votes received for each of the options.
+ The data is organised as the following fields:
+ \begin{itemize}
+  \item \texttt{id}: A 5 lettered randomly generated id of the question.
+  \item \texttt{op\_i}: Number of votes received for the ith option.
  \end{itemize}
 \end{itemize}
 \section{HTML Pages}
@@ -63,8 +70,8 @@ Signals used in the program:
 user submits a password in auth.html.
 
 \textit{Signal Action:}
-    On receiving this signal,the server connect to the MongoDB server
-and retrieves the 'users' collection.The user's ip sent with is signal 
+    On receiving this signal,the server connects to the MongoDB server
+and retrieves the 'users' collection.The user's ip sent with the signal 
 is first checked of its precense in the database.If the ip is not present \textbf{no response} is sent.
     If the ip is present,the true-pass(password) is checked with the pass sent
 by the user.If the password is correct,then the logged property of the user is set
@@ -85,7 +92,7 @@ submitted by the user is incorrect.
 \item \textbf{fin}
 
 \textit{Signal Cause:}
-    This signal is sent when the user's ip is prenset in the database and the password
+    This signal is sent when the user's ip is present in the database and the password
 entered by the user is correct.
 
 \textit{Signal Action:}
@@ -119,7 +126,7 @@ This signal denotes that the end was acknowleged by the server.
 the body of the question,the options and time are sent as well.
 
 \textit{Signal Action:}
-    On reciving this signal,the server generates a random 5 alphanumeric id 
+    On receiving this signal,the server generates a random 5 alphanumeric id 
 of the question on which the question is stored in the database.The server then
 connects to the MongoDB server and retrieves the 'voteq' collection.It inserts the 
 body and options of the question in the collection.The server then \textbf{broadcasts} a 
@@ -147,6 +154,18 @@ the question and the options selected(1 for selected and 0 for not selected).
     On receiving this signal,the server connects to the MongoDB server and retieves the 'voteq'
 collection.It updates the corresponding options in the collection according to the users' 
 responses.
+
+\item \textbf{voteresults}
+
+\textit{Signal Cause:}
+    This signal is sent from the server after a delay of 5000ms after the time of the question
+has expired.It signifies that the results must be now displayed.Along with the signal,the number of
+votes received and the options themselves are also sent.
+
+\textit{Signal Action:}
+    This signal causes the respective index.html pages of both users and super-users to display
+the results in the form of a histogram using chartjs.    
+
 \end{itemize}
 
 \section{File Upload}

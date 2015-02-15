@@ -4,9 +4,25 @@ server.js file of the Server system for IPhO-2015 India
 To run the server,
 nodejs server.js
 
-Copyright (c) 2015 Kumar Ayush, Sandesh Kalantre, Sharad Mirani 
-MIT License
-See license.txt for the exact copy of the license.
+Copyright (c) 2015 Kumar Ayush, Sandesh Kalantre, Sharad Mirani
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to use
+, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+the Software, and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 */
 
 //load the required modules
@@ -242,6 +258,16 @@ SIGNAL ACTION:
 collection.It updates the corresponding options in the collection according to the users' 
 responses.
 -------------------------------------------------------------------------------
+*voteresults*
+
+SIGNAL CAUSE:
+    This signal is sent from the server after a delay of 5000ms after the time of the question
+has expired.It signifies that the results must be now displayed.Along with the signal,the number of
+votes received and the options themselves are also sent.
+
+SIGNAL ACTION:
+    This signal causes the respective index.html pages of both users and super-users to display
+the results in the form of a histogram using chartjs.    
 */
 
 
@@ -360,7 +386,7 @@ io.on('connection',function(socket)
 						console.log("'voteresults' signal broadcasted from the server for question id: "+id);
 				});
 			});
-
+        //a 5000ms delay is added to ensure that logvote from all users has been received
 		},parseInt(time)*1000+5000);
 	});
 	
@@ -400,8 +426,10 @@ However the index.html files are located at /u/index.html.This distinction
 was done to ensure that each user has the same index file.The directory listing
 is done by the serve-index package.
 */
-app.use('/home/10.112.16.19/',serve_index(__dirname + '/home/10.112.16.19/',{'template':__dirname + '/u/index.html','icons': true,'view':'details'}));
-console.log("Directory listing enabled for /home/10.112.16.19/");
+//ADD app.use with the given syntax if we have to add another ip to the system
+//ALSO the mongo database must also be simultaneously updated
+app.use('/home/127.0.0.1/',serve_index(__dirname + '/home/127.0.0.1/',{'template':__dirname + '/u/index.html','icons': true,'view':'details'}));
+console.log("Directory listing enabled for /home/127.0.0.1/");
 for(i = 0;i < 100;i++)
 {
     app.use('/home/192.168.1.' + i.toString(),serve_index(__dirname + '/home/192.168.1.' + i.toString()) );
