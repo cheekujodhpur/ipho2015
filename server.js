@@ -93,6 +93,7 @@ app.get('/static/css/bootstrap.min.css', function(req,res){res.sendFile(__dirnam
 app.get('/static/css/main.css', function(req,res){res.sendFile(__dirname+'/static/css/main.css');});
 app.get('/static/js/jquery.min.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.min.js');});
 app.get('/static/js/bootstrap.min.js', function(req,res){res.sendFile(__dirname+'/static/js/bootstrap.min.js');});
+app.get('/static/js/Chart.min.js', function(req,res){res.sendFile(__dirname+'/static/js/Chart.min.js');});
 app.get('/media/ipho-logo1.png', function(req,res){res.sendFile(__dirname+'/media/ipho-logo1.png');});
 app.get('/media/tifr-logo-s.png', function(req,res){res.sendFile(__dirname+'/media/tifr-logo-s.png');});
 app.get('/static/fonts/glyphicons-halflings-regular.woff2', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff2');});
@@ -340,8 +341,27 @@ io.on('connection',function(socket)
 		    }
 		});
 		voted = [];
-		socket.broadcast.emit('govote',id,body,options,time);
+		io.sockets.emit('govote',id,body,options,time);
         console.log("'govote' signal broadcasted from the server in response to " + ip.toString());
+		
+		//show results
+		setTimeout(function(){
+			MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    	    {
+			    if(err)
+			    {
+			  		console.log(err);
+				    return 0;
+			    }
+            	console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+				var count_db = db.collection('votec');
+				count_db.find({"id":id}).toArray(function(err,items){
+						io.sockets.emit('voteresults',items[0],options);
+						console.log("'voteresults' signal broadcasted from the server for question id: "+id);
+				});
+			});
+
+		},parseInt(time)*1000+5000);
 	});
 	
 	//receive vote inputs
@@ -365,7 +385,8 @@ io.on('connection',function(socket)
 		    	query[option] = 2;
 			else{
 				query[option]=1;
-				query[option2]=1;
+				if(undefined!=option2)	//single window votes
+					query[option2]=1;
 			}
 		    collection.update({"id":id},{$inc:query},function(err,result){});
 		});

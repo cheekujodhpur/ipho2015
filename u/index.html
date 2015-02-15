@@ -39,9 +39,9 @@
 				<ul class = "nav nav-pills" id = "nemo">
 					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
 					<li role = "presentation"><a href = "#trans" aria-controls="trans" role="tab" data-toggle="tab">Translation</a></li>
+					<li role = "presentation"><a href = "#upload" aria-controls="upload" role="tab" data-toggle="tab">Upload</a></li>	
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
-					<li role = "presentation"><a href = "#upload" aria-controls="upload" role="tab" data-toggle="tab">Upload</a></li>
-	
+					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
 				</ul>
 			</div>
 			<div class = "tab-content">
@@ -72,8 +72,8 @@
                     		<h1><a href="/">~</a>{linked-path}</h1>
       				{files}                		
 				<!--Upload ends here-->
-            			</div>
-				
+            	</div>
+				<div role="tabpanel" class="tab-pane" id = "rvote"><h3>Results</h3></div>
 				 </div>
     </div>
     <footer id="sp-footer-wrapper">
@@ -85,7 +85,8 @@
                 </div>
         </footer>   	
     <!-- jQuery -->
-    <script src = "/static/js/jquery.min.js"></script>
+   	 <script src = "/static/js/jquery.min.js"></script>
+		<script src = "/static/js/Chart.min.js"></script>
 		<script src = "/static/js/bootstrap.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
@@ -121,6 +122,7 @@
 				var Body = $('<font style="font-size:18px;">'+body+'</font>');
 				$("#vote-body").append(Body);
 				$("#cvoteb").show();
+				$("#nemo a:eq(-2)").tab('show');
 				clearInterval(timer);
 				var timer = setInterval(function(){
 					$("#timer").html(time);
@@ -132,9 +134,39 @@
 				},1000);
 			});
 		
-           		
-						
+				//results came
+				socket.on('voteresults',function(counts,options){
+				var canvas = '<div style="width:50%"><canvas id = "canvas" height="450" width = "600"></div>';
+				var Canvas = $(canvas);
+				$("#rvote").append(Canvas);
+				var data = [];
 			
+				for(var i in counts)
+					if(i!='_id' && i!='id')
+					{
+						data.push(parseInt(counts[i]));
+					}	
+				var barChartData = {
+				labels : options,
+				datasets : [
+				{
+					fillColor : "rgba(220,220,220,0.5)",
+					strokeColor : "rgba(220,220,220,0.8)",
+					highlightFill: "rgba(220,220,220,0.75)",
+					highlightStroke: "rgba(220,220,220,1)",
+					data : data
+				},
+				]};
+				//TODO:ScrollTo canvas
+				var ctx = document.getElementById("canvas").getContext("2d");
+				window.myBar = new Chart(ctx).Bar(barChartData, {
+				responsive : true
+				});
+			
+				$("#rvoteb").show();
+				$("#nemo a:last").tab('show');
+			});
+
             function logVote(id)
 			{
 				var option = $('input[name=vote-options]:checked').val();
