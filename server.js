@@ -242,6 +242,9 @@ collection.It updates the corresponding options in the collection according to t
 responses.
 -------------------------------------------------------------------------------
 */
+
+
+var voted = [];	//a global variable which maintains the ip of people who have voted once
 io.on('connection',function(socket)
 {
 	//login
@@ -323,23 +326,30 @@ io.on('connection',function(socket)
 			    return 0;
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-		    var collection = db.collection('voteq');
-		    collection.insert({"id":id,"body":body},function(err,result){});
+		    var question_db = db.collection('voteq');
+			var count_db = db.collection('votec');
+		    question_db.insert({"id":id,"body":body},function(err,result){});
+			count_db.insert({"id":id},function(err,result){});
 		    for(var i = 1;i<=options.length;i++)
             {
 			    var query = {};
-			    query['opt'+i] = 0;
-			    collection.update({"id":id},{$set:query},function(err,result){});
+			    query['opt'+i] = options[i-1];
+			    question_db.update({"id":id},{$set:query},function(err,result){});
+				query['opt'+i] = 0;
+			    count_db.update({"id":id},{$set:query},function(err,result){});
 		    }
 		});
+		voted = [];
 		socket.broadcast.emit('govote',id,body,options,time);
         console.log("'govote' signal broadcasted from the server in response to " + ip.toString());
 	});
 	
 	//receive vote inputs
-	socket.on('logvote',function(id,option)
+	socket.on('logvote',function(id,option,option2)
     {
 		var ip = socket.request.connection.remoteAddress;
+		if(voted.indexOf(ip)>=0)return; //already voted
+		voted.push(ip);
 		console.log("'logvote' signal received from " + ip.toString());
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
@@ -349,9 +359,14 @@ io.on('connection',function(socket)
 			    return 0;
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-		    var collection = db.collection('voteq');
+		    var collection = db.collection('votec');
 		    var query = {};
-		    query[option] = 1;
+			if(option==option2)
+		    	query[option] = 2;
+			else{
+				query[option]=1;
+				query[option2]=1;
+			}
 		    collection.update({"id":id},{$inc:query},function(err,result){});
 		});
 	});
@@ -364,8 +379,8 @@ However the index.html files are located at /u/index.html.This distinction
 was done to ensure that each user has the same index file.The directory listing
 is done by the serve-index package.
 */
-app.use('/home/10.15.26.103/',serve_index(__dirname + '/home/10.15.26.103/',{'template':__dirname + '/u/index.html','icons': true,'view':'details'}));
-console.log("Directory listing enabled for /home/10.15.26.103/");
+app.use('/home/10.112.16.19/',serve_index(__dirname + '/home/10.112.16.19/',{'template':__dirname + '/u/index.html','icons': true,'view':'details'}));
+console.log("Directory listing enabled for /home/10.112.16.19/");
 for(i = 0;i < 100;i++)
 {
     app.use('/home/192.168.1.' + i.toString(),serve_index(__dirname + '/home/192.168.1.' + i.toString()) );

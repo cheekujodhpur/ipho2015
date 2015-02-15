@@ -139,6 +139,11 @@
 					var time = $("#vote-time").val();
 					$("#vote-time").val('');
 					socket.emit('setvote',body,options,time);
+					//have just one option	
+					var total = $("input.input").length;
+					for(var i = 0;i<total-1;i++)
+						$("input.input:eq(0)").remove();
+					$(".remove-me").remove();
 				});
 			});
 		</script>

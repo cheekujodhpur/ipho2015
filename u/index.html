@@ -106,12 +106,18 @@
 			//on receiving vote request
 			socket.on('govote',function(id,body,options,time){
 				var option,Option;
-				$("#vote-opts").html('');
+				$("#vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left" style = "width:50%"><h5>Leader 1</h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5>Leader 2</h5></div><div class = "clear"></div></div>');
 				for(var i = 1;i<=options.length;i++){
 					option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
 					Option = $(option);
-					$("#vote-opts").append(Option);
+					$("#left-opts").append(Option);
 				}
+				for(var i = 1;i<=options.length;i++){
+					option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+					Option = $(option);
+					$("#right-opts").append(Option);
+				}
+
 				var Body = $('<font style="font-size:18px;">'+body+'</font>');
 				$("#vote-body").append(Body);
 				$("#cvoteb").show();
@@ -132,8 +138,10 @@
             function logVote(id)
 			{
 				var option = $('input[name=vote-options]:checked').val();
-				socket.emit('logvote',id,option);
+				var option2 = $('input[name=vote-options2]:checked').val();
+				socket.emit('logvote',id,option,option2);
 				$('input[name=vote-options]').attr('disabled',true);
+				$('input[name=vote-options2]').attr('disabled',true);
 				$("#timer").parent().hide();
 			}
 
