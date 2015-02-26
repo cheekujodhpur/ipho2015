@@ -21,13 +21,17 @@
 				</div>
 			</div>
 			<div id = "tifr-mast">
-				<div id = "tifr-logo"><img alt="tifr-logo" src = "/media/tifr-logo-s.png" />
+				<div id = "tifr-logo"><img class = "right" alt="tifr-logo" src = "/media/tifr-logo-s.png" />
 				<br />
-				<button type = "button" id = "out-button" class = "btn btn-default btn-sm right">
+				<div id = "out-button" class="right">
+				<button id = "chpass-button" type = "button" class = "btn btn-default btn-sm">Change Password</button>
+				<button id = "logout-button" type = "button"  class = "btn btn-default btn-sm">
 					<span class="glyphicon glyphicon-log-out"></span> Log out
 				</button>
 				</div>
-				<div id = "hbc-tifr">
+				<br />
+				</div>
+				<div id = "hbc-tifr" style = "position:relative;left:110px">
 					<div id = "hbc">Homi Bhabha Centre for Education</div>
 					<div id = "tifr">Tata Institute of Fundamental Research</div>
 				</div>
@@ -137,8 +141,11 @@
 				$('#nemo a:first').tab('show');
 
 				//socket.io controls
-				$("#out-button").click(function(){
+				$("#logout-button").click(function(){
 					socket.emit('end');
+				});
+				$("#chpass-button").click(function(){
+					window.location = '/chpass.html';
 				});
 
 

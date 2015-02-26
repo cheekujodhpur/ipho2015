@@ -121,6 +121,12 @@ app.get('/auth.html',function(req,res)
 	res.sendFile(__dirname + '/auth.html');
 });
 
+//change password page
+app.get('/chpass.html',function(req,res)
+{
+	res.sendFile(__dirname + '/chpass.html');
+});
+
 //homepage
 app.get('/', function (req, res)
 {
@@ -140,6 +146,9 @@ app.get('/', function (req, res)
             }
 			if(items[0].logged)
 			{
+				if(!items[0].first)
+					res.redirect('/chpass.html');
+				
 				var type = items[0].type;
 				if(type)
 				{
@@ -294,7 +303,8 @@ io.on('connection',function(socket)
 			    var truePass = items[0].pass;
 			    if(truePass == pass)
 			    {
-				    collection.update({"ip":ip},{$set:{"logged":true}},function(err,result){});
+			
+					collection.update({"ip":ip},{$set:{"logged":true}},function(err,result){});
 				    socket.emit('fin');
 		            console.log("'fin' signal emitted from server in response to " + ip.toString());
 			    }
@@ -416,6 +426,38 @@ io.on('connection',function(socket)
 			}
 		    collection.update({"id":id},{$inc:query},function(err,result){});
 		});
+	});
+
+	socket.on('chpass',function(oldpass,newpass){
+		var ip = socket.request.connection.remoteAddress;
+		console.log("'chpass' signal received from " + ip.toString());
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+		    var collection = db.collection('users');
+			collection.find({"ip":ip}).toArray(function(err,items){
+				if(oldpass!=items[0].pass)	//entered the same password
+				{
+					socket.emit('chpass-err');
+        			console.log("'chpass-err' signal broadcasted from the server in response to " + ip.toString());
+				}
+				else
+				{
+					var query = {};
+					query['pass'] = newpass;
+					query['first'] = true;
+					collection.update({"ip":ip},{$set:query},function(err,result){});
+					socket.emit('chpass-fin');
+        			console.log("'chpass-fin' signal broadcasted from the server in response to " + ip.toString());
+				}
+			});
+		});
+
 	});
 });
 
