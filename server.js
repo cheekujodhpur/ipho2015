@@ -32,12 +32,24 @@ var express = require('express')
   , MongoClient = require('mongodb').MongoClient
   , server = http.createServer(app)
   , multer  = require('multer')
-  , serve_index = require('serve-index');
-
+  , serve_index = require('serve-index')
+  , path = require("path")
+  , fs = require("fs-extra");
 var io = require('socket.io').listen(server);
 
 //required to allow file downloads
-app.use(express.static(__dirname + '/'));
+app.use("/uploads/127.0.0.1/",express.static(__dirname + '/uploads/127.0.0.1/'));
+console.log("File download enabled for /uploads/127.0.0.1/");
+app.use("/downloads/",express.static(__dirname + '/downloads/'));
+console.log("File download enabled for /downloads/");
+for(var i = 200;i < 231;i++)
+{
+    app.use("/uploads/192.168.200." + i.toString() + "/",express.static(__dirname + '/uploads/192.168.200.' + i.toString() + "/"));
+    console.log("File download enabled for /uploads/192.168.200." + i.toString() + "/");
+}
+
+
+
 
 //server running at port 8080
 server.listen(8080);
@@ -50,7 +62,6 @@ console.log('Server running at http://127.0.0.1:8080/');
 //file upload
 //done stores whether a file has been uploaded to the /tmp folder
 var done = false;
-var fs = require("fs-extra");
 
 //uploads the file to /tmp and appends the Date.now() to the file name
 app.use(multer(
@@ -58,7 +69,7 @@ app.use(multer(
     dest: __dirname + '/tmp/',
     rename: function (fieldname, filename) 
     {
-        return filename + Date.now();
+        return filename;
     },
     onFileUploadStart: function (file) 
     {
@@ -82,7 +93,7 @@ app.post('/uploaded',function(req,res)
         var file_name = req.files.user_file.name
         //the new location to which the file will be copied according to
         //the user's ip
-        var new_location = __dirname + '/home/'+ req.ip + '/' + file_name;
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
        
         //copy the file to the new_location from the temp_path 
         fs.copy(temp_path.toString(), new_location.toString(), function(err) 
@@ -93,12 +104,12 @@ app.post('/uploaded',function(req,res)
             }
             //print the uploaded file metadata on the console
             console.log(req.files.user_file);
-            console.log(file_name + " successfully copied to /home/" + req.ip.toString() + "/");
+            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
         });
 
         //redirect the client to his homepage
         //TODO:IS IT POSSIBLE TO REDIRECT DIRECTLY TO THE UPLOAD TAB?
-        res.redirect('/home/' + req.ip + "/#upload")
+        res.sendFile(__dirname + '/u/index.html')
         done = false;
     }
 });
@@ -153,7 +164,7 @@ app.get('/', function (req, res)
 				if(type)
 				{
                     //redirect the user to his homepage
-					res.redirect('/home/' + req.ip + "/");				
+					res.sendFile(__dirname + '/u/index.html');				
 				}
 				else
 				{
@@ -279,11 +290,50 @@ SIGNAL ACTION:
 the results in the form of a histogram using chartjs.    
 */
 
-
 var voted = [];	//a global variable which maintains the ip of people who have voted once
 io.on('connection',function(socket)
 {
-	//login
+    //directory listing
+    socket.on('list-dir',function(directory_path)
+    {
+        var ip = socket.request.connection.remoteAddress;
+        console.log("'list-dir' signal received from " + ip.toString());
+        if(directory_path == "/uploads")
+        {
+            directory_path = __dirname + "/uploads/" + ip.toString() + "/";
+        }
+        else
+        {
+            directory_path = __dirname + "/downloads";
+        }
+        fs.readdir(directory_path, function(err,files)
+        {
+            if(err)
+            {
+                throw err;
+            }
+        files.map(function(file)
+        {
+            return path.join(directory_path,file);
+        }).filter(function(file)
+        {
+            return fs.statSync(file).isFile();
+        });
+        if(directory_path == __dirname + "/downloads")
+        {
+            id = "download"
+            socket.emit('listed-dir',id,directory_path,files);
+        }
+        else
+        {
+            id = "upload"
+            socket.emit('listed-dir',id,directory_path,files);
+        }
+        console.log("'listed-dir' signal emmited from server in response to " + ip.toString());
+        });
+	});
+    
+    //login
 	socket.on('syn',function(pass)
     {
         var ip = socket.request.connection.remoteAddress;
@@ -461,19 +511,3 @@ io.on('connection',function(socket)
 	});
 });
 
-//directory listing
-/*
-Each user has a directory located at '/home/ip'
-However the index.html files are located at /u/index.html.This distinction
-was done to ensure that each user has the same index file.The directory listing
-is done by the serve-index package.
-*/
-//ADD app.use with the given syntax if we have to add another ip to the system
-//ALSO the mongo database must also be simultaneously updated
-app.use('/home/127.0.0.1/',serve_index(__dirname + '/home/127.0.0.1/',{'template':__dirname + '/u/index.html','icons': true,'view':'details'}));
-console.log("Directory listing enabled for /home/127.0.0.1/");
-for(i = 0;i < 100;i++)
-{
-    app.use('/home/192.168.1.' + i.toString(),serve_index(__dirname + '/home/192.168.1.' + i.toString()) );
-    console.log("Directory listing enabled for /home/192.168.1." + i.toString());
-} 
