@@ -43,7 +43,7 @@ app.use("/uploads/127.0.0.1/",express.static(__dirname + '/uploads/127.0.0.1/'))
 console.log("File download enabled for /uploads/127.0.0.1/");
 app.use("/downloads/",express.static(__dirname + '/downloads/'));
 console.log("File download enabled for /downloads/");
-for(var i = 200;i < 231;i++)
+for(var i = 200;i < 255;i++)
 {
     app.use("/uploads/192.168.200." + i.toString() + "/",express.static(__dirname + '/uploads/192.168.200.' + i.toString() + "/"));
     console.log("File download enabled for /uploads/192.168.200." + i.toString() + "/");
@@ -149,9 +149,10 @@ app.get('/', function (req, res)
 			console.log(err);
 			return 0;
 		}
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + req.ip.toString());
+		var ip = req.ip;
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
 		var collection = db.collection('users');
-		collection.find({"ip":req.ip}).toArray(function(err,items)
+		collection.find({"ip":ip}).toArray(function(err,items)
 		{
 			if(items.length == 0)
             {
@@ -175,6 +176,7 @@ app.get('/', function (req, res)
 			}
 			else
     	    res.sendFile(__dirname + '/auth.html');
+			db.close();
 		});
 	});
 });
@@ -375,6 +377,7 @@ io.on('connection',function(socket)
 				    socket.emit('syn-err');
 		            console.log("'syn-err' signal emitted from server in response to " + ip.toString());
 			    }
+			db.close();
 		    });
 		});
 	});
@@ -401,7 +404,7 @@ io.on('connection',function(socket)
             */
 		    collection.find({"ip":ip}).toArray(function(err,items)
 		    {
-		        collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){});
+		        collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){db.close();});
 		    });
             //send the end acknowleged signal
             socket.emit('end-ack');
@@ -435,7 +438,10 @@ io.on('connection',function(socket)
 			    query['opt'+i] = options[i-1];
 			    question_db.update({"id":id},{$set:query},function(err,result){});
 				query['opt'+i] = 0;
-			    count_db.update({"id":id},{$set:query},function(err,result){});
+				if(i!=options.length)
+			    	count_db.update({"id":id},{$set:query},function(err,result){});
+			    else
+					count_db.update({"id":id},{$set:query},function(err,result){db.close();});
 		    }
 		});
 		voted = [];
@@ -456,6 +462,7 @@ io.on('connection',function(socket)
 				count_db.find({"id":id}).toArray(function(err,items){
 						io.sockets.emit('voteresults',items[0],options);
 						console.log("'voteresults' signal broadcasted from the server for question id: "+id);
+				db.close();
 				});
 			});
         //a 5000ms delay is added to ensure that logvote from all users has been received
@@ -466,6 +473,7 @@ io.on('connection',function(socket)
 	socket.on('logvote',function(id,option,option2)
     {
 		var ip = socket.request.connection.remoteAddress;
+		if(ip=='undefined')return;
 		if(voted.indexOf(ip)>=0)return; //already voted
 		voted.push(ip);
 		console.log("'logvote' signal received from " + ip.toString());
@@ -486,7 +494,7 @@ io.on('connection',function(socket)
 				if(undefined!=option2)	//single window votes
 					query[option2]=1;
 			}
-		    collection.update({"id":id},{$inc:query},function(err,result){});
+		    collection.update({"id":id},{$inc:query},function(err,result){db.close();});
 		});
 	});
 
@@ -507,19 +515,27 @@ io.on('connection',function(socket)
 				{
 					socket.emit('chpass-err');
         			console.log("'chpass-err' signal broadcasted from the server in response to " + ip.toString());
+					db.close();
 				}
 				else
 				{
 					var query = {};
 					query['pass'] = newpass;
 					query['first'] = true;
-					collection.update({"ip":ip},{$set:query},function(err,result){});
+					collection.update({"ip":ip},{$set:query},function(err,result){db.close();});
 					socket.emit('chpass-fin');
         			console.log("'chpass-fin' signal broadcasted from the server in response to " + ip.toString());
 				}
 			});
 		});
 
+	});
+	
+	socket.on('refresh',function(){
+		var ip = socket.request.connection.remoteAddress;
+		if(ip=='undefined')return;
+		console.log("'refresh' signal received from " + ip.toString());
+		io.sockets.emit('refreshAll');
 	});
 });
 
