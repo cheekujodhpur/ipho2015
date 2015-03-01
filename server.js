@@ -1,3 +1,4 @@
+#!/usr/bin/env nodejs
 /*
 server.js file of the Server system for IPhO-2015 India
 
@@ -117,6 +118,7 @@ app.post('/uploaded',function(req,res)
 //tell node to send the required files when requested
 //static files
 app.get('/static/css/bootstrap.min.css', function(req,res){res.sendFile(__dirname+'/static/css/bootstrap.min.css');});
+app.get('/static/css/simple-sidebar.css', function(req,res){res.sendFile(__dirname+'/static/css/simple-sidebar.css');});
 app.get('/static/css/main.css', function(req,res){res.sendFile(__dirname+'/static/css/main.css');});
 app.get('/static/js/jquery.min.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.min.js');});
 app.get('/static/js/bootstrap.min.js', function(req,res){res.sendFile(__dirname+'/static/js/bootstrap.min.js');});
@@ -293,6 +295,16 @@ the results in the form of a histogram using chartjs.
 var voted = [];	//a global variable which maintains the ip of people who have voted once
 io.on('connection',function(socket)
 {
+    //message-board
+    socket.on('message-submit',function(message)
+    {
+        var ip = socket.request.connection.remoteAddress;
+        console.log(message);
+		console.log("'mesasge-submit' received from " + ip.toString());
+        io.sockets.emit('message-sent',message);
+        console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
+    });
+
     //directory listing
     socket.on('list-dir',function(directory_path)
     {

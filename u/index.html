@@ -32,17 +32,16 @@
 				</div>
 				<br />
 				</div>
-				<div id = "hbc-tifr" style = "postion:relative;left:110px;">
+				<div id = "hbc-tifr" style = "position:relative;left:110px;">
 					<div id = "hbc">Homi Bhabha Centre for Education</div>
 					<div id = "tifr">Tata Institute of Fundamental Research</div>
 				</div>
 			</div>
-
+            </div>
 			<div id = "document">
 			<div role = "tabpanel">
 				<ul class = "nav nav-pills" id = "nemo">
 					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-					<li role = "presentation"><a href = "#trans" aria-controls="trans" role="tab" data-toggle="tab">Translation</a></li>
 					<li role = "presentation"><a href = "#upload" aria-controls="upload" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/uploads");'>Upload</a></li>	
 					<li role = "presentation"><a href = "#download" aria-controls="download" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/downloads");'>Downloads</a></li>	
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
@@ -75,31 +74,35 @@
     				<input id = 'file_upload' type="file" name="user_file" />
     				<input type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check();'/>
     				</form>
-				<!--Upload ends here-->
+				    <!--Upload ends here-->
             	</div>
-				<div role="tabpanel" class="tab-pane" id = "download" onclick = 'socket.emit("list-dir","/downloads");'>
+				<div role="tabpanel" class="tab-pane" id = "download">
                 </div>
                 <div role="tabpanel" class="tab-pane" id = "rvote"><h3>Results</h3></div>
-				 </div>
+				</div>
     </div>
     <footer id="sp-footer-wrapper">
-                <div class="container">
-                        <div class="row-fluid" id="footer">
-                 <div id="sp-footer1" class="span6"><span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
-                <br /><span>Mumbai - India </span> </div>
-                        </div>
+        <div class="container">
+            <div class="row-fluid" id="footer">
+                <div id="sp-footer1" class="span6">
+                    <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                    <br /><span>Mumbai - India </span> 
                 </div>
-        </footer>   	
+            </div>
+        </div>
+    </footer>   	
+    
     <!-- jQuery -->
-   	 <script src = "/static/js/jquery.min.js"></script>
-		<script src = "/static/js/Chart.min.js"></script>
-		<script src = "/static/js/bootstrap.min.js"></script>
-		<script src = "/socket.io/socket.io.js"></script>
-		<script>
-			var socket = io();
-			socket.on('end-ack',function(){
-				window.location = '/auth.html';
-			});
+   	<script src = "/static/js/jquery.min.js"></script>
+	<script src = "/static/js/Chart.min.js"></script>
+	<script src = "/static/js/bootstrap.min.js"></script>
+	<script src = "/socket.io/socket.io.js"></script>
+	<script>
+	    var socket = io();
+		socket.on('end-ack',function()
+        {
+		    window.location = '/auth.html';
+		});
 			
 			//document ready script
 			$(document).ready(function(){
