@@ -38,20 +38,6 @@ var express = require('express')
   , fs = require("fs-extra");
 var io = require('socket.io').listen(server);
 
-//required to allow file downloads
-app.use("/uploads/127.0.0.1/",express.static(__dirname + '/uploads/127.0.0.1/'));
-console.log("File download enabled for /uploads/127.0.0.1/");
-app.use("/downloads/",express.static(__dirname + '/downloads/'));
-console.log("File download enabled for /downloads/");
-for(var i = 200;i < 255;i++)
-{
-    app.use("/uploads/192.168.200." + i.toString() + "/",express.static(__dirname + '/uploads/192.168.200.' + i.toString() + "/"));
-    console.log("File download enabled for /uploads/192.168.200." + i.toString() + "/");
-}
-
-
-
-
 //server running at port 8080
 server.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');
@@ -539,3 +525,4 @@ io.on('connection',function(socket)
 	});
 });
 
+app.use("/uploads/127.0.0.1/",express.static(__dirname + "/uploads/127.0.0.1/"));console.log("File download enabled for /uploads/127.0.0.1/");
