@@ -120,3 +120,36 @@
 	color:red;
 	font-size:22px;
 }
+
+#vote_count
+{
+    width:100px;
+}
+
+#option_name
+{
+    width:300px;
+}
+
+#bar
+{
+    display:inline-block;
+	background-image:linear-gradient(to left,#AA99FF,#FFF);
+}
+
+#bar_container
+{
+    text-align:left;
+    display:inline-block;
+    width:516px;
+}
+
+#graph
+{
+    width:916px;
+}
+
+#graph_table
+{
+    text-align:center;
+}

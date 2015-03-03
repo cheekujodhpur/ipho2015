@@ -172,8 +172,11 @@
 				var option,Option;
 				$("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left" style = "width:50%"><h5></h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
 				for(var i = 1;i<=options.length;i++){
-					option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
-					Option = $(option);
+                    if(i!=options.length)
+					    option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+					else
+                        option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
+                    Option = $(option);
 					$("#left-opts").append(Option);
 				}
 				
@@ -203,17 +206,32 @@
 			socket.on("message-sent",function(message){
             $("#message-board").append("<tr><td>" + message + "</td></tr>");
             });
+
 			//results came
 			socket.on('voteresults',function(counts,options){
-				var j = 0;
+                var graph = '<div id = "graph"></div>';
+                $("#rvote").append(graph);
+
+                //get total number of counts
+                var totalus = 0;
+                for(var i in counts)
+                    if(i!='_id' && i!='id')
+                    {
+                        totalus += parseInt(counts[i]);
+                    }
+
+             //add graph elements
+                    $("#graph").append('<table id = "graph_table" class = "table table-bordered table-hover"></table>');
+                var j = 0;
 				for(var i in counts)
 					if(i!='_id' && i!='id')
 					{
-						var bb = "<p>" + counts[i] +  " for the option <b>" + options[j] + "</b></p>";
-						$("#rvote").append(bb);
+                        var wid = (parseFloat(counts[i])/totalus)*500;
+                        var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+						$("#graph_table").append(bb);
 						j++; 
 					}
-				$("#rvoteb").show();
+                $("#rvoteb").show();
 				$("#nemo a:last").tab('show');
 			});
 			
