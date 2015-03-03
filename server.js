@@ -525,4 +525,3 @@ io.on('connection',function(socket)
 	});
 });
 
-app.use("/uploads/127.0.0.1/",express.static(__dirname + "/uploads/127.0.0.1/"));console.log("File download enabled for /uploads/127.0.0.1/");

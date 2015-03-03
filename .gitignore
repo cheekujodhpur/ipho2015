@@ -4,3 +4,4 @@ backend/notes.txt
 src_php/*
 *~
 *.backup
+uploads/*
