@@ -286,7 +286,7 @@ io.on('connection',function(socket)
     //message-board
     socket.on('message-submit',function(message)
     {
-        var ip = socket.request.connection.remoteAddress;
+        var ip = socket.handshake.address;
         console.log(message);
 		console.log("'mesasge-submit' received from " + ip.toString());
         io.sockets.emit('message-sent',message);
@@ -296,7 +296,7 @@ io.on('connection',function(socket)
     //directory listing
     socket.on('list-dir',function(directory_path)
     {
-        var ip = socket.request.connection.remoteAddress;
+        var ip = socket.handshake.address;
         console.log("'list-dir' signal received from " + ip.toString());
         if(directory_path == "/uploads")
         {
@@ -338,7 +338,7 @@ io.on('connection',function(socket)
     //login
 	socket.on('syn',function(pass)
     {
-        var ip = socket.request.connection.remoteAddress;
+        var ip = socket.handshake.address;
 		console.log("'syn' signal received from " + ip.toString());
 		// Connect to the db
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -373,7 +373,7 @@ io.on('connection',function(socket)
     //logout
 	socket.on('end',function()
     {
-		var ip = socket.request.connection.remoteAddress;
+		var ip = socket.handshake.address;
 		console.log("'end' signal received from " + ip.toString());
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
@@ -403,7 +403,7 @@ io.on('connection',function(socket)
 	//set vote question
 	socket.on('setvote',function(body,options,time)
     {
-		var ip = socket.request.connection.remoteAddress;
+		var ip = socket.handshake.address;
 		console.log("'setvote' signal received from " + ip.toString());
         //the five letter long alphanumeric id of a question is generated randomly
 		var id = Math.random().toString(36).substr(2,5);
@@ -465,7 +465,7 @@ io.on('connection',function(socket)
 	//receive vote inputs
 	socket.on('logvote',function(id,option,option2)
     {
-		var ip = socket.request.connection.remoteAddress;
+		var ip = socket.handshake.address;
 		if(!ip)return;
 		if(voted.indexOf(ip)>=0)return; //already voted
 		voted.push(ip);
@@ -497,7 +497,7 @@ io.on('connection',function(socket)
 	});
 
 	socket.on('chpass',function(oldpass,newpass){
-		var ip = socket.request.connection.remoteAddress;
+		var ip = socket.handshake.address;
 		console.log("'chpass' signal received from " + ip.toString());
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
@@ -530,7 +530,7 @@ io.on('connection',function(socket)
 	});
 	
 	socket.on('refresh',function(){
-		var ip = socket.request.connection.remoteAddress;
+		var ip = socket.handshake.address;
 		if(!ip)return;
 		console.log("'refresh' signal received from " + ip.toString());
 		io.sockets.emit('refreshAll');
