@@ -83,6 +83,13 @@
                 <div role="tabpanel" class="tab-pane" id = "rvote"><h3>Results</h3></div>
 				</div>
     </div>
+        <div id="sidebar-wrapper" >
+            <table class="table" id = "message-board">
+            <thead>
+                <th><tr>Message Board</tr></th>
+            </thead>
+            </table>
+        </div>
     <footer id="sp-footer-wrapper">
         <div class="container">
             <div class="row-fluid" id="footer">
@@ -105,7 +112,15 @@
         {
 		    window.location = '/auth.html';
 		});
-			
+        socket.on('disconnect',function()
+        {
+            console.log('Disconnected');
+            socket.io.reconnect();
+        });	
+        
+                //function to disableF5
+                function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
+    		
 			//document ready script
 			$(document).ready(function(){
 				$('#nemo a:first').tab('show');
@@ -125,7 +140,7 @@
                     var table = "<table class='table table-hover'><thead><tr><th>Filename</th></tr></thead>";
                     for(var i = 0;i < files.length;i++)
                     {
-                        table += '<tr><td><a href="' + "/downloads/" + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                     }
                     table += "</table>";
                     $("table").remove();
@@ -136,7 +151,7 @@
                     var table = "<table class='table table-hover'><thead><tr><th>Filename</th></tr></thead>";
                     for(var i = 0;i < files.length;i++)
                     {
-                        table += '<tr><td><a href="' + "/uploads/127.0.0.1/" + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                     }
                     table += "</table>";
                     $("table").remove();
@@ -168,13 +183,33 @@
 					$("#right-opts").append(Option);
 				}
 
+                var dummy_submit = '<button id = "dummy_submit" class = "btn btn-default">Submit</button>';
+                var Dummy_submit = $(dummy_submit);
+                $("#left-opts").append(Dummy_submit);
+
+                var dummy_submit = '<button id = "dummy_submit2" class = "btn btn-default">Submit</button>';
+                var Dummy_submit = $(dummy_submit);
+                $("#right-opts").append(Dummy_submit);
+                
+                //add click event handler to dummy_submit
+                $("#dummy_submit").click(function(e){
+                    e.preventDefault();
+                    $('input[name=vote-options]').attr('disabled',true);
+                });
+
+                $("#dummy_submit2").click(function(e){
+                    e.preventDefault();
+                    $('input[name=vote-options2]').attr('disabled',true);
+                });
+
 				var Body = $('<font style="font-size:18px;">'+body+'</font>');
 				$("#vote-body").append(Body);
 				$("#cvoteb").show();
 				$("#nemo a:eq(-2)").tab('show');
 				clearInterval(timer);
 				var timer = setInterval(function(){
-					$("#timer").html(time);
+					$("#timer").parent().show();
+                    $("#timer").html(time);
 					if(time==0) {
 					logVote(id);
 					clearInterval(timer);
@@ -183,6 +218,11 @@
 				},1000);
 			});
 		
+            //show the message on board
+			socket.on("message-sent",function(message){
+            $("#message-board").append("<tr><td>" + message + "</td></tr>");
+            });
+
 				//results came
 				socket.on('voteresults',function(counts,options){
 				var graph = '<div id = "graph"></div>';
@@ -237,7 +277,13 @@
             }
 			
 			socket.on('refreshAll',function(){
-				window.location = '/';
+				    $("#rvote").html('');
+                    $("#cast-vote-body").html('');
+                    $("#cast-vote-opts").html('');
+                    $("#timer").html('');
+                    $("#rvoteb").hide();
+                    $("#cvoteb").hide();
+                    $("#nemo a:eq(0)").tab('show');
 			});
 
 

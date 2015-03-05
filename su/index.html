@@ -10,7 +10,6 @@
 		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
 		<!!--Custom CSS-->
 		<link href = "/static/css/main.css" rel = "stylesheet" />
-        <link href="/static/css/simple-sidebar.css" rel="stylesheet">	
     </head>
 	<body>
 		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
@@ -42,15 +41,13 @@
 			<div role = "tabpanel">
 				<ul class = "nav nav-pills" id = "nemo">
 					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-					<li role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
+					<li id = "svoteb" role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
                 </ul>
 			</div>
 			<div class = "tab-content">
-				<div role="tabpanel" class="tab-pane active" id = "home">Home
-<button class = "btn btn-default" id = "refresh">Refresh</button>
-</div>
+				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
 				<div role="tabpanel" class="tab-pane" id = "vote">
 				
                     <!--Section for Vote on Administrator End///starts here-->
@@ -93,7 +90,9 @@
 				</div>
 				<div role="tabpanel" class="tab-pane" id = "rvote"><h3>Results</h3></div>
 			</div>
+		</div>
         <div id="sidebar-wrapper" >
+            <button class = "btn btn-default" id = "refresh">Refresh</button>
             <form id="form-message-submit">
                 <div class="form-group">
                     <label for="message_input">Message</label>
@@ -107,7 +106,6 @@
             </thead>
             </table>
         </div>
-		</div>
         <div id="sp-footer-wrapper">
             <div class="container">
                 <div class="row-fluid" id="footer">
@@ -125,8 +123,15 @@
 		<script src = "/static/js/Chart.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
+                var socket = io();
+                
 			//document ready script
 			$(document).ready(function(){
+				$("#refresh").click(function(e)
+				{
+					e.preventDefault();
+					socket.emit('refresh');
+				});
 				//for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -149,12 +154,10 @@
 						$(fieldID).remove();						
 					});
 				});
-                var socket = io(); 
-                socket.on('end-ack',function() 
-                { 
-                     window.location = '/auth.html'; 
-                }); 
+                
 	
+                //function to disableF5
+                function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
 
 				//show tab
 				$('#nemo a:first').tab('show');
@@ -167,8 +170,18 @@
 					window.location = '/chpass.html';
 				});
 
+                socket.on('disconnect',function()
+                {
+                    console.log('Disconnected');
+                    socket.io.reconnect();
+                }); 
+                socket.on('end-ack',function() 
+                { 
+                     window.location = '/auth.html'; 
+                }); 
 				//on receiving vote request
 				socket.on('govote',function(id,body,options,time){
+                $(document).on("keydown",disableF5);
 				var option,Option;
 				$("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left" style = "width:50%"><h5></h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
 				for(var i = 1;i<=options.length;i++){
@@ -179,6 +192,16 @@
                     Option = $(option);
 					$("#left-opts").append(Option);
 				}
+                
+                var dummy_submit = '<button id = "dummy_submit" class = "btn btn-default">Submit</button>';
+                var Dummy_submit = $(dummy_submit);
+                $("#left-opts").append(Dummy_submit);
+
+                //add click event handler to dummy_submit
+                $("#dummy_submit").click(function(e){
+                    e.preventDefault();
+                    $('input[name=vote-options]').attr('disabled',true);
+                });
 				
 				var Body = $('<font style="font-size:18px;">'+body+'</font>');
 				$("#cast-vote-body").append(Body);
@@ -186,6 +209,7 @@
 				$("#nemo a:eq(-2)").tab('show');
 				clearInterval(timer);
 				var timer = setInterval(function(){
+                    $("#timer").parent().show();
 					$("#timer").html(time);
 					if(time==0) {
 					logVote(id);
@@ -209,6 +233,7 @@
 
 			//results came
 			socket.on('voteresults',function(counts,options){
+                $(document).off("keydown",disableF5);
                 var graph = '<div id = "graph"></div>';
                 $("#rvote").append(graph);
 
@@ -234,7 +259,7 @@
                 $("#rvoteb").show();
 				$("#nemo a:last").tab('show');
 			});
-			
+            
             function logVote(id)
 			{
 				var option = $('input[name=vote-options]:checked').val();
@@ -264,14 +289,21 @@
 				});
 
 				
-				$("#refresh").click(function(e)
-				{
-					e.preventDefault();
-					socket.emit('refresh');
-				});
+
+                $("#svoteb").click(function(e)
+                {
+                    e.preventDefault();
+                    socket.emit('refresh');
+                });
 				
 				socket.on('refreshAll',function(){
-					window.location = '/';
+                    $("#rvote").html('');
+                    $("#cast-vote-body").html('');
+                    $("#cast-vote-opts").html('');
+                    $("#timer").html('');
+                    $("#rvoteb").hide();
+                    $("#cvoteb").hide();
+                    $("#nemo a:eq(1)").tab('show');
 				});
 
 			});

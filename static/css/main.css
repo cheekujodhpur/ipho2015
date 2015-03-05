@@ -1,3 +1,16 @@
+#document
+{
+    width:70%;
+}
+
+#sidebar-wrapper
+{
+    width:19%;
+    position:absolute;
+    right:20px;
+    top:220px;
+}
+
 .left{float:left;}
 .right{float:right;}
 .clear{clear:both;}
@@ -134,7 +147,7 @@
 #bar
 {
     display:inline-block;
-	background-image:linear-gradient(to left,#AA99FF,#FFF);
+	background:#AA99FF;
 }
 
 #bar_container
