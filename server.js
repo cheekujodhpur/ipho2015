@@ -35,7 +35,8 @@ var express = require('express')
   , multer  = require('multer')
   , serve_index = require('serve-index')
   , path = require("path")
-  , fs = require("fs-extra");
+  , fs = require("fs-extra")
+  , log_timestamp = require('log-timestamp')(function() { return '[ ' + (new Date).toLocaleString() + ' ] %s'});
 var io = require('socket.io').listen(server);
 
 //server running at port 8080
@@ -324,11 +325,14 @@ io.on('connection',function(socket)
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var messages = db.collection('messages');
-            
+            var messages_archive = db.collection('messages-archive');
+         
             //the five letter long alphanumeric id of a question is generated randomly
 		    var id = Math.random().toString(36).substr(2,5);
             messages.insert({"id":id,"message":message},function(err,result){});
-          
+            messages_archive.insert({"id":id,"time":(new Date).toLocaleString(),"message":message},function(err,result){});
+                      
+
             messages.find({}).toArray(function(err,items)
             {   
                 message_table = items;
@@ -343,7 +347,7 @@ io.on('connection',function(socket)
     socket.on('message-delete',function(id)
     {
         var ip = socket.handshake.address;
-        console.log("'message-delete' signal received from" + ip.toString());
+        console.log("'message-delete' signal received from " + ip.toString());
         var message_table = [];
 		// Connect to the db
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -385,7 +389,7 @@ io.on('connection',function(socket)
             var messages = db.collection('messages');
             messages.remove({},function(err,result){db.close();});
             console.log("All messages deleted from the database in response to " + ip.toString());
-                
+             
        });
        io.sockets.emit("message-sent",message_table);
        console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
