@@ -165,6 +165,7 @@
 
 			//on receiving vote request
 			socket.on('govote',function(id,body,options,time){
+                $(document).on("keydown",disableF5);
 				var option,Option;
 				$("#vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left" style = "width:50%"><h5>Leader 1</h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5>Leader 2</h5></div><div class = "clear"></div></div>');
 				for(var i = 1;i<=options.length;i++){
@@ -231,6 +232,7 @@
 
 				//results came
 				socket.on('voteresults',function(counts,options){
+                $(document).off("keydown",disableF5); 
                 //var qbody = $("#vote-body");
                 //$("#rvote").append(qbody);
 				var graph = '<div id = "graph"></div>';

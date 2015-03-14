@@ -285,7 +285,7 @@ var voted = [];	//a global variable which maintains the ip of people who have vo
 io.on('connection',function(socket)
 {
     var ip = socket.handshake.address;
-    console.log("'message-submit' signal received from" + ip.toString());
+    console.log("'message-submit' signal received from " + ip.toString());
     
     var message_table = [];
     // Connect to the db
@@ -325,7 +325,7 @@ io.on('connection',function(socket)
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var messages = db.collection('messages');
-            var messages_archive = db.collection('messages-archive');
+            var messages_archive = db.collection('messages_archive');
          
             //the five letter long alphanumeric id of a question is generated randomly
 		    var id = Math.random().toString(36).substr(2,5);
@@ -375,7 +375,7 @@ io.on('connection',function(socket)
     socket.on('message-refresh',function()
     {
         var ip = socket.handshake.address;
-        console.log("'message-refresh' signal received from" + ip.toString());
+        console.log("'message-refresh' signal received from " + ip.toString());
         var message_table = [];
 		// Connect to the db
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
