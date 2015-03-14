@@ -1,3 +1,8 @@
+.table
+{
+	word-break:break-all;
+}
+
 #document
 {
     width:70%;
