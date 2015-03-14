@@ -555,7 +555,7 @@ io.on('connection',function(socket)
             	console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
 				var count_db = db.collection('votec');
 				count_db.find({"id":id}).toArray(function(err,items){
-						io.sockets.emit('voteresults',items[0],options);
+						io.sockets.emit('voteresults',items[0],body,options);
 						console.log("'voteresults' signal broadcasted from the server for question id: "+id);
 				db.close();
 				});

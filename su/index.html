@@ -32,7 +32,7 @@
 				<br />
 				</div>
 				<div id = "hbc-tifr" style = "position:relative;left:110px">
-					<div id = "hbc">Homi Bhabha Centre for Education</div>
+					<div id = "hbc">Homi Bhabha Centre for Science Education</div>
 					<div id = "tifr">Tata Institute of Fundamental Research</div>
 				</div>
 			</div>
@@ -88,7 +88,7 @@
 					<font>Time to vote: <span id = "timer"></span> seconds</font>
 					<!--Cast Vote ends here-->
 				</div>
-				<div role="tabpanel" class="tab-pane" id = "rvote"><h3>Results</h3></div>
+				<div role="tabpanel" class="tab-pane" id = "rvote"></div>
 			</div>
 		</div>
         <div id="sidebar-wrapper" >
@@ -246,10 +246,10 @@
             
             
 			//results came
-			socket.on('voteresults',function(counts,options){
+			socket.on('voteresults',function(counts,body,options){
                 $(document).off("keydown",disableF5); 
-                //var qbody = $("#cast-vote-body");
-                //$("#rvote").append(qbody);
+				var Body = $('<font style="font-size:18px;">'+body+'</font>');
+                $("#rvote").append(Body);
                 var graph = '<div id = "graph"></div>';
                 $("#rvote").append(graph);
 
