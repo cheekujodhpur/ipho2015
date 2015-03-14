@@ -283,14 +283,112 @@ the results in the form of a histogram using chartjs.
 var voted = [];	//a global variable which maintains the ip of people who have voted once
 io.on('connection',function(socket)
 {
-    //message-board
+    var ip = socket.handshake.address;
+    console.log("'message-submit' signal received from" + ip.toString());
+    
+    var message_table = [];
+    // Connect to the db
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return 0;
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+        var messages = db.collection('messages');
+      
+        messages.find({}).toArray(function(err,items)
+        {   
+            message_table = items;
+            io.sockets.emit('message-sent',message_table); 
+            console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
+            db.close();
+        });
+   });
+
     socket.on('message-submit',function(message)
     {
         var ip = socket.handshake.address;
-        console.log(message);
-		console.log("'mesasge-submit' received from " + ip.toString());
-        io.sockets.emit('message-sent',message);
-        console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
+        console.log("'message-submit' signal received from" + ip.toString());
+		
+
+        var message_table = [];
+        // Connect to the db
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var messages = db.collection('messages');
+            
+            //the five letter long alphanumeric id of a question is generated randomly
+		    var id = Math.random().toString(36).substr(2,5);
+            messages.insert({"id":id,"message":message},function(err,result){});
+          
+            messages.find({}).toArray(function(err,items)
+            {   
+                message_table = items;
+                io.sockets.emit('message-sent',message_table); 
+                console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
+                db.close();
+            });
+       });
+       
+    });
+
+    socket.on('message-delete',function(id)
+    {
+        var ip = socket.handshake.address;
+        console.log("'message-delete' signal received from" + ip.toString());
+        var message_table = [];
+		// Connect to the db
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var messages = db.collection('messages');
+            messages.remove({"id":id},function(err,result){});
+            console.log("Message with id: " + id.toString() + " deleted from the database");
+            
+            messages.find({}).toArray(function(err,items)
+            {    
+                message_table = items;
+                io.sockets.emit('message-sent',message_table);
+                console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
+                db.close();
+            });
+       });
+    });
+
+    socket.on('message-refresh',function()
+    {
+        var ip = socket.handshake.address;
+        console.log("'message-refresh' signal received from" + ip.toString());
+        var message_table = [];
+		// Connect to the db
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var messages = db.collection('messages');
+            messages.remove({},function(err,result){db.close();});
+            console.log("All messages deleted from the database in response to " + ip.toString());
+                
+       });
+       io.sockets.emit("message-sent",message_table);
+       console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
     });
 
     //directory listing
@@ -492,6 +590,11 @@ io.on('connection',function(socket)
 			    		query[option2]=1;
 			    }
 		        collection.update({"id":id},{$inc:query},function(err,result){db.close();});
+            }
+            else if(undefined!=option2)
+            {
+                query[option2] = 1;
+                collection.update({"id":id},{$inc:query},function(err,result){db.close();});
             }
 		});
 	});

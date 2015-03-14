@@ -86,8 +86,10 @@
         <div id="sidebar-wrapper" >
             <table class="table" id = "message-board">
             <thead>
-                <th><tr>Message Board</tr></th>
+                <tr><th>Message Board</th></tr>
             </thead>
+            <tbody id="message-board-body">
+            </tbody> 
             </table>
         </div>
     <footer id="sp-footer-wrapper">
@@ -219,12 +221,18 @@
 			});
 		
             //show the message on board
-			socket.on("message-sent",function(message){
-            $("#message-board").append("<tr><td>" + message + "</td></tr>");
+			socket.on("message-sent",function(message_table){
+            $("#message-board-body").html('');
+            for(var i in message_table)
+            {
+                $("#message-board-body").append("<tr><td>" + message_table[i].message + "</td></tr>");
+            }
             });
 
 				//results came
 				socket.on('voteresults',function(counts,options){
+                //var qbody = $("#vote-body");
+                //$("#rvote").append(qbody);
 				var graph = '<div id = "graph"></div>';
                 $("#rvote").append(graph);
 

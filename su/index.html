@@ -92,7 +92,7 @@
 			</div>
 		</div>
         <div id="sidebar-wrapper" >
-            <button class = "btn btn-default" id = "refresh">Refresh</button>
+            <button type="button" class="btn btn-default" id = "refresh-button">Refresh</button>
             <form id="form-message-submit">
                 <div class="form-group">
                     <label for="message_input">Message</label>
@@ -102,8 +102,10 @@
             </form>
             <table class="table" id = "message-board">
             <thead>
-                <th><tr>Message Board</tr></th>
+                <tr><th>Message Board</th></tr>
             </thead>
+            <tbody id="message-board-body">
+            </tbody>
             </table>
         </div>
         <div id="sp-footer-wrapper">
@@ -127,11 +129,7 @@
                 
 			//document ready script
 			$(document).ready(function(){
-				$("#refresh").click(function(e)
-				{
-					e.preventDefault();
-					socket.emit('refresh');
-				});
+
 				//for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -219,21 +217,39 @@
 				},1000);
 			});
 
-            $("#form-message-submit").submit(function(){
+            //refresh-button
+            $("#refresh-button").click(function(e){
+                e.preventDefault();
+                socket.emit('message-refresh');
+            });
+
+            $("#form-message-submit").submit(function(e){
+                e.preventDefault();
                 socket.emit("message-submit",$("#message_input").val());
                 $("#message_input").val('');
-                return false;
             });
                     
 
             //show the message on board
-			socket.on("message-sent",function(message){
-            $("#message-board").append("<tr><td>" + message + "</td></tr>");
+			socket.on("message-sent",function(message_table){
+            $("#message-board-body").html('');
+            for(var i in message_table)
+            {
+                $("#message-board").append('<tr><td>' + message_table[i].message + '</td><td><button type="button" class="btn btn-default btn-sm message-remove" id = "'+message_table[i].id+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>   </td></tr>');
+            }
+            //delete-message
+            $(".message-remove").click(function(e){
+                e.preventDefault();
+                socket.emit('message-delete',$(this).attr("id"));
             });
-
+            });
+            
+            
 			//results came
 			socket.on('voteresults',function(counts,options){
-                $(document).off("keydown",disableF5);
+                $(document).off("keydown",disableF5); 
+                //var qbody = $("#cast-vote-body");
+                //$("#rvote").append(qbody);
                 var graph = '<div id = "graph"></div>';
                 $("#rvote").append(graph);
 
