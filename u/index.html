@@ -109,7 +109,13 @@
 	<script src = "/static/js/bootstrap.min.js"></script>
 	<script src = "/socket.io/socket.io.js"></script>
 	<script>
-	    var socket = io();
+	    //to protect from unload
+        window.onbeforeunload = function() {
+            if($("#cvoteb").is(":visible"))
+                return 'You will lose your chance to vote if you continue. Are you sure?';
+        };
+        
+        var socket = io();
 		socket.on('end-ack',function()
         {
 		    window.location = '/auth.html';
