@@ -1,0 +1,7 @@
+notes/*
+backend/notes.txt
+*.swp
+src_php/*
+*~
+*.backup
+uploads/*

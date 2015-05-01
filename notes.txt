@@ -1,0 +1,21 @@
+To encounter, 'node-waf' not found error while installing db-mysql, the following solutions have been implemeneted.
+
+sudo npm install -g node-gyp
+sudo apt-get install libcurl3-dev
+
+alternatively, just installed
+sudo npm install -g mysql
+sudo npm install -g node-mysql
+
+remove bind-address form /etc/mysql/my.cnf
+
+we are just using mongodb as of now
+apt-get install mongodb
+npm install mongodb
+
+
+
+===Issues===
+1. User must not log in via two tabs or windows
+2. Make no. of options 1 after setvote
+3. Do superusers have uplaod privilieges?

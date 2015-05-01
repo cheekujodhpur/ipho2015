@@ -1,0 +1,173 @@
+.table
+{
+	word-break:break-all;
+}
+
+#document
+{
+    width:70%;
+}
+
+#sidebar-wrapper
+{
+    width:19%;
+    position:absolute;
+    right:20px;
+    top:220px;
+}
+
+.left{float:left;}
+.right{float:right;}
+.clear{clear:both;}
+
+.nav
+{
+	position:relative;
+	top:-65px;
+	left:23%;
+	z-index:2;
+	width:40%;
+}
+
+#out-button
+{
+	position:relative;
+	top:15px;
+}
+
+#form-auth,#form-chpass
+{
+	width:300px;
+	margin:10px auto;
+	position:relative;
+}
+
+#form-auth-submit
+{
+	width:100px;
+	margin:0 auto;
+}
+
+#sp-header-wrapper
+{
+	background-image:linear-gradient(to bottom,#ADD8E6,#FFF);
+	height:150px;
+	position:relative;
+	z-index:1;
+}
+
+#tifr-mast
+{
+	margin-right:10px;
+}
+
+#tifr-logo
+{
+	float:right;
+	margin-left:10px;
+}
+
+#hbc-tifr
+{
+	float:right;
+	text-align:right;
+	line-height:1.2em;
+}
+
+#sp-footer-wrapper
+{	
+	position:fixed;
+	bottom:0px;
+	width:100%;
+	height:auto;
+	background-color:#464277;
+}
+
+#sp-footer-wrapper .container
+{
+	font-size:14px;
+	color:white;
+	padding:0px 10px;
+}
+
+#sp-footer-wrapper a:not(.btn)
+{
+	color:lightyellow;
+}
+
+#tifr-logo
+{
+	float:right;
+	margin-left:10px;
+}
+
+.tab-content
+{
+	position:relative;
+	top:-40px;
+	padding:0px 25px;
+}
+
+#option input
+{
+	display:inline;
+	width:auto;
+	border-top-right-radius:0px;
+	border-bottom-right-radius:0px;
+}
+
+.remove-me
+{
+	border-top-left-radius:0px;
+	border-bottom-left-radius:0px;
+}
+
+.add-more
+{
+	margin-left:-5px;
+}
+
+.add-more,.remove-me
+{
+	position:relative;
+	top:-1px;
+}
+
+#timer
+{
+	color:red;
+	font-size:22px;
+}
+
+#vote_count
+{
+    width:100px;
+}
+
+#option_name
+{
+    width:300px;
+}
+
+#bar
+{
+    display:inline-block;
+	background:#AA99FF;
+}
+
+#bar_container
+{
+    text-align:left;
+    display:inline-block;
+    width:516px;
+}
+
+#graph
+{
+    width:916px;
+}
+
+#graph_table
+{
+    text-align:center;
+}
