@@ -40,16 +40,29 @@
         <div id = "document">
 			<div role = "tabpanel">
 				<ul class = "nav nav-pills" id = "nemo">
-					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/downloads");'>Home</a></li>
 					<li id = "svoteb" role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
                 </ul>
 			</div>
 			<div class = "tab-content">
-				<div role="tabpanel" class="tab-pane active" id = "home">Home</div>
-				<div role="tabpanel" class="tab-pane" id = "vote">
-				
+				<div role="tabpanel" class="tab-pane active" id = "home">
+					 <!--Upload starts here-->
+
+                                        <p id = "upload-body">Upload</p>
+                                        <form id        =  "upload_form"
+                                        enctype   =  "multipart/form-data"
+                                        action    =  "/uploaded"
+                                        method    =  "post"
+                                        >
+                                <input id = 'file_upload' type="file" name="user_file" />
+                                <input type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check();'/>
+                                </form>
+                                    <!--Upload ends here-->
+
+				</div>
+                <div role="tabpanel" class="tab-pane" id = "vote">
                     <!--Section for Vote on Administrator End///starts here-->
                     <h3>Create Vote question</h3>
                     <form style = "width:500px;" id = "form-vote">
@@ -74,7 +87,6 @@
 	                <button type = "submit" class = "btn btn-default">Submit</button>
                     </form>
                     <!--Section for Vote on Administrator End///ends here-->
-
 				</div>
 				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
 				<div role="tabpanel" class="tab-pane" id = "cvote">
@@ -126,16 +138,21 @@
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
             //to protect from unload
-            window.onbeforeunload = function() {
+            window.onbeforeunload = function() 
+            {
+                socket.emit('list-dir','/downloads');
                 if($("#cvoteb").is(":visible"))
                     return 'You will lose your chance to vote if you continue. Are you sure?';
             };
             
             var socket = io();
                 
-			//document ready script
-			$(document).ready(function(){
-            
+            //function to disableF5
+            function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
+			
+            //document ready script
+			$(document).ready(function()
+            {
 				//for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -160,12 +177,8 @@
 				});
                 
 	
-                //function to disableF5
-                function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
-
 				//show tab
 				$('#nemo a:first').tab('show');
-
 				//socket.io controls
 				$("#logout-button").click(function(){
 					socket.emit('end');
@@ -173,71 +186,74 @@
 				$("#chpass-button").click(function(){
 					window.location = '/chpass.html';
 				});
+		    });
 
-                socket.on('disconnect',function()
-                {
-                    console.log('Disconnected');
-                    socket.io.reconnect();
-                }); 
-                socket.on('end-ack',function() 
-                { 
-                     window.location = '/auth.html'; 
-                }); 
-				//on receiving vote request
-				socket.on('govote',function(id,body,options,time){
+            //SOCKET SIGNALS
+            socket.on('disconnect',function()
+            {
+                console.log('Disconnected');
+                socket.io.reconnect();
+            }); 
+            
+            socket.on('end-ack',function() 
+            { 
+                 window.location = '/auth.html'; 
+            }); 
+            
+            //on receiving vote request
+            socket.on('govote',function(id,body,options,time)
+            {
                 $(document).on("keydown",disableF5);
-				var option,Option;
-				$("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left" style = "width:50%"><h5></h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
-				for(var i = 1;i<=options.length;i++){
+                var option,Option;
+                $("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left" style = "width:50%"><h5></h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
+                for(var i = 1;i<=options.length;i++)
+                {
                     if(i!=options.length)
-					    option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
-					else
+                        option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+                    else
                         option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
                     Option = $(option);
-					$("#left-opts").append(Option);
-				}
-                
+                    $("#left-opts").append(Option);
+                }   
+            
                 var dummy_submit = '<button id = "dummy_submit" class = "btn btn-default">Submit</button>';
                 var Dummy_submit = $(dummy_submit);
                 $("#left-opts").append(Dummy_submit);
-
                 //add click event handler to dummy_submit
-                $("#dummy_submit").click(function(e){
+                $("#dummy_submit").click(function(e)
+                {
                     e.preventDefault();
                     $('input[name=vote-options]').attr('disabled',true);
                 });
-				
-				var Body = $('<font style="font-size:18px;">'+body+'</font>');
-				$("#cast-vote-body").append(Body);
-				$("#cvoteb").show();
-				$("#nemo a:eq(-2)").tab('show');
-				clearInterval(timer);
-				var timer = setInterval(function(){
+                
+                var Body = $('<font style="font-size:18px;">'+body+'</font>');
+                $("#cast-vote-body").append(Body);
+                $("#cvoteb").show();
+                $("#nemo a:eq(-2)").tab('show');
+                clearInterval(timer);
+                var timer = setInterval(function(){
                     $("#timer").parent().show();
-					$("#timer").html(time);
-					if(time==0) {
-					logVote(id);
-					clearInterval(timer);
-					}	
-					time = time-1;
-				},1000);
-			});
-
+                    $("#timer").html(time);
+                    if(time==0) {
+                    logVote(id);
+                    clearInterval(timer);
+                    }	
+                    time = time-1;
+                },1000);
+            });
             //refresh-button
             $("#refresh-button").click(function(e){
                 e.preventDefault();
                 socket.emit('message-refresh');
             });
-
             $("#form-message-submit").submit(function(e){
                 e.preventDefault();
                 socket.emit("message-submit",$("#message_input").val());
                 $("#message_input").val('');
             });
                     
-
             //show the message on board
-			socket.on("message-sent",function(message_table){
+            socket.on("message-sent",function(message_table){
             $("#message-board-body").html('');
             for(var i in message_table)
             {
@@ -250,15 +266,14 @@
             });
             });
             
-            
-			//results came
-			socket.on('voteresults',function(counts,body,options){
+        
+            //results came
+            socket.on('voteresults',function(counts,body,options){
                 $(document).off("keydown",disableF5); 
-				var Body = $('<font style="font-size:18px;">'+body+'</font>');
+                var Body = $('<font style="font-size:18px;">'+body+'</font>');
                 $("#rvote").append(Body);
                 var graph = '<div id = "graph"></div>';
                 $("#rvote").append(graph);
-
                 //get total number of counts
                 var totalus = 0;
                 for(var i in counts)
@@ -266,69 +281,104 @@
                     {
                         totalus += parseInt(counts[i]);
                     }
-
              //add graph elements
                     $("#graph").append('<table id = "graph_table" class = "table table-bordered table-hover"></table>');
                 var j = 0;
-				for(var i in counts)
-					if(i!='_id' && i!='id')
-					{
+                for(var i in counts)
+                    if(i!='_id' && i!='id')
+                    {
                         var wid = (parseFloat(counts[i])/totalus)*500;
                         var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
-						$("#graph_table").append(bb);
-						j++; 
-					}
+                        $("#graph_table").append(bb);
+                        j++; 
+                    }
                 $("#rvoteb").show();
-				$("#nemo a:last").tab('show');
-			});
+                $("#nemo a:last").tab('show');
+            });
             
             function logVote(id)
-			{
-				var option = $('input[name=vote-options]:checked').val();
-				socket.emit('logvote',id,option);
-				$('input[name=vote-options]').attr('disabled',true);
-				$("#timer").parent().hide();
-			}
-
-				//vote form submit
-				$("#form-vote").submit(function(e){
-					e.preventDefault();
-					var body = $("#vote-body").val();
-					$("#vote-body").val('');
-					var options = [];
-					$("#option").find("input").each(function(){
-						options.push($(this).val());
-						$(this).val('');
-					});
-					var time = $("#vote-time").val();
-					$("#vote-time").val('');
-					socket.emit('setvote',body,options,time);
-					//have just one option	
-					var total = $("input.input").length;
-					for(var i = 0;i<total-1;i++)
-						$("input.input:eq(0)").remove();
-					$(".remove-me").remove();
-				});
-
-				
-
-                $("#svoteb").click(function(e)
-                {
-                    e.preventDefault();
-                    socket.emit('refresh');
+            {
+                var option = $('input[name=vote-options]:checked').val();
+                socket.emit('logvote',id,option);
+                $('input[name=vote-options]').attr('disabled',true);
+                $("#timer").parent().hide();
+            }
+            //vote form submit
+            $("#form-vote").submit(function(e){
+                e.preventDefault();
+                var body = $("#vote-body").val();
+                $("#vote-body").val('');
+                var options = [];
+                $("#option").find("input").each(function(){
+                    options.push($(this).val());
+                    $(this).val('');
                 });
+                var time = $("#vote-time").val();
+                $("#vote-time").val('');
+                socket.emit('setvote',body,options,time);
+                //have just one option	
+                var total = $("input.input").length;
+                for(var i = 0;i<total-1;i++)
+                    $("input.input:eq(0)").remove();
+                $(".remove-me").remove();
+            });
+            
+            $("#svoteb").click(function(e)
+            {
+                e.preventDefault();
+                socket.emit('refresh');
+            });
+            function emptyfile_check()
+            {
+                var file = document.getElementById('file_upload');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully");
+                    return true;
+                }
+            }
+	        socket.on('listed-dir',function(id,directory_path,files)
+            {
+                if(id == "download")
+                {
+                    var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                    for(var i = 0;i < files.length;i++)
+                    {
+                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                    }
+                    table += "</table>";
+                    $("#download_table").remove();
+                    $("#home").append(table);
+                }
+                else
+                {
+                    var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                    for(var i = 0;i < files.length;i++)
+                    {
+                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                    }
+                    table += "</table>";
+                    $("#upload_table").remove();
+                    $("#home").append(table);
+                    
+                }
+            }); 
 				
-				socket.on('refreshAll',function(){
-                    $("#rvote").html('');
-                    $("#cast-vote-body").html('');
-                    $("#cast-vote-opts").html('');
-                    $("#timer").html('');
-                    $("#rvoteb").hide();
-                    $("#cvoteb").hide();
-                    $("#nemo a:eq(1)").tab('show');
-				});
-
-			});
+            socket.on('refreshAll',function(){
+                $("#rvote").html('');
+                $("#cast-vote-body").html('');
+                $("#cast-vote-opts").html('');
+                $("#timer").html('');
+                $("#rvoteb").hide();
+                $("#cvoteb").hide();
+                $("#nemo a:eq(1)").tab('show');
+            });
+			
 		</script>
 	</body>
 </html>
