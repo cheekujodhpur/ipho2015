@@ -140,7 +140,6 @@
             //to protect from unload
             window.onbeforeunload = function() 
             {
-                socket.emit('list-dir','/downloads');
                 if($("#cvoteb").is(":visible"))
                     return 'You will lose your chance to vote if you continue. Are you sure?';
             };
@@ -206,17 +205,14 @@
             socket.on('govote',function(id,body,options,time)
             {
                 $(document).on("keydown",disableF5);
-                //var option,Option;
-                //$("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left"><h5></h5></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
-                //for(var i = 1;i<=options.length;i++)
-                //{
-                //    if(i!=options.length)
-                //        option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
-                //    else
-                //        option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
-                //    Option = $(option);
-                //    $("#left-opts").append(Option);
-                //}   
+                var option,Option;
+                $("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left"><ul id = "left-opts-list" style = "padding:0px;"></ul></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
+                for(var i = 1;i<=options.length;i++)
+                {
+                    option = '<li>'+options[i-1]+'</li>';
+                    Option = $(option);
+                    $("#left-opts-list").append(Option);
+                }   
             
                 //var dummy_submit = '<button id = "dummy_submit" class = "btn btn-default">Submit</button>';
                 //var Dummy_submit = $(dummy_submit);
@@ -228,8 +224,8 @@
                 //    $('input[name=vote-options]').attr('disabled',true);
                 //});
                 //
-                //var Body = $('<font style="font-size:18px;">'+body+'</font>');
-                //$("#cast-vote-body").append(Body);
+                var Body = $('<font style="font-size:18px;">'+body+'</font>');
+                $("#cast-vote-body").append(Body);
                 //$("#cvoteb").show();
                 $("#nemo a:eq(-2)").tab('show');
                 clearInterval(timer);

@@ -110,8 +110,6 @@
         window.onbeforeunload = function() 
         {
             //send directory listing signal before refesh
-            socket.emit('list-dir','/downloads');
-            socket.emit('list-dir','/uploads');
             if($("#cvoteb").is(":visible"))
                 return 'You will lose your chance to vote if you continue. Are you sure?';
         };
