@@ -355,37 +355,61 @@
                     alert("It is not possible to upload an empty file.");
                     return false;
                 }
-                else
+				else
                 {
                     alert("File uploaded successfully");
                     return true;
                 }
             }
+			socket.on('file-upload-success',function()
+			{
+				alert("File uploaded successfully");
+			});
+			socket.on('file-upload-failed',function()
+			{
+				alert("File upload failed as max filesize limit was exceeded");
+			});
+
+			socket.on('file-deleted',function()
+			{
+				socket.emit('list-dir',"/downloads");
+			});
+
+
+
 	        socket.on('listed-dir',function(id,directory_path,files)
             {
+		//alert("listed dir received");
                 if(id == "download")
                 {
-                    var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                    var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
                     for(var i = 0;i < files.length;i++)
                     {
-                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td><td><button type="button" class="btn btn-default btn-sm file-remove" id = "'+directory_path+files[i].toString()+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>'
                     }
                     table += "</table>";
+
                     $("#download_table").remove();
                     $("#home").append(table);
+					//delete-file
+            		$(".file-remove").click(function(e){
+                		e.preventDefault();
+                		socket.emit('file-delete',$(this).attr("id"));
+            		});
+
                 }
-                else
-                {
-                    var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
-                    for(var i = 0;i < files.length;i++)
-                    {
-                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
-                    }
-                    table += "</table>";
-                    $("#upload_table").remove();
-                    $("#home").append(table);
+                //else
+                //{
+                //    var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                //    for(var i = 0;i < files.length;i++)
+                //    {
+                //        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                //   }
+                //    table += "</table>";
+                //    $("#upload_table").remove();
+                //    $("#home").append(table);
                     
-                }
+                //}
             }); 
 				
             socket.on('refreshAll',function(){

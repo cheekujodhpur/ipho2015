@@ -7,7 +7,7 @@
 #create the upload directory for the user
 mkdir ./uploads/$1
 #create entry in the database
-inp='db.users.insert({"ip":"'$1'","country_code":"'$2'","type":1,"pass":"ipho2015","logged":false,"first":false})'
+inp='db.users.insert({"ip":"'$1'","country_code":"'$2'","number_of_votes":"'$3'","type":1,"pass":"ipho2015","logged":false,"first":false})'
 echo $inp
 mongo test --eval $inp
 #enable downloads from the directory in server.js
