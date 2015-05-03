@@ -171,3 +171,12 @@
 {
     text-align:center;
 }
+
+#left-opts,#right-opts
+{
+   width:40%;
+   margin:10px;
+   padding:10px;
+   word-wrap:break-word;
+}
+}
