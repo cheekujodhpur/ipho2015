@@ -152,7 +152,16 @@
 #bar
 {
     display:inline-block;
-	background:#AA99FF;
+}
+
+.bar_red
+{
+    background:#FF0000;
+}
+
+.bar_green
+{
+    background:#28E246;
 }
 
 #bar_container

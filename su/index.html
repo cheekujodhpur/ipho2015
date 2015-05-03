@@ -290,11 +290,21 @@
              //add graph elements
                     $("#graph").append('<table id = "graph_table" class = "table table-bordered table-hover"></table>');
                 var j = 0;
+	    var maxcount = 0;
+	    for(var i in counts)
+	    {
+		if(i!='_id' && i!='id')
+		    if(parseInt(counts[i])>maxcount)
+			maxcount = parseInt(counts[i]);
+	    }
                 for(var i in counts)
                     if(i!='_id' && i!='id')
                     {
                         var wid = (parseFloat(counts[i])/totalus)*500;
-                        var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+		    if(parseInt(counts[i])==maxcount)
+                    	var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_green" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                    else
+			var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_red" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
                         $("#graph_table").append(bb);
                         j++; 
                     }
