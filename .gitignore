@@ -5,3 +5,5 @@ src_php/*
 *~
 *.backup
 uploads/*
+downloads/*
+tmp/*

@@ -313,13 +313,20 @@
             $("#form-vote").submit(function(e){
                 e.preventDefault();
                 var body = $("#vote-body").val();
-                $("#vote-body").val('');
                 var options = [];
                 $("#option").find("input").each(function(){
                     options.push($(this).val());
-                    $(this).val('');
                 });
                 var time = $("#vote-time").val();
+		if(parseInt(time)<10 || time=='')
+		{
+		    alert('Minimum time for voting is 10 seconds');
+		    return;
+		}
+                $("#vote-body").val('');
+                $("#option").find("input").each(function(){
+                    $(this).val('');
+                });
                 $("#vote-time").val('');
                 socket.emit('setvote',body,options,time);
                 //have just one option	
