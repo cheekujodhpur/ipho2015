@@ -153,6 +153,8 @@
             //document ready script
 			$(document).ready(function()
             {
+	    socket.emit('list-dir','/uploads');
+	    socket.emit('list-dir','/downloads');
 				//for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -231,14 +233,18 @@
                 $("#cvoteb").show();
                 $("#nemo a:eq(-2)").tab('show');
                 clearInterval(timer);
+		var startDate = new Date();
+		var startTime = startDate.getTime()/1000;
                 var timer = setInterval(function(){
+		    var nowDate = new Date();
+		    var nowTime = nowDate.getTime()/1000;
+		    var seconds = parseInt(time-nowTime+startTime);
                     $("#timer").parent().show();
-                    $("#timer").html(time);
-                    if(time==0) {
+                    $("#timer").html(seconds);
+                    if(seconds<=0) {
                     logVote(id);
                     clearInterval(timer);
                     }	
-                    time = time-1;
                 },1000);
             });
             //refresh-button

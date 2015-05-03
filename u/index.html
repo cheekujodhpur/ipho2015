@@ -134,6 +134,8 @@
         //document ready script
         $(document).ready(function()
         {
+	    socket.emit('list-dir','/uploads');
+	    socket.emit('list-dir','/downloads');
             $('#nemo a:first').tab('show');
             //socket.io controls
             $("#logout-button").click(function()
@@ -219,17 +221,22 @@
             $("#vote-body").append(Body);
             $("#cvoteb").show();
             $("#nemo a:eq(-2)").tab('show');
-            clearInterval(timer);
-            var timer = setInterval(function(){
-                $("#timer").parent().show();
-                $("#timer").html(time);
-                if(time==0) {
-                logVote(id);
+        
                 clearInterval(timer);
-                }	
-                time = time-1;
-            },1000);
-        });
+		var startDate = new Date();
+		var startTime = startDate.getTime()/1000;
+                var timer = setInterval(function(){
+		    var nowDate = new Date();
+		    var nowTime = nowDate.getTime()/1000;
+		    var seconds = parseInt(time-nowTime+startTime);
+                    $("#timer").parent().show();
+                    $("#timer").html(seconds);
+                    if(seconds<=0) {
+                    logVote(id);
+                    clearInterval(timer);
+                    }	
+                },1000);
+	});
 		
         //results came
         socket.on('voteresults',function(counts,body,options)

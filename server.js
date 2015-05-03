@@ -83,13 +83,13 @@ app.use(multer(
 //copies the uploaded file from /tmp to the user's home folder
 app.post('/uploaded',function(req,res)
 {
-	if(file_size_ex == true)
-	{
-		file_size_ex = false;
-        done = false;
-		res.sendFile(__dirname + '/u/index.html');
-        return;
-	}
+    if(file_size_ex == true)
+    {
+	file_size_ex = false;
+	done = false;
+	res.redirect('/');
+	return;
+    }
     if(done==true)
  	{
 		//the /tmp path of the file
@@ -135,7 +135,7 @@ app.post('/uploaded',function(req,res)
                         });
 
                         //redirect the client to his homepage
-                        res.sendFile(__dirname + '/u/index.html')
+                        res.redirect('/')
                         done = false;
                     }
                     else
@@ -151,12 +151,12 @@ app.post('/uploaded',function(req,res)
                                 return console.error(err);
                             }
                             //print the uploaded file metadata on the console
-                            console.log(req.files.user_file);
+                            console.log('%j',req.files.user_file);
                             console.log(file_name + " successfully copied to /downloads/");
                         });
 
                         //redirect the client to his homepage
-                        res.sendFile(__dirname + '/su/index.html')
+                        res.redirect('/')
                         done = false;
                     }
                 }
@@ -817,3 +817,159 @@ app.use("/uploads/awk {print/",express.static(__dirname + "/uploads/awk {print/"
 app.use("/uploads/awk {print/",express.static(__dirname + "/uploads/awk {print/"));console.log("File download enabled for /uploads/awk {print/");
 app.use("/uploads/awk '{print }' country_code_ip.txt/",express.static(__dirname + "/uploads/awk '{print }' country_code_ip.txt/"));console.log("File download enabled for /uploads/awk '{print }' country_code_ip.txt/");
 app.use("/uploads/192.168.100.100/",express.static(__dirname + "/uploads/192.168.100.100/"));console.log("File download enabled for /uploads/192.168.100.100/");
+app.use("/uploads/192.168.200.100/",express.static(__dirname + "/uploads/192.168.200.100/"));console.log("File download enabled for /uploads/192.168.200.100/");
+app.use("/uploads/192.168.200.101/",express.static(__dirname + "/uploads/192.168.200.101/"));console.log("File download enabled for /uploads/192.168.200.101/");
+app.use("/uploads/192.168.200.102/",express.static(__dirname + "/uploads/192.168.200.102/"));console.log("File download enabled for /uploads/192.168.200.102/");
+app.use("/uploads/192.168.200.103/",express.static(__dirname + "/uploads/192.168.200.103/"));console.log("File download enabled for /uploads/192.168.200.103/");
+app.use("/uploads/192.168.200.104/",express.static(__dirname + "/uploads/192.168.200.104/"));console.log("File download enabled for /uploads/192.168.200.104/");
+app.use("/uploads/192.168.200.105/",express.static(__dirname + "/uploads/192.168.200.105/"));console.log("File download enabled for /uploads/192.168.200.105/");
+app.use("/uploads/192.168.200.106/",express.static(__dirname + "/uploads/192.168.200.106/"));console.log("File download enabled for /uploads/192.168.200.106/");
+app.use("/uploads/192.168.200.107/",express.static(__dirname + "/uploads/192.168.200.107/"));console.log("File download enabled for /uploads/192.168.200.107/");
+app.use("/uploads/192.168.200.108/",express.static(__dirname + "/uploads/192.168.200.108/"));console.log("File download enabled for /uploads/192.168.200.108/");
+app.use("/uploads/192.168.200.109/",express.static(__dirname + "/uploads/192.168.200.109/"));console.log("File download enabled for /uploads/192.168.200.109/");
+app.use("/uploads/192.168.200.110/",express.static(__dirname + "/uploads/192.168.200.110/"));console.log("File download enabled for /uploads/192.168.200.110/");
+app.use("/uploads/192.168.200.111/",express.static(__dirname + "/uploads/192.168.200.111/"));console.log("File download enabled for /uploads/192.168.200.111/");
+app.use("/uploads/192.168.200.112/",express.static(__dirname + "/uploads/192.168.200.112/"));console.log("File download enabled for /uploads/192.168.200.112/");
+app.use("/uploads/192.168.200.113/",express.static(__dirname + "/uploads/192.168.200.113/"));console.log("File download enabled for /uploads/192.168.200.113/");
+app.use("/uploads/192.168.200.114/",express.static(__dirname + "/uploads/192.168.200.114/"));console.log("File download enabled for /uploads/192.168.200.114/");
+app.use("/uploads/192.168.200.115/",express.static(__dirname + "/uploads/192.168.200.115/"));console.log("File download enabled for /uploads/192.168.200.115/");
+app.use("/uploads/192.168.200.116/",express.static(__dirname + "/uploads/192.168.200.116/"));console.log("File download enabled for /uploads/192.168.200.116/");
+app.use("/uploads/192.168.200.117/",express.static(__dirname + "/uploads/192.168.200.117/"));console.log("File download enabled for /uploads/192.168.200.117/");
+app.use("/uploads/192.168.200.118/",express.static(__dirname + "/uploads/192.168.200.118/"));console.log("File download enabled for /uploads/192.168.200.118/");
+app.use("/uploads/192.168.200.119/",express.static(__dirname + "/uploads/192.168.200.119/"));console.log("File download enabled for /uploads/192.168.200.119/");
+app.use("/uploads/192.168.200.120/",express.static(__dirname + "/uploads/192.168.200.120/"));console.log("File download enabled for /uploads/192.168.200.120/");
+app.use("/uploads/192.168.200.121/",express.static(__dirname + "/uploads/192.168.200.121/"));console.log("File download enabled for /uploads/192.168.200.121/");
+app.use("/uploads/192.168.200.122/",express.static(__dirname + "/uploads/192.168.200.122/"));console.log("File download enabled for /uploads/192.168.200.122/");
+app.use("/uploads/192.168.200.123/",express.static(__dirname + "/uploads/192.168.200.123/"));console.log("File download enabled for /uploads/192.168.200.123/");
+app.use("/uploads/192.168.200.124/",express.static(__dirname + "/uploads/192.168.200.124/"));console.log("File download enabled for /uploads/192.168.200.124/");
+app.use("/uploads/192.168.200.125/",express.static(__dirname + "/uploads/192.168.200.125/"));console.log("File download enabled for /uploads/192.168.200.125/");
+app.use("/uploads/192.168.200.126/",express.static(__dirname + "/uploads/192.168.200.126/"));console.log("File download enabled for /uploads/192.168.200.126/");
+app.use("/uploads/192.168.200.127/",express.static(__dirname + "/uploads/192.168.200.127/"));console.log("File download enabled for /uploads/192.168.200.127/");
+app.use("/uploads/192.168.200.128/",express.static(__dirname + "/uploads/192.168.200.128/"));console.log("File download enabled for /uploads/192.168.200.128/");
+app.use("/uploads/192.168.200.129/",express.static(__dirname + "/uploads/192.168.200.129/"));console.log("File download enabled for /uploads/192.168.200.129/");
+app.use("/uploads/192.168.200.130/",express.static(__dirname + "/uploads/192.168.200.130/"));console.log("File download enabled for /uploads/192.168.200.130/");
+app.use("/uploads/192.168.200.131/",express.static(__dirname + "/uploads/192.168.200.131/"));console.log("File download enabled for /uploads/192.168.200.131/");
+app.use("/uploads/192.168.200.132/",express.static(__dirname + "/uploads/192.168.200.132/"));console.log("File download enabled for /uploads/192.168.200.132/");
+app.use("/uploads/192.168.200.133/",express.static(__dirname + "/uploads/192.168.200.133/"));console.log("File download enabled for /uploads/192.168.200.133/");
+app.use("/uploads/192.168.200.134/",express.static(__dirname + "/uploads/192.168.200.134/"));console.log("File download enabled for /uploads/192.168.200.134/");
+app.use("/uploads/192.168.200.135/",express.static(__dirname + "/uploads/192.168.200.135/"));console.log("File download enabled for /uploads/192.168.200.135/");
+app.use("/uploads/192.168.200.136/",express.static(__dirname + "/uploads/192.168.200.136/"));console.log("File download enabled for /uploads/192.168.200.136/");
+app.use("/uploads/192.168.200.137/",express.static(__dirname + "/uploads/192.168.200.137/"));console.log("File download enabled for /uploads/192.168.200.137/");
+app.use("/uploads/192.168.200.138/",express.static(__dirname + "/uploads/192.168.200.138/"));console.log("File download enabled for /uploads/192.168.200.138/");
+app.use("/uploads/192.168.200.139/",express.static(__dirname + "/uploads/192.168.200.139/"));console.log("File download enabled for /uploads/192.168.200.139/");
+app.use("/uploads/192.168.200.140/",express.static(__dirname + "/uploads/192.168.200.140/"));console.log("File download enabled for /uploads/192.168.200.140/");
+app.use("/uploads/192.168.200.141/",express.static(__dirname + "/uploads/192.168.200.141/"));console.log("File download enabled for /uploads/192.168.200.141/");
+app.use("/uploads/192.168.200.142/",express.static(__dirname + "/uploads/192.168.200.142/"));console.log("File download enabled for /uploads/192.168.200.142/");
+app.use("/uploads/192.168.200.143/",express.static(__dirname + "/uploads/192.168.200.143/"));console.log("File download enabled for /uploads/192.168.200.143/");
+app.use("/uploads/192.168.200.144/",express.static(__dirname + "/uploads/192.168.200.144/"));console.log("File download enabled for /uploads/192.168.200.144/");
+app.use("/uploads/192.168.200.145/",express.static(__dirname + "/uploads/192.168.200.145/"));console.log("File download enabled for /uploads/192.168.200.145/");
+app.use("/uploads/192.168.200.146/",express.static(__dirname + "/uploads/192.168.200.146/"));console.log("File download enabled for /uploads/192.168.200.146/");
+app.use("/uploads/192.168.200.147/",express.static(__dirname + "/uploads/192.168.200.147/"));console.log("File download enabled for /uploads/192.168.200.147/");
+app.use("/uploads/192.168.200.148/",express.static(__dirname + "/uploads/192.168.200.148/"));console.log("File download enabled for /uploads/192.168.200.148/");
+app.use("/uploads/192.168.200.149/",express.static(__dirname + "/uploads/192.168.200.149/"));console.log("File download enabled for /uploads/192.168.200.149/");
+app.use("/uploads/192.168.200.150/",express.static(__dirname + "/uploads/192.168.200.150/"));console.log("File download enabled for /uploads/192.168.200.150/");
+app.use("/uploads/192.168.200.151/",express.static(__dirname + "/uploads/192.168.200.151/"));console.log("File download enabled for /uploads/192.168.200.151/");
+app.use("/uploads/192.168.200.152/",express.static(__dirname + "/uploads/192.168.200.152/"));console.log("File download enabled for /uploads/192.168.200.152/");
+app.use("/uploads/192.168.200.153/",express.static(__dirname + "/uploads/192.168.200.153/"));console.log("File download enabled for /uploads/192.168.200.153/");
+app.use("/uploads/192.168.200.154/",express.static(__dirname + "/uploads/192.168.200.154/"));console.log("File download enabled for /uploads/192.168.200.154/");
+app.use("/uploads/192.168.200.155/",express.static(__dirname + "/uploads/192.168.200.155/"));console.log("File download enabled for /uploads/192.168.200.155/");
+app.use("/uploads/192.168.200.156/",express.static(__dirname + "/uploads/192.168.200.156/"));console.log("File download enabled for /uploads/192.168.200.156/");
+app.use("/uploads/192.168.200.157/",express.static(__dirname + "/uploads/192.168.200.157/"));console.log("File download enabled for /uploads/192.168.200.157/");
+app.use("/uploads/192.168.200.158/",express.static(__dirname + "/uploads/192.168.200.158/"));console.log("File download enabled for /uploads/192.168.200.158/");
+app.use("/uploads/192.168.200.159/",express.static(__dirname + "/uploads/192.168.200.159/"));console.log("File download enabled for /uploads/192.168.200.159/");
+app.use("/uploads/192.168.200.160/",express.static(__dirname + "/uploads/192.168.200.160/"));console.log("File download enabled for /uploads/192.168.200.160/");
+app.use("/uploads/192.168.200.161/",express.static(__dirname + "/uploads/192.168.200.161/"));console.log("File download enabled for /uploads/192.168.200.161/");
+app.use("/uploads/192.168.200.162/",express.static(__dirname + "/uploads/192.168.200.162/"));console.log("File download enabled for /uploads/192.168.200.162/");
+app.use("/uploads/192.168.200.163/",express.static(__dirname + "/uploads/192.168.200.163/"));console.log("File download enabled for /uploads/192.168.200.163/");
+app.use("/uploads/192.168.200.164/",express.static(__dirname + "/uploads/192.168.200.164/"));console.log("File download enabled for /uploads/192.168.200.164/");
+app.use("/uploads/192.168.200.165/",express.static(__dirname + "/uploads/192.168.200.165/"));console.log("File download enabled for /uploads/192.168.200.165/");
+app.use("/uploads/192.168.200.166/",express.static(__dirname + "/uploads/192.168.200.166/"));console.log("File download enabled for /uploads/192.168.200.166/");
+app.use("/uploads/192.168.200.167/",express.static(__dirname + "/uploads/192.168.200.167/"));console.log("File download enabled for /uploads/192.168.200.167/");
+app.use("/uploads/192.168.200.168/",express.static(__dirname + "/uploads/192.168.200.168/"));console.log("File download enabled for /uploads/192.168.200.168/");
+app.use("/uploads/192.168.200.169/",express.static(__dirname + "/uploads/192.168.200.169/"));console.log("File download enabled for /uploads/192.168.200.169/");
+app.use("/uploads/192.168.200.170/",express.static(__dirname + "/uploads/192.168.200.170/"));console.log("File download enabled for /uploads/192.168.200.170/");
+app.use("/uploads/192.168.200.171/",express.static(__dirname + "/uploads/192.168.200.171/"));console.log("File download enabled for /uploads/192.168.200.171/");
+app.use("/uploads/192.168.200.172/",express.static(__dirname + "/uploads/192.168.200.172/"));console.log("File download enabled for /uploads/192.168.200.172/");
+app.use("/uploads/192.168.200.173/",express.static(__dirname + "/uploads/192.168.200.173/"));console.log("File download enabled for /uploads/192.168.200.173/");
+app.use("/uploads/192.168.200.174/",express.static(__dirname + "/uploads/192.168.200.174/"));console.log("File download enabled for /uploads/192.168.200.174/");
+app.use("/uploads/192.168.200.175/",express.static(__dirname + "/uploads/192.168.200.175/"));console.log("File download enabled for /uploads/192.168.200.175/");
+app.use("/uploads/192.168.200.176/",express.static(__dirname + "/uploads/192.168.200.176/"));console.log("File download enabled for /uploads/192.168.200.176/");
+app.use("/uploads/192.168.200.177/",express.static(__dirname + "/uploads/192.168.200.177/"));console.log("File download enabled for /uploads/192.168.200.177/");
+app.use("/uploads/192.168.200.178/",express.static(__dirname + "/uploads/192.168.200.178/"));console.log("File download enabled for /uploads/192.168.200.178/");
+app.use("/uploads/192.168.200.179/",express.static(__dirname + "/uploads/192.168.200.179/"));console.log("File download enabled for /uploads/192.168.200.179/");
+app.use("/uploads/192.168.200.180/",express.static(__dirname + "/uploads/192.168.200.180/"));console.log("File download enabled for /uploads/192.168.200.180/");
+app.use("/uploads/192.168.200.181/",express.static(__dirname + "/uploads/192.168.200.181/"));console.log("File download enabled for /uploads/192.168.200.181/");
+app.use("/uploads/192.168.200.182/",express.static(__dirname + "/uploads/192.168.200.182/"));console.log("File download enabled for /uploads/192.168.200.182/");
+app.use("/uploads/192.168.200.183/",express.static(__dirname + "/uploads/192.168.200.183/"));console.log("File download enabled for /uploads/192.168.200.183/");
+app.use("/uploads/192.168.200.184/",express.static(__dirname + "/uploads/192.168.200.184/"));console.log("File download enabled for /uploads/192.168.200.184/");
+app.use("/uploads/192.168.200.185/",express.static(__dirname + "/uploads/192.168.200.185/"));console.log("File download enabled for /uploads/192.168.200.185/");
+app.use("/uploads/192.168.200.186/",express.static(__dirname + "/uploads/192.168.200.186/"));console.log("File download enabled for /uploads/192.168.200.186/");
+app.use("/uploads/192.168.200.187/",express.static(__dirname + "/uploads/192.168.200.187/"));console.log("File download enabled for /uploads/192.168.200.187/");
+app.use("/uploads/192.168.200.188/",express.static(__dirname + "/uploads/192.168.200.188/"));console.log("File download enabled for /uploads/192.168.200.188/");
+app.use("/uploads/192.168.200.189/",express.static(__dirname + "/uploads/192.168.200.189/"));console.log("File download enabled for /uploads/192.168.200.189/");
+app.use("/uploads/192.168.200.190/",express.static(__dirname + "/uploads/192.168.200.190/"));console.log("File download enabled for /uploads/192.168.200.190/");
+app.use("/uploads/192.168.200.191/",express.static(__dirname + "/uploads/192.168.200.191/"));console.log("File download enabled for /uploads/192.168.200.191/");
+app.use("/uploads/192.168.200.192/",express.static(__dirname + "/uploads/192.168.200.192/"));console.log("File download enabled for /uploads/192.168.200.192/");
+app.use("/uploads/192.168.200.193/",express.static(__dirname + "/uploads/192.168.200.193/"));console.log("File download enabled for /uploads/192.168.200.193/");
+app.use("/uploads/192.168.200.194/",express.static(__dirname + "/uploads/192.168.200.194/"));console.log("File download enabled for /uploads/192.168.200.194/");
+app.use("/uploads/192.168.200.195/",express.static(__dirname + "/uploads/192.168.200.195/"));console.log("File download enabled for /uploads/192.168.200.195/");
+app.use("/uploads/192.168.200.196/",express.static(__dirname + "/uploads/192.168.200.196/"));console.log("File download enabled for /uploads/192.168.200.196/");
+app.use("/uploads/192.168.200.197/",express.static(__dirname + "/uploads/192.168.200.197/"));console.log("File download enabled for /uploads/192.168.200.197/");
+app.use("/uploads/192.168.200.198/",express.static(__dirname + "/uploads/192.168.200.198/"));console.log("File download enabled for /uploads/192.168.200.198/");
+app.use("/uploads/192.168.200.199/",express.static(__dirname + "/uploads/192.168.200.199/"));console.log("File download enabled for /uploads/192.168.200.199/");
+app.use("/uploads/192.168.200.200/",express.static(__dirname + "/uploads/192.168.200.200/"));console.log("File download enabled for /uploads/192.168.200.200/");
+app.use("/uploads/192.168.200.201/",express.static(__dirname + "/uploads/192.168.200.201/"));console.log("File download enabled for /uploads/192.168.200.201/");
+app.use("/uploads/192.168.200.202/",express.static(__dirname + "/uploads/192.168.200.202/"));console.log("File download enabled for /uploads/192.168.200.202/");
+app.use("/uploads/192.168.200.203/",express.static(__dirname + "/uploads/192.168.200.203/"));console.log("File download enabled for /uploads/192.168.200.203/");
+app.use("/uploads/192.168.200.204/",express.static(__dirname + "/uploads/192.168.200.204/"));console.log("File download enabled for /uploads/192.168.200.204/");
+app.use("/uploads/192.168.200.205/",express.static(__dirname + "/uploads/192.168.200.205/"));console.log("File download enabled for /uploads/192.168.200.205/");
+app.use("/uploads/192.168.200.206/",express.static(__dirname + "/uploads/192.168.200.206/"));console.log("File download enabled for /uploads/192.168.200.206/");
+app.use("/uploads/192.168.200.207/",express.static(__dirname + "/uploads/192.168.200.207/"));console.log("File download enabled for /uploads/192.168.200.207/");
+app.use("/uploads/192.168.200.208/",express.static(__dirname + "/uploads/192.168.200.208/"));console.log("File download enabled for /uploads/192.168.200.208/");
+app.use("/uploads/192.168.200.209/",express.static(__dirname + "/uploads/192.168.200.209/"));console.log("File download enabled for /uploads/192.168.200.209/");
+app.use("/uploads/192.168.200.210/",express.static(__dirname + "/uploads/192.168.200.210/"));console.log("File download enabled for /uploads/192.168.200.210/");
+app.use("/uploads/192.168.200.211/",express.static(__dirname + "/uploads/192.168.200.211/"));console.log("File download enabled for /uploads/192.168.200.211/");
+app.use("/uploads/192.168.200.212/",express.static(__dirname + "/uploads/192.168.200.212/"));console.log("File download enabled for /uploads/192.168.200.212/");
+app.use("/uploads/192.168.200.213/",express.static(__dirname + "/uploads/192.168.200.213/"));console.log("File download enabled for /uploads/192.168.200.213/");
+app.use("/uploads/192.168.200.214/",express.static(__dirname + "/uploads/192.168.200.214/"));console.log("File download enabled for /uploads/192.168.200.214/");
+app.use("/uploads/192.168.200.215/",express.static(__dirname + "/uploads/192.168.200.215/"));console.log("File download enabled for /uploads/192.168.200.215/");
+app.use("/uploads/192.168.200.216/",express.static(__dirname + "/uploads/192.168.200.216/"));console.log("File download enabled for /uploads/192.168.200.216/");
+app.use("/uploads/192.168.200.217/",express.static(__dirname + "/uploads/192.168.200.217/"));console.log("File download enabled for /uploads/192.168.200.217/");
+app.use("/uploads/192.168.200.218/",express.static(__dirname + "/uploads/192.168.200.218/"));console.log("File download enabled for /uploads/192.168.200.218/");
+app.use("/uploads/192.168.200.219/",express.static(__dirname + "/uploads/192.168.200.219/"));console.log("File download enabled for /uploads/192.168.200.219/");
+app.use("/uploads/192.168.200.220/",express.static(__dirname + "/uploads/192.168.200.220/"));console.log("File download enabled for /uploads/192.168.200.220/");
+app.use("/uploads/192.168.200.221/",express.static(__dirname + "/uploads/192.168.200.221/"));console.log("File download enabled for /uploads/192.168.200.221/");
+app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
+app.use("/uploads/192.168.200.223/",express.static(__dirname + "/uploads/192.168.200.223/"));console.log("File download enabled for /uploads/192.168.200.223/");
+app.use("/uploads/192.168.200.224/",express.static(__dirname + "/uploads/192.168.200.224/"));console.log("File download enabled for /uploads/192.168.200.224/");
+app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
+app.use("/uploads/192.168.200.226/",express.static(__dirname + "/uploads/192.168.200.226/"));console.log("File download enabled for /uploads/192.168.200.226/");
+app.use("/uploads/192.168.200.227/",express.static(__dirname + "/uploads/192.168.200.227/"));console.log("File download enabled for /uploads/192.168.200.227/");
+app.use("/uploads/192.168.200.228/",express.static(__dirname + "/uploads/192.168.200.228/"));console.log("File download enabled for /uploads/192.168.200.228/");
+app.use("/uploads/192.168.200.229/",express.static(__dirname + "/uploads/192.168.200.229/"));console.log("File download enabled for /uploads/192.168.200.229/");
+app.use("/uploads/192.168.200.230/",express.static(__dirname + "/uploads/192.168.200.230/"));console.log("File download enabled for /uploads/192.168.200.230/");
+app.use("/uploads/192.168.200.231/",express.static(__dirname + "/uploads/192.168.200.231/"));console.log("File download enabled for /uploads/192.168.200.231/");
+app.use("/uploads/192.168.200.232/",express.static(__dirname + "/uploads/192.168.200.232/"));console.log("File download enabled for /uploads/192.168.200.232/");
+app.use("/uploads/192.168.200.233/",express.static(__dirname + "/uploads/192.168.200.233/"));console.log("File download enabled for /uploads/192.168.200.233/");
+app.use("/uploads/192.168.200.234/",express.static(__dirname + "/uploads/192.168.200.234/"));console.log("File download enabled for /uploads/192.168.200.234/");
+app.use("/uploads/192.168.200.235/",express.static(__dirname + "/uploads/192.168.200.235/"));console.log("File download enabled for /uploads/192.168.200.235/");
+app.use("/uploads/192.168.200.236/",express.static(__dirname + "/uploads/192.168.200.236/"));console.log("File download enabled for /uploads/192.168.200.236/");
+app.use("/uploads/192.168.200.237/",express.static(__dirname + "/uploads/192.168.200.237/"));console.log("File download enabled for /uploads/192.168.200.237/");
+app.use("/uploads/192.168.200.238/",express.static(__dirname + "/uploads/192.168.200.238/"));console.log("File download enabled for /uploads/192.168.200.238/");
+app.use("/uploads/192.168.200.239/",express.static(__dirname + "/uploads/192.168.200.239/"));console.log("File download enabled for /uploads/192.168.200.239/");
+app.use("/uploads/192.168.200.240/",express.static(__dirname + "/uploads/192.168.200.240/"));console.log("File download enabled for /uploads/192.168.200.240/");
+app.use("/uploads/192.168.200.241/",express.static(__dirname + "/uploads/192.168.200.241/"));console.log("File download enabled for /uploads/192.168.200.241/");
+app.use("/uploads/192.168.200.242/",express.static(__dirname + "/uploads/192.168.200.242/"));console.log("File download enabled for /uploads/192.168.200.242/");
+app.use("/uploads/192.168.200.243/",express.static(__dirname + "/uploads/192.168.200.243/"));console.log("File download enabled for /uploads/192.168.200.243/");
+app.use("/uploads/192.168.200.244/",express.static(__dirname + "/uploads/192.168.200.244/"));console.log("File download enabled for /uploads/192.168.200.244/");
+app.use("/uploads/192.168.200.245/",express.static(__dirname + "/uploads/192.168.200.245/"));console.log("File download enabled for /uploads/192.168.200.245/");
+app.use("/uploads/192.168.200.246/",express.static(__dirname + "/uploads/192.168.200.246/"));console.log("File download enabled for /uploads/192.168.200.246/");
+app.use("/uploads/192.168.200.247/",express.static(__dirname + "/uploads/192.168.200.247/"));console.log("File download enabled for /uploads/192.168.200.247/");
+app.use("/uploads/192.168.200.248/",express.static(__dirname + "/uploads/192.168.200.248/"));console.log("File download enabled for /uploads/192.168.200.248/");
+app.use("/uploads/192.168.200.249/",express.static(__dirname + "/uploads/192.168.200.249/"));console.log("File download enabled for /uploads/192.168.200.249/");
+app.use("/uploads/192.168.200.250/",express.static(__dirname + "/uploads/192.168.200.250/"));console.log("File download enabled for /uploads/192.168.200.250/");
+app.use("/uploads/192.168.200.251/",express.static(__dirname + "/uploads/192.168.200.251/"));console.log("File download enabled for /uploads/192.168.200.251/");
+app.use("/uploads/192.168.200.252/",express.static(__dirname + "/uploads/192.168.200.252/"));console.log("File download enabled for /uploads/192.168.200.252/");
+app.use("/uploads/192.168.200.253/",express.static(__dirname + "/uploads/192.168.200.253/"));console.log("File download enabled for /uploads/192.168.200.253/");
+app.use("/uploads/192.168.200.254/",express.static(__dirname + "/uploads/192.168.200.254/"));console.log("File download enabled for /uploads/192.168.200.254/");
+app.use("/uploads/192.168.200.255/",express.static(__dirname + "/uploads/192.168.200.255/"));console.log("File download enabled for /uploads/192.168.200.255/");
