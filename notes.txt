@@ -19,3 +19,39 @@ npm install mongodb
 1. User must not log in via two tabs or windows
 2. Make no. of options 1 after setvote
 3. Do superusers have uplaod privilieges?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===New Issues===
+1. Open all downloads in new tab
+2. Latest message in bold and red
+3. Abstain be grey
+4. Rename final version with country name
+5. Lock final version after printed
