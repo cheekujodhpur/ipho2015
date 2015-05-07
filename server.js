@@ -237,119 +237,6 @@ app.get('/', function (req, res)
 	    }
 	});
 
-
-//io
-/*
-The io between the server and the client is managed by socket.io signals
-Signals used in the program:
--------------------------------------------------------------------------------
-*syn*
-
-SIGNAL CAUSE:
-    'syn' signal is sent when the client is synchronised with the server and the 
-user submits a password in auth.html.
-TODO:Encrypt this password which currently is being sent as simply text
-
-SIGNAL ACTION:
-    On receiving this signal,the server connect to the MongoDB server
-and retrieves the 'users' collection.The user's ip sent with is signal 
-is first checked of its precense in the database.If the ip is not present NO
-RESPONSE is sent.
-    If the ip is present,the true-pass(password) is checked with the pass sent
-by the user.If the password is correct,then the logged property of the user is set
-to true and a 'fin' signal is sent to signify that the syncing is complete.If the 
-password is incorrect a 'syn-err' error signal is emmited.
---------------------------------------------------------------------------------
-
-*syn-err*
-
-SIGNAL CAUSE:
-    This signal is sent when the user's ip is present in the database but the password
-submitted by the user is incorrect.
-    
-SIGNAL ACTION
-    On receiving this signal,auth.html adds to the password input box,the class "has-error".
--------------------------------------------------------------------------------
-
-*fin*
-
-SIGNAL CAUSE:
-    This signal is sent when the user's ip is prenset in the database and the password
-entered by the user is correct.
-
-SIGNAL ACTION
-    On reciving this signal,auth.html redirects the browser to the '/' page.
--------------------------------------------------------------------------------
-
-*end*
-
-SIGNAL CAUSE:
-    This signal is sent when the logout button on the index.html page is clicked.
-
-SIGNAL ACTION:
-    On receiving the signal,the server connects to the MongoDB server and retrieves
-the 'users' collection.The server upadates the logged property of the ip of the user
-to false.In the end the server emits a 'end-ack' signal.
--------------------------------------------------------------------------------
-
-*end-ack*
-This signal denotes that the end was acknowleged by the server.
-SIGNAL CAUSE:
-    This signal is sent when an 'end' signal is received by the server.
-
-SIGNAL ACTION:
-    On receiving this signal,the index.html page redirects the user to the
-'/auth.html' page.
--------------------------------------------------------------------------------
-
-*setvote*
-
-SIGNAL CAUSE:
-    This signal is sent by the su's index.html page.Along with the signal,
-the body of the question,the options and time are sent as well.
-
-SIGNAL ACTION:
-    On reciving this signal,the server generates a random 5 alphanumeric id 
-of the question on which the question is stored in the database.The server then
-connects to the MongoDB server and retrieves the 'voteq' collection.It inserts the 
-body and options of the question in the collection.The server then broadcasts a 
-'govote' signal along which it sends the id,body,options and time of the question.
--------------------------------------------------------------------------------
-
-*govote*
-
-SIGNAL CAUSE:
-    This signal is BROADCASTED by the server after storing the question in 'voteq'
-collection on receiving the 'setvote' signal.
-
-SIGNAL ACTION:
-    On receiving this signal,the index.html of the user runs a timer for the time recieved
-with the signal.On end of the counter,the 'logvote' signal is emitted along with the id of
-the question and the options selected(1 for selected and 0 for not selected).
--------------------------------------------------------------------------------
-
-*logvote*
-
-SIGNAL CAUSE:
-    This signal is sent by the index.html of user when the timer for a question has expired.
-
-SIGNAL ACTION:
-    On receiving this signal,the server connects to the MongoDB server and retieves the 'voteq'
-collection.It updates the corresponding options in the collection according to the users' 
-responses.
--------------------------------------------------------------------------------
-*voteresults*
-
-SIGNAL CAUSE:
-    This signal is sent from the server after a delay of 5000ms after the time of the question
-has expired.It signifies that the results must be now displayed.Along with the signal,the number of
-votes received and the options themselves are also sent.
-
-SIGNAL ACTION:
-    This signal causes the respective index.html pages of both users and super-users to display
-the results in the form of a histogram using chartjs.    
-*/
-
 var voted = [];	//a global variable which maintains the ip of people who have voted once
 
 io.on('connection',function(socket)
@@ -368,13 +255,32 @@ io.on('connection',function(socket)
         }
         console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
         var messages = db.collection('messages');
-      
+        var flags = db.collection('flags');
+
         messages.find({}).toArray(function(err,items)
         {   
             message_table = items;
             io.sockets.emit('message-sent',message_table); 
             console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
-            db.close();
+        });
+        flags.find({"name":"feedback"}).toArray(function(err,items)
+        {
+            if(items!=''){
+                if(parseInt(items[0].value)==0){
+                    socket.emit('fbDisable');
+                    console.log("'fbDisable' signal sent from the server in response to " + ip.toString());
+                }
+                else{
+                    socket.emit('fbEnable',items[0].value);
+                    console.log("'fbEnable' signal sent from the server in response to " + ip.toString());
+                }
+            }
+            else
+            {
+                    socket.emit('fbDisable');
+                    console.log("'fbDisable' signal sent from the server in response to " + ip.toString());
+            }
+        db.close();
         });
     });
 
@@ -511,15 +417,6 @@ io.on('connection',function(socket)
         var ip = socket.handshake.address;
         console.log("'file-delete' signal received from " + ip.toString());
         var message_table = [];
-		// Connect to the db
-		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-        {
-		    if(err)
-		    {
-			    console.log(err);
-			    return 0;
-		    }
-            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
 	    try
 	    {
 	    	fs.unlink(__dirname + id);
@@ -528,11 +425,76 @@ io.on('connection',function(socket)
             {
                 console.log("File deletion failed");
 	    }
-	});
 	socket.emit('file-deleted');
 	});
 
+    //start feedback
+    socket.on('fbStart',function(q){
+        var ip = socket.handshake.address;
+		console.log("'fbStart' signal for " + q +" received from " + ip.toString());
 
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            
+			var flags = db.collection('flags');
+			var query = {};
+			query['value'] = q;
+		    flags.update({"name":"feedback"},{$set:query},{upsert:true},function(err,result){db.close();});
+	    });
+	    io.sockets.emit('fbEnable',q);
+		console.log("'fbEnable' signal emitted from server in response to " + ip.toString());
+    });
+    
+    //end feedback
+    socket.on('fbEnd',function(){
+        var ip = socket.handshake.address;
+		console.log("'fbEnd' signal received from " + ip.toString());
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            
+			var flags = db.collection('flags');
+			var query = {};
+			query['value'] = 0;
+		    flags.update({"name":"feedback"},{$set:query},function(err,result){db.close();});
+	    });
+	    io.sockets.emit('fbDisable');
+		console.log("'fbDisable' signal emitted from server in response to " + ip.toString());
+    });
+
+    //store and send feedback
+    socket.on('fbContent',function(id,content){
+        var ip = socket.handshake.address;
+		console.log("'fbContent' signal received from " + ip.toString());
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            
+			var fbs = db.collection('fbs');
+			var query = {};
+			query['ip'] = ip;
+            query['qid'] = id;  //question id
+            var query2 = {};
+            query2['content'] = content;
+		    fbs.update(query,{$push:query2},{upsert:true},function(err,result){db.close();});
+	    });
+    });
 
     //login
 	socket.on('syn',function(pass)

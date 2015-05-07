@@ -42,6 +42,12 @@
 	position:relative;
 }
 
+#form-feedback
+{
+	width:300px;
+	position:relative;
+}
+
 #form-auth-submit
 {
 	width:100px;
@@ -188,4 +194,8 @@
    padding:10px;
    word-wrap:break-word;
 }
+
+#message-board tr:last-child
+{
+    font-weight:bold;
 }

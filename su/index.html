@@ -44,6 +44,7 @@
 					<li id = "svoteb" role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
+					<li id = "fbb" role = "presentation"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
                 </ul>
 			</div>
 			<div class = "tab-content">
@@ -88,7 +89,6 @@
                     </form>
                     <!--Section for Vote on Administrator End///ends here-->
 				</div>
-				<div role="tabpanel" class="tab-pane" id = "trans">Translation</div>
 				<div role="tabpanel" class="tab-pane" id = "cvote">
 					<!--Cast Vote starts here-->
 					<p id = "cast-vote-body"></p>
@@ -101,7 +101,30 @@
 					<!--Cast Vote ends here-->
 				</div>
 				<div role="tabpanel" class="tab-pane" id = "rvote"></div>
-			</div>
+				<div role="tabpanel" class="tab-pane" id = "fb">
+			        <form id="form-feedback-toggle">
+                        <div class = "form-group" id = "feedback-togglers">
+                            <label class = "form-label" for = "fb-toggle">Turn Feedback on</label>
+                            <div class = "radio">
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')"/>Theory 1</label>
+                            </div>
+                            <div class = "radio">
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')"/>Theory 2</label>
+                            </div>
+                            <div class = "radio">
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')"/>Theory 3</label>
+                            </div>
+                            <div class = "radio">
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','ep1')"/>Experiment 1</label>
+                            </div>
+                            <div class = "radio">
+                                <label><input name = "fb-toggle" type = "radio" checked="checked" onclick = "socket.emit('fbEnd');"/>None</label>
+                            </div>
+
+                        </div>
+                    </form>    
+				</div>
+			</div>	
 		</div>
         <div id="sidebar-wrapper" >
             <button type="button" class="btn btn-default" id = "refresh-button">Clear All</button>

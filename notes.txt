@@ -55,3 +55,4 @@ npm install mongodb
 3. Abstain be grey
 4. Rename final version with country name
 5. Lock final version after printed
+6. Have 'feedback' in flags

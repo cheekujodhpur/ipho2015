@@ -47,6 +47,7 @@
                         <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");'>Home</a></li>
                         <li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
                         <li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
+                        <li id = "fbb" role = "presentation" style = "display:none;"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
                     </ul>
             </div>
             
@@ -79,6 +80,26 @@
                 </div>
                 
                 <div role="tabpanel" class="tab-pane" id = "rvote"></div>
+                
+		<div role="tabpanel" class="tab-pane" id = "fb">
+            <h4 id = "fbHead">Feedback for </h4>
+            <form id = "form-feedback">
+                <div class="form-group" id = "fb-dropdown">
+                   <label for = "fbMenu">Question:</label>
+                   <select class = "form-control" id = "fbMenu">
+                       <option>1a</option>
+                       <option>1b</option>
+                       <option>1c</option>
+                       <option>1d</option>
+                   </select>    
+                </div>
+                <div class = "form-group" id = "fb-content">
+                    <label for = "comment">Comment:</label>
+                    <textarea class = "form-control" rows = "5" id = "comment"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default" id = "fb_submit">Submit</button>
+            </form>
+        </div>
             </div>
         </div>
         <div id="sidebar-wrapper" >
@@ -171,8 +192,7 @@
                 }
                 table += "</table>";
                 $("#upload_table").remove();
-                $("#home").append(table);
-                
+                $("#home").append(table); 
             }
         });
 
@@ -221,8 +241,8 @@
             $("#nemo a:eq(-2)").tab('show');
         
                 clearInterval(timer);
-		var startDate = new Date();
-		var startTime = startDate.getTime()/1000;
+                var startDate = new Date();
+                var startTime = startDate.getTime()/1000;
                 var timer = setInterval(function(){
 		    var nowDate = new Date();
 		    var nowTime = nowDate.getTime()/1000;
@@ -298,6 +318,34 @@
                 $("#nemo a:eq(0)").tab('show');
         });
 
+	//FEEDBACK ENABLE
+	socket.on('fbEnable',function(q){
+        if(q=='tq1')
+            $("#fbHead").text("Feedback for Theory Question 1");
+        if(q=='tq2')
+            $("#fbHead").text("Feedback for Theory Question 2");
+        if(q=='tq3')
+            $("#fbHead").text("Feedback for Theory Question 3");
+        if(q=='ep1')
+            $("#fbHead").text("Feedback for Practical Question 1");
+            
+		$("#fbb").show();
+	});
+	
+	//FEEDBACK DISABLE
+	socket.on('fbDisable',function(){
+        $("#nemo a:first").tab('show');
+		$("#fbb").hide();
+	});
+
+    $("#fb_submit").click(function(e){
+        e.preventDefault();
+        var content = $("#comment").val();
+        var id = $("#fbMenu").val();
+        
+        $("#comment").val('');
+        socket.emit('fbContent',id,content);
+     });
         //FUNCTIONS
         function logVote(id)
         {
