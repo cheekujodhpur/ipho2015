@@ -474,7 +474,7 @@ io.on('connection',function(socket)
     });
 
     //store and send feedback
-    socket.on('fbContent',function(id,content){
+    socket.on('fbContent',function(id,current,content){
         var ip = socket.handshake.address;
 		console.log("'fbContent' signal received from " + ip.toString());
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -490,10 +490,32 @@ io.on('connection',function(socket)
 			var query = {};
 			query['ip'] = ip;
             query['qid'] = id;  //question id
+            query['qno'] = current;
             var query2 = {};
             query2['content'] = content;
 		    fbs.update(query,{$push:query2},{upsert:true},function(err,result){db.close();});
 	    });
+    });
+
+    socket.on('fbRequest',function(value){
+        var ip = socket.handshake.address;
+		console.log("'fbRequest' for "+value+" signal received from " + ip.toString());
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+		    var fbs = db.collection('fbs');
+		    fbs.find({qno:value}).toArray(function(err,feeds)
+		    {
+				socket.emit('fbDisplay',feeds);
+		        console.log("'fbDisplay' signal emitted from server in response to " + ip.toString());
+			    db.close();
+		    });
+		});
     });
 
     //login

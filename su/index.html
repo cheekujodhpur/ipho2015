@@ -106,23 +106,31 @@
                         <div class = "form-group" id = "feedback-togglers">
                             <label class = "form-label" for = "fb-toggle">Turn Feedback on</label>
                             <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')"/>Theory 1</label>
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" />Theory 1</label>
                             </div>
                             <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')"/>Theory 2</label>
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" />Theory 2</label>
                             </div>
                             <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')"/>Theory 3</label>
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')" value="tq3" />Theory 3</label>
                             </div>
                             <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','ep1')"/>Experiment 1</label>
+                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','ep1')" value="ep1" />Experiment 1</label>
                             </div>
                             <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" checked="checked" onclick = "socket.emit('fbEnd');"/>None</label>
+                                <label><input name = "fb-toggle" type = "radio" checked="checked" onclick = "socket.emit('fbEnd');clearInterval(fbtimer);"/>None</label>
                             </div>
 
                         </div>
-                    </form>    
+                    </form>
+                    <div id = "fb_data">
+                        <table class = "table table-striped" id = "fb_data_table">
+                            <tr>
+                            <th>IP</th>
+                            <th>QID</th>
+                            <th>Content</th></tr>
+                        </table>
+                    </div>    
 				</div>
 			</div>	
 		</div>
@@ -168,15 +176,16 @@
             };
             
             var socket = io();
-                
+            var fb_current = '';
+            var fbtimer;     
             //function to disableF5
             function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
 			
             //document ready script
 			$(document).ready(function()
             {
-	    socket.emit('list-dir','/uploads');
-	    socket.emit('list-dir','/downloads');
+	            socket.emit('list-dir','/uploads');
+	            socket.emit('list-dir','/downloads');
 				//for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -250,7 +259,7 @@
                 var Body = $('<font style="font-size:18px;">'+body+'</font>');
                 $("#cast-vote-body").append(Body);
                 //$("#cvoteb").show();
-                $("#nemo a:eq(-2)").tab('show');
+                $("#nemo a:eq(-3)").tab('show');
                 clearInterval(timer);
 		var startDate = new Date();
 		var startTime = startDate.getTime()/1000;
@@ -320,15 +329,22 @@
                     if(i!='_id' && i!='id')
                     {
                         var wid = (parseFloat(counts[i])/totalus)*500;
-		    if(parseInt(counts[i])==maxcount)
-                    	var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_green" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                    if(options[j]=='Abstain')
+                    {
+                            var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span id = "bar" style = "height:30px;width:'+wid+'px;background:grey"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                    }
                     else
-			var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_red" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                    {
+                        if(parseInt(counts[i])==maxcount)
+                            var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_green" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                        else
+                            var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_red" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                    }
                         $("#graph_table").append(bb);
                         j++; 
                     }
                 $("#rvoteb").show();
-                $("#nemo a:last").tab('show');
+                $("#nemo a:eq(-2)").tab('show');
             });
             
             function logVote(id)
@@ -443,6 +459,35 @@
                 $("#rvoteb").hide();
                 $("#cvoteb").hide();
                 $("#nemo a:eq(1)").tab('show');
+            });
+
+            socket.on('fbEnable',function(q){
+                if(q=='tq1')
+                    $("input:radio[name='fb-toggle']:eq(0)").attr('checked','checked');       
+                if(q=='tq2')
+                    $("input:radio[name='fb-toggle']:eq(1)").attr('checked','checked');       
+                if(q=='tq3')
+                    $("input:radio[name='fb-toggle']:eq(2)").attr('checked','checked');       
+                if(q=='ep1')
+                    $("input:radio[name='fb-toggle']:eq(3)").attr('checked','checked');       
+                fb_current = q;
+                fbtimer = setInterval(function(){
+                    socket.emit('fbRequest',fb_current);    
+                },10000);
+            });
+            
+            socket.on('fbDisplay',function(feeds){
+                var field = '<tr><th>IP</th><th>QID</th><th>Content</th></tr>';
+                var Field = $(field);
+                $("#fb_data_table").html(Field);
+                for(var feed in feeds)
+                {
+                    var ll = '';
+                    for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
+                    var field = '<tr><td>'+feeds[feed].ip+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                    var Field = $(field);
+                    $("#fb_data_table").append(Field);
+                } 
             });
 			
 		</script>
