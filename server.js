@@ -387,13 +387,18 @@ io.on('connection',function(socket)
           
             var uploads_dir = {}; 
             var country_codes = {}; 
+            var directory_paths = {};
             collection.find({}).toArray(function(err,users)
             {
-                for (var person in users)
+               //TODO: SOMETHING ABOUT THIS
+               //IMPORTANT 
+                for (var i =0;i < 100;i++)
                 {
-                    country_code = person.country_code;
-                    directory_path = __dirname + "/uploads/" + ip.toString() + "/";
-
+                     
+                    var country_code = users[i].country_code.toString();
+                    var ip = users[i].ip;
+                    var directory_path = __dirname + "/uploads/" + ip.toString() + "/";
+                    //console.log(country_code + directory_path);
 
                     fs.readdir(directory_path, function(err,files)
                     {
@@ -408,17 +413,28 @@ io.on('connection',function(socket)
                         {
                             return fs.statSync(file).isFile();
                         });
+                    
+                        uploads_dir[country_code] = files;
+                        directory_paths[country_code] = directory_path;  
+                    
+                        //console.log(JSON.stringify(uploads_dir));
                     });
-                    uploads_dir[country_code] = files;
-                  }
-            }
-            socket.emit('listed-all-uploads',uploads_dir,directory_path);
+
+
+                }
+            });
+            
+                        console.log(JSON.stringify(uploads_dir));
+            //console.log(directory_paths["Armenia"].toString());
+            socket.emit('listed-all-uploads',uploads_dir,directory_paths);
+            
         });
-                
+        console.log("'listed-all-uploads' signal emmited from server in response to " + ip.toString());
     });
 
 
-    //directory listing
+ole.log(JSON.stringify(uploads_dir));
+//directory listing
     socket.on('list-dir',function(directory_path)
     {
         var ip = socket.handshake.address;

@@ -45,7 +45,7 @@
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
 					<li id = "fbb" role = "presentation"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
-                    <li id = "all_uploads" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab">Uploads</a></li>
+                    <li id = "all_uploads" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab" onclick = 'socket.emit("list-all-uploads");'>Uploads</a></li>
                 </ul>
 			</div>
 			<div class = "tab-content">
@@ -194,7 +194,8 @@
             {
 	            socket.emit('list-dir','/uploads');
 	            socket.emit('list-dir','/downloads');
-				//for adding options
+				socket.emit('list-all-uploads');
+                //for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
 					e.preventDefault();
@@ -421,11 +422,15 @@
 			{
 				socket.emit('list-dir',"/downloads");
 			});
-            socket.on('listed-all-uploads',function(uploads_dir,directory_path)
+            socket.on('listed-all-uploads',function(uploads_dir,directory_paths)
             {
                 var country_codes = Object.keys(uploads_dir);
+                //alert(uploads_dir["Armenia"]);
+                console.log(JSON.stringify(uploads_dir));
                 for(var country in country_codes)
                 {
+                    alert(country.toString);
+                    var directory_path = directory_paths[country];
                     var table = '<table id="download_table' + country.toString() + '" class="table table-hover"><thead><tr><th>' + country.toString() + '</th></tr></thead>';
                     var files = uploads_dir[country];
                     for(var i = 0;i < files.length;i++)
@@ -437,6 +442,7 @@
                     $("#download_table" + country.toString()).remove();
                     $("#all_uploads").append(table);
                  }
+                 alert("SDf");
              });
 
 	        socket.on('listed-dir',function(id,directory_path,files)
