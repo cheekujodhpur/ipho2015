@@ -370,6 +370,53 @@ io.on('connection',function(socket)
        io.sockets.emit("message-sent",message_table);
        console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
     });
+    //directory listing for the convener
+    socket.on('list-all-uploads',function()
+    {
+        var ip = socket.handshake.address;
+        console.log("'list-all-uploads' signal received from " + ip.toString());
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                    console.log(err);
+                    return 0;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+          
+            var uploads_dir = {}; 
+            var country_codes = {}; 
+            collection.find({}).toArray(function(err,users)
+            {
+                for (var person in users)
+                {
+                    country_code = person.country_code;
+                    directory_path = __dirname + "/uploads/" + ip.toString() + "/";
+
+
+                    fs.readdir(directory_path, function(err,files)
+                    {
+                        if(err)
+                        {
+                            throw err;
+                        }
+                        files.map(function(file)
+                        {
+                            return path.join(directory_path,file);
+                        }).filter(function(file)
+                        {
+                            return fs.statSync(file).isFile();
+                        });
+                    });
+                    uploads_dir[country_code] = files;
+                  }
+            }
+            socket.emit('listed-all-uploads',uploads_dir,directory_path);
+        });
+                
+    });
+
 
     //directory listing
     socket.on('list-dir',function(directory_path)
