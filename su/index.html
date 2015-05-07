@@ -45,6 +45,7 @@
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
 					<li id = "fbb" role = "presentation"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
+                    <li id = "all_uploads" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab">Uploads</a></li>
                 </ul>
 			</div>
 			<div class = "tab-content">
@@ -132,6 +133,13 @@
                         </table>
                     </div>    
 				</div>
+				<div role="tabpanel" class="tab-pane" id = "all_uploads">
+                     
+                    
+                
+                
+                
+                </div>
 			</div>	
 		</div>
         <div id="sidebar-wrapper" >
@@ -413,8 +421,23 @@
 			{
 				socket.emit('list-dir',"/downloads");
 			});
+            socket.on('listed-all-uploads',function(uploads_dir,directory_path)
+            {
+                var country_codes = Object.keys(uploads_dir);
+                for(var country in country_codes)
+                {
+                    var table = '<table id="download_table' + country.toString() + '" class="table table-hover"><thead><tr><th>' + country.toString() + '</th></tr></thead>';
+                    var files = uploads_dir[country];
+                    for(var i = 0;i < files.length;i++)
+                    {
+                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>'
+                    }
+                    table += "</table>";
 
-
+                    $("#download_table" + country.toString()).remove();
+                    $("#all_uploads").append(table);
+                 }
+             });
 
 	        socket.on('listed-dir',function(id,directory_path,files)
             {
