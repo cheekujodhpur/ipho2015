@@ -557,13 +557,18 @@ io.on('connection',function(socket)
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             
 			var fbs = db.collection('fbs');
-			var query = {};
-			query['ip'] = ip;
-            query['qid'] = id;  //question id
-            query['qno'] = current;
-            var query2 = {};
-            query2['content'] = content;
-		    fbs.update(query,{$push:query2},{upsert:true},function(err,result){db.close();});
+            var users = db.collection('users');
+            users.find({"ip":ip}).toArray(function(err,result){
+                var country_code = result[0].country_code;
+                var query = {};
+                query['ip'] = ip;
+                query['country_code'] = country_code;
+                query['qid'] = id;  //question id
+                query['qno'] = current;
+                var query2 = {};
+                query2['content'] = content;
+                fbs.update(query,{$push:query2},{upsert:true},function(err,result){db.close();});
+            });
 	    });
     });
 

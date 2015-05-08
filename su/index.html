@@ -125,10 +125,10 @@
                         </div>
                     </form>
                     <div id = "fb_data">
-                        <table class = "table table-striped tablesorter" id = "fb_data_table">
+                        <table style = "table-layout:fixed" class = "table table-striped tablesorter" id = "fb_data_table">
                             <thead>
                             <tr>
-                            <th>IP</th>
+                            <th>Country Code</th>
                             <th>QID</th>
                             <th>Content</th></tr>
                             </thead>
@@ -517,7 +517,7 @@
                 {
                     var ll = '';
                     for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
-                    var field = '<tr><td>'+feeds[feed].ip+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                    var field = '<tr><td>'+feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
                     var Field = $(field);
                     $("#fb_data_table_body").append(Field);
                 } 
