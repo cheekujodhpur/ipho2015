@@ -137,6 +137,7 @@
         
         var socket = io();
         var fb_current = '';
+        var num_of_leaders = '';
 		socket.on('end-ack',function()
         {
 		    window.location = '/auth.html';
@@ -146,7 +147,11 @@
             console.log('Disconnected');
             socket.io.reconnect();
         });	
-        
+       
+        socket.on('numofleaders',function(value)
+        {
+            num_of_leaders = value;
+        });
         //DONT PUT THIS IN DOCUMENT READY SCRIPT
         //function to disableF5
         function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
@@ -203,7 +208,11 @@
         {
             $(document).on("keydown",disableF5);
             var option,Option;
-            $("#vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left"><h5>Leader 1</h5></div><div class = "left" id = "right-opts" style = "position:relative"><h5>Leader 2</h5></div><div class = "clear"></div></div>');
+            if(num_of_leaders==2)
+                var optiontext = '<div id="divider-container"><div id = "left-opts" class = "left"><h5>Leader 1</h5></div><div class = "left" id = "right-opts" style = "position:relative"><h5>Leader 2</h5></div><div class = "clear"></div></div>';
+            else
+                var optiontext = '<div id="divider-container"><div id = "left-opts" class = "left"><h5>Leader 1</h5></div><div class = "clear"></div></div>';
+            $("#vote-opts").html(optiontext);
             for(var i = 1;i<=options.length;i++){
                 if(i!=options.length)
                     option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
@@ -212,30 +221,38 @@
                 Option = $(option);
                 $("#left-opts").append(Option);
             }
-            for(var i = 1;i<=options.length;i++){
-                if(i!=options.length)
-                    option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
-                else
-                    option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
-                Option = $(option);
-                $("#right-opts").append(Option);
+            if(num_of_leaders==2)
+            {
+                for(var i = 1;i<=options.length;i++){
+                    if(i!=options.length)
+                        option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+                    else
+                        option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
+                    Option = $(option);
+                    $("#right-opts").append(Option);
+                }
             }
             var dummy_submit = '<button id = "dummy_submit" class = "btn btn-default">Submit</button>';
             var Dummy_submit = $(dummy_submit);
             $("#left-opts").append(Dummy_submit);
-            var dummy_submit = '<button id = "dummy_submit2" class = "btn btn-default">Submit</button>';
-            var Dummy_submit = $(dummy_submit);
-            $("#right-opts").append(Dummy_submit);
-            
+            if(num_of_leaders==2)
+            {
+                var dummy_submit = '<button id = "dummy_submit2" class = "btn btn-default">Submit</button>';
+                var Dummy_submit = $(dummy_submit);
+                $("#right-opts").append(Dummy_submit);
+            }
             //add click event handler to dummy_submit
             $("#dummy_submit").click(function(e){
                 e.preventDefault();
                 $('input[name=vote-options]').attr('disabled',true);
             });
-            $("#dummy_submit2").click(function(e){
-                e.preventDefault();
-                $('input[name=vote-options2]').attr('disabled',true);
-            });
+            if(num_of_leaders==2)
+            {
+                $("#dummy_submit2").click(function(e){
+                    e.preventDefault();
+                    $('input[name=vote-options2]').attr('disabled',true);
+                });
+            }
             var Body = $('<font style="font-size:18px;">'+body+'</font>');
             $("#vote-body").append(Body);
             $("#cvoteb").show();

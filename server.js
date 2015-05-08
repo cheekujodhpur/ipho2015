@@ -87,6 +87,7 @@ app.get('/static/css/simple-sidebar.css', function(req,res){res.sendFile(__dirna
 app.get('/static/css/main.css', function(req,res){res.sendFile(__dirname+'/static/css/main.css');});
 app.get('/static/js/jquery.min.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.min.js');});
 app.get('/static/js/bootstrap.min.js', function(req,res){res.sendFile(__dirname+'/static/js/bootstrap.min.js');});
+app.get('/static/js/jquery.tablesorter.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.tablesorter.js');});
 app.get('/static/js/Chart.min.js', function(req,res){res.sendFile(__dirname+'/static/js/Chart.min.js');});
 app.get('/media/ipho-logo1.png', function(req,res){res.sendFile(__dirname+'/media/ipho-logo1.png');});
 app.get('/media/tifr-logo-s.png', function(req,res){res.sendFile(__dirname+'/media/tifr-logo-s.png');});
@@ -256,7 +257,14 @@ io.on('connection',function(socket)
         console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
         var messages = db.collection('messages');
         var flags = db.collection('flags');
+        var users = db.collection('users');
 
+        users.find({"ip":ip}).toArray(function(err,items)
+        {
+            var val = items[0].number_of_votes;
+            socket.emit('numberofleaders',val);
+            console.log("'numberofleaders' signal broadcasted from the server in response to " + ip.toString());
+        });
         messages.find({}).toArray(function(err,items)
         {   
             message_table = items;
@@ -433,7 +441,6 @@ io.on('connection',function(socket)
     });
 
 
-ole.log(JSON.stringify(uploads_dir));
 //directory listing
     socket.on('list-dir',function(directory_path)
     {
