@@ -45,23 +45,29 @@
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
 					<li id = "fbb" role = "presentation"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
-                    <li id = "all_uploads" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab" onclick = 'socket.emit("list-all-uploads");'>Uploads</a></li>
+                    <li id = "all_uploads_b" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab" onclick = 'socket.emit("list-all-uploads");'>Uploads</a></li>
                 </ul>
 			</div>
 			<div class = "tab-content">
 				<div role="tabpanel" class="tab-pane active" id = "home">
-					 <!--Upload starts here-->
-
-                                        <p id = "upload-body">Upload</p>
-                                        <form id        =  "upload_form"
-                                        enctype   =  "multipart/form-data"
-                                        action    =  "/uploaded"
-                                        method    =  "post"
-                                        >
-                                <input id = 'file_upload' type="file" name="user_file" />
-                                <input type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check();'/>
-                                </form>
-                                    <!--Upload ends here-->
+					<!--Upload starts here-->
+                    <p id = "upload-body">Upload</p>
+                    <form id        =  "upload_form"
+                    enctype   =  "multipart/form-data"
+                    action    =  "/uploadedT1"
+                    method    =  "post"
+                    >
+                    <div style="position:relative;">
+                        <a class='btn btn-default' href='javascript:;'>
+                                    Choose File...
+                                            <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id="file_upload" name="user_file" size="40"  onchange='$("#upload-file-info").html($(this).val().replace("C:\\fakepath\\", ""));'>
+                         </a>
+                         &nbsp;
+                         <span class='label label-info' id="upload-file-info"></span>
+                    </div> 
+                    <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check();'/>
+                    </form>
+                    <!--Upload ends here-->
 
 				</div>
                 <div role="tabpanel" class="tab-pane" id = "vote">
@@ -138,11 +144,6 @@
                     </div>    
 				</div>
 				<div role="tabpanel" class="tab-pane" id = "all_uploads">
-                     
-                    
-                
-                
-                
                 </div>
 			</div>	
 		</div>
@@ -428,32 +429,54 @@
 			{
 				socket.emit('list-dir',"/downloads");
 			});
-            socket.on('listed-all-uploads',function(uploads_dir,directory_paths)
+            socket.on('listed-all-uploads',function(all_uploads)
             {
-                var country_codes = Object.keys(uploads_dir);
-                //alert(uploads_dir["Armenia"]);
-                console.log(JSON.stringify(uploads_dir));
-                for(var country in country_codes)
+                var table = '<table class="table table-bordered table-hover" id = "all_uploads_table">';
+                for(var i in all_uploads)
                 {
-                    alert(country.toString);
-                    var directory_path = directory_paths[country];
-                    var table = '<table id="download_table' + country.toString() + '" class="table table-hover"><thead><tr><th>' + country.toString() + '</th></tr></thead>';
-                    var files = uploads_dir[country];
-                    for(var i = 0;i < files.length;i++)
+                    table += '<thead><tr><th>' + all_uploads[i].ip.toString() + '</th></tr></thead>';
+                    table += "<tbody>";
+                    if(all_uploads[i].T1)
                     {
-                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>'
+                        table += '<tbody><tr class="success"><td>Theory 1</td></tr>';
                     }
-                    table += "</table>";
-
-                    $("#download_table" + country.toString()).remove();
-                    $("#all_uploads").append(table);
-                 }
-                 alert("SDf");
+                    else
+                    {   
+                        table += '<tbody><tr class="warning"><td>Theory 1</td></tr>';
+                    }
+                    if(all_uploads[i].T2)
+                    {
+                        table += '<tr class="success"><td>Theory 2</td></tr>';
+                    }
+                    else
+                    {    
+                        table += '<tr class="warning"><td>Theory 2</td></tr>';
+                    }
+                    if(all_uploads[i].T3)
+                    {
+                        table += '<tr class="success"><td>Theory 3</td></tr>';
+                    }
+                    else
+                    {    
+                        table += '<tr class="warning"><td>Theory 3</td></tr>';
+                    }
+                    if(all_uploads[i].E)
+                    {
+                        table += '<tr class="success"><td>Experimental</td></tr>';
+                    }
+                    else
+                    {    
+                        table += '<tr class="warning"><td>Experimental</td></tr>';
+                    }
+                    table += "</tbody>";
+                }
+                table += "</table>";
+                var Table = $(table);
+                $("#all_uploads").html(Table);
              });
 
 	        socket.on('listed-dir',function(id,directory_path,files)
             {
-		//alert("listed dir received");
                 if(id == "download")
                 {
                     var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
