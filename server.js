@@ -57,7 +57,8 @@ app.use(multer(
     dest: __dirname + '/tmp/',
     limits:
     {
-	fileSize:518144,
+        //MAX FILESIZE
+	    fileSize:5018144,
     },
     rename: function (fieldname, filename) 
     {
@@ -76,7 +77,7 @@ app.use(multer(
     {
         file_size_ex = true;
         console.log('File size limit exceeded: ', file.originalname)
-  	fs.unlink('./' + file.path) // delete the partially written file
+  	    fs.unlink('./' + file.path) // delete the partially written file
     }
 }));
 
@@ -148,95 +149,374 @@ app.get('/', function (req, res)
 	});
 });
 
-	//copies the uploaded file from /tmp to the user's home folder
-	app.post('/uploaded',function(req,res)
-	{
-	    if(file_size_ex == true)
-	    {
-		file_size_ex = false;
-		done = false;
-	//	socket.emit('file-upload-failed');
-	//	console.log('File upload failed signal emitted');
-		res.redirect('/');
-		return;
-	    }
-	    if(done==true)
-		{
-			//the /tmp path of the file
-		var temp_path = req.files.user_file.path;
-		//the name of the uploaded file with the timestamp
-		var file_name = req.files.user_file.name
-		//the new location to which the file will be copied according to
-		//the user's ip
-		var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
-	 
+//copies the uploaded file from /tmp to the user's home folder
+app.post('/uploadedT1',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+     
 
-			MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-		{
-		    if(err)
-		    {
-			    console.log(err);
-			    return 0;
-		    }
-		    var ip = req.ip;
-		    console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-		    var collection = db.collection('users');
-		    collection.find({"ip":ip}).toArray(function(err,items)
-		    {
-			if(items.length == 0)
-			{
-			    return;
-			}
-			if(items[0].logged)
-			{
-			    var type = items[0].type;
-			    if(type)
-			    {
-				//copy the file to the new_location from the temp_path 
-				fs.copy(temp_path.toString(), new_location.toString(), function(err) 
-				{
-				    if (err) 
-				    {
-					return console.error(err);
-				    }
-				    //print the uploaded file metadata on the console
-				    console.log(req.files.user_file);
-				    console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
-				});
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "T1_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+                        
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"T1":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                    else
+                    {
+                        //change to location for uploads for the convener to /downloads
+                        new_location = __dirname + '/downloads/' + file_name;
+                
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log('%j',req.files.user_file);
+                            console.log(file_name + " successfully copied to /downloads/");
+                        });
 
-				//redirect the client to his homepage
-				res.redirect('/')
-	//			socket.emit('file-upload-success');
-				done = false;
-			    }
-			    else
-			    {
-				//change to location for uploads for the convener to /downloads
-				new_location = __dirname + '/downloads/' + file_name;
-		
-				//copy the file to the new_location from the temp_path 
-				fs.copy(temp_path.toString(), new_location.toString(), function(err) 
-				{
-				    if (err) 
-				    {
-					return console.error(err);
-				    }
-				    //print the uploaded file metadata on the console
-				    console.log('%j',req.files.user_file);
-				    console.log(file_name + " successfully copied to /downloads/");
-				});
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                }
+            });
+        });
+    }
+});
 
-				//redirect the client to his homepage
-	//			socket.emit('file-upload-success');
-				res.redirect('/')
-				done = false;
-			    }
-			}
-		    });
-		});
-	    }
-	});
+//copies the uploaded file from /tmp to the user's home folder
+app.post('/uploadedT2',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+     
 
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "T2_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"T2":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                    else
+                    {
+                        //change to location for uploads for the convener to /downloads
+                        new_location = __dirname + '/downloads/' + file_name;
+                
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log('%j',req.files.user_file);
+                            console.log(file_name + " successfully copied to /downloads/");
+                        });
+
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                }
+            });
+        });
+    }
+});
+
+//copies the uploaded file from /tmp to the user's home folder
+app.post('/uploadedT3',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "T3_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"T3":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                    else
+                    {
+                        //change to location for uploads for the convener to /downloads
+                        new_location = __dirname + '/downloads/' + file_name;
+                
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log('%j',req.files.user_file);
+                            console.log(file_name + " successfully copied to /downloads/");
+                        });
+
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                }
+            });
+        });
+    }
+});
+
+
+//copies the uploaded file from /tmp to the user's home folder
+app.post('/uploadedE',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "E_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"E":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;                        
+                    }
+                    else
+                    {
+                        //change to location for uploads for the convener to /downloads
+                        new_location = __dirname + '/downloads/' + file_name;
+                
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log('%j',req.files.user_file);
+                            console.log(file_name + " successfully copied to /downloads/");
+                        });
+
+                        //redirect the client to his homepage
+                        res.redirect('/')
+                        done = false;
+                    }
+                }
+            });
+        });
+    }
+});
 var voted = [];	//a global variable which maintains the ip of people who have voted once
 
 io.on('connection',function(socket)
@@ -375,6 +655,7 @@ io.on('connection',function(socket)
     {
         var ip = socket.handshake.address;
         console.log("'list-all-uploads' signal received from " + ip.toString());
+        var all_uploads = [];
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
@@ -383,57 +664,20 @@ io.on('connection',function(socket)
                     return 0;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var collection = db.collection('users');
-          
-            var uploads_dir = {}; 
-            var country_codes = {}; 
-            var directory_paths = {};
-            collection.find({}).toArray(function(err,users)
+            var uploads = db.collection('uploads');
+                       
+            uploads.find({}).toArray(function(err,items)
             {
-               //TODO: SOMETHING ABOUT THIS
-               //IMPORTANT 
-                for (var i =0;i < 100;i++)
-                {
-                     
-                    var country_code = users[i].country_code.toString();
-                    var ip = users[i].ip;
-                    var directory_path = __dirname + "/uploads/" + ip.toString() + "/";
-                    //console.log(country_code + directory_path);
-
-                    fs.readdir(directory_path, function(err,files)
-                    {
-                        if(err)
-                        {
-                            throw err;
-                        }
-                        files.map(function(file)
-                        {
-                            return path.join(directory_path,file);
-                        }).filter(function(file)
-                        {
-                            return fs.statSync(file).isFile();
-                        });
-                    
-                        uploads_dir[country_code] = files;
-                        directory_paths[country_code] = directory_path;  
-                    
-                        //console.log(JSON.stringify(uploads_dir));
-                    });
-
-
-                }
+                all_uploads = items;
+                socket.emit('listed-all-uploads',all_uploads);
+                console.log("'listed-all-uploads' signal emmited from server in response to " + ip.toString());
+                console.log(all_uploads);
+                db.close();
             });
-            
-                        console.log(JSON.stringify(uploads_dir));
-            //console.log(directory_paths["Armenia"].toString());
-            socket.emit('listed-all-uploads',uploads_dir,directory_paths);
-            
         });
-        console.log("'listed-all-uploads' signal emmited from server in response to " + ip.toString());
     });
 
 
-ole.log(JSON.stringify(uploads_dir));
 //directory listing
     socket.on('list-dir',function(directory_path)
     {
