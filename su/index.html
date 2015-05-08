@@ -198,10 +198,13 @@
             //document ready script
 			$(document).ready(function()
             {
-                $("#fb_data_table").tablesorter();
+                var uptimer = setInterval(function(){
 	            socket.emit('list-dir','/uploads');
 	            socket.emit('list-dir','/downloads');
 				socket.emit('list-all-uploads');
+                },10000);
+
+                $("#fb_data_table").tablesorter();
                 //for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -434,7 +437,7 @@
                 var table = '<table class="table table-bordered table-hover" id = "all_uploads_table">';
                 for(var i in all_uploads)
                 {
-                    table += '<thead><tr><th>' + all_uploads[i].ip.toString() + '</th></tr></thead>';
+                    table += '<thead><tr><th>' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
                     table += "<tbody>";
                     if(all_uploads[i].T1)
                     {

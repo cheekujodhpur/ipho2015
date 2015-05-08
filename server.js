@@ -679,7 +679,6 @@ io.on('connection',function(socket)
                 all_uploads = items;
                 socket.emit('listed-all-uploads',all_uploads);
                 console.log("'listed-all-uploads' signal emmited from server in response to " + ip.toString());
-                console.log(all_uploads);
                 db.close();
             });
         });

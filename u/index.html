@@ -57,7 +57,7 @@
                     <!--Upload starts here-->
                 <table class ="table table-bordered table-condensed" style="table-layout: fixed;">
                     <thead>
-                        <tr>
+                        <tr style = "border-top:solid 1px black;">
                             <th style="border-left:1px solid #000000;border-right:1px solid #000000">Theory 1 Upload</th>
                             <th style="border-right:1px solid #000000">Theory 2 Upload</th>
                         </tr>
@@ -240,8 +240,10 @@
         //document ready script
         $(document).ready(function()
         {
+            var uptimer = setInterval(function(){
 	    socket.emit('list-dir','/uploads');
 	    socket.emit('list-dir','/downloads');
+        },10000);
             $('#nemo a:first').tab('show');
             //socket.io controls
             $("#logout-button").click(function()
