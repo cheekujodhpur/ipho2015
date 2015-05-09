@@ -1042,7 +1042,9 @@ io.on('connection',function(socket)
 	});
 	
     //packed and printed
-    socket.on('flagPrint',function(val,type,ip){
+    socket.on('flagPrint',function(val,type,ipi){
+		var ip = socket.handshake.address;
+		console.log("'flagPrint' signal received from " + ip.toString());
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
 		    if(err)
@@ -1055,10 +1057,12 @@ io.on('connection',function(socket)
             var query = {};
             var field = type + '_printed';
             query[field] = val;
-		    uploads.update({"ip":ip},{$set:query},function(err,result){db.close();});
+		    uploads.update({"ip":ipi},{$set:query},function(err,result){db.close();});
         });
     });
-    socket.on('flagPack',function(val,type,ip){
+    socket.on('flagPack',function(val,type,ipi){
+		var ip = socket.handshake.address;
+		console.log("'flagPack' signal received from " + ip.toString());
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
 		    if(err)
@@ -1071,7 +1075,7 @@ io.on('connection',function(socket)
             var query = {};
             var field = type + '_packed';
             query[field] = val;
-		    uploads.update({"ip":ip},{$set:query},function(err,result){db.close();});
+		    uploads.update({"ip":ipi},{$set:query},function(err,result){db.close();});
         });
     });
 
@@ -1083,7 +1087,6 @@ io.on('connection',function(socket)
 	});
 });
 
-app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");
 app.use("/uploads/192.168.200.100/",express.static(__dirname + "/uploads/192.168.200.100/"));console.log("File download enabled for /uploads/192.168.200.100/");
 app.use("/uploads/192.168.200.101/",express.static(__dirname + "/uploads/192.168.200.101/"));console.log("File download enabled for /uploads/192.168.200.101/");
 app.use("/uploads/192.168.200.102/",express.static(__dirname + "/uploads/192.168.200.102/"));console.log("File download enabled for /uploads/192.168.200.102/");

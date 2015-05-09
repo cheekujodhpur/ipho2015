@@ -100,12 +100,16 @@
 				});
 		    });
 
-            function sendPrinted(elem,type,ip)
+            function sendPrinted(elem)
             {
+                var type = $(elem).attr('data-q');
+                var ip = $(elem).attr('data-ip');
                 socket.emit('flagPrint',$(elem).is(':checked'),type,ip);
             }
             function sendPacked(elem)
             {
+                var type = $(elem).attr('data-q');
+                var ip = $(elem).attr('data-ip');
                 socket.emit('flagPack',$(elem).is(':checked'),type,ip);
             }
 
@@ -143,7 +147,15 @@
                     table += "<tbody>";
                     if(all_uploads[i].T1)
                     {
-                    table += '<tbody><tr class="success"><td>Theory 1</td><td class = "prcheck"><input onclick = "sendPrinted(this,"t1","'+all_uploads[i].ip.toString()+'")" name = "printed" type = "checkbox" /></td><td class = "prcheck"><input onclick = "sendPrinted(this,"t1","'+all_uploads[i].ip.toString()+'" name = "packed" type = "checkbox" /></td></tr>';
+                        var printchecked = all_uploads[i].T1_printed;
+                        var packchecked = all_uploads[i].T1_packed;
+                        var prcheckstr = '';
+                        var pacheckstr = '';
+                        if(printchecked)
+                            prcheckstr = 'checked';
+                        if(packchecked)
+                            pacheckstr = 'checked';
+                        table += '<tbody><tr class="success"><td>Theory 1</td><td class = "prcheck"><input '+prcheckstr+' data-q = "T1" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPrinted(this)" name = "printed" type = "checkbox" /></td><td class = "prcheck"><input '+pacheckstr+' data-q = "T1" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPacked(this)" name = "packed" type = "checkbox" /></td></tr>';
                     }
                     else
                     {   
@@ -151,7 +163,15 @@
                     }
                     if(all_uploads[i].T2)
                     {
-                        table += '<tr class="success"><td>Theory 2</td><td><input type = "checkbox" /></td></tr>';
+                        var printchecked = all_uploads[i].T2_printed;
+                        var packchecked = all_uploads[i].T2_packed;
+                        var prcheckstr = '';
+                        var pacheckstr = '';
+                        if(printchecked)
+                            prcheckstr = 'checked';
+                        if(packchecked)
+                            pacheckstr = 'checked';
+                        table += '<tbody><tr class="success"><td>Theory 2</td><td class = "prcheck"><input '+prcheckstr+' data-q = "T2" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPrinted(this)" name = "printed" type = "checkbox" /></td><td class = "prcheck"><input '+pacheckstr+' data-q = "T2" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPacked(this)" name = "packed" type = "checkbox" /></td></tr>';
                     }
                     else
                     {    
@@ -159,7 +179,15 @@
                     }
                     if(all_uploads[i].T3)
                     {
-                        table += '<tr class="success"><td>Theory 3</td><td><input type = "checkbox" /></td></tr>';
+                        var printchecked = all_uploads[i].T3_printed;
+                        var packchecked = all_uploads[i].T3_packed;
+                        var prcheckstr = '';
+                        var pacheckstr = '';
+                        if(printchecked)
+                            prcheckstr = 'checked';
+                        if(packchecked)
+                            pacheckstr = 'checked';
+                        table += '<tbody><tr class="success"><td>Theory 3</td><td class = "prcheck"><input '+prcheckstr+' data-q = "T3" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPrinted(this)" name = "printed" type = "checkbox" /></td><td class = "prcheck"><input '+pacheckstr+' data-q = "T3" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPacked(this)" name = "packed" type = "checkbox" /></td></tr>';
                     }
                     else
                     {    
@@ -167,7 +195,15 @@
                     }
                     if(all_uploads[i].E)
                     {
-                        table += '<tr class="success"><td>Experimental</td><td><input type = "checkbox" /></td></tr>';
+                        var printchecked = all_uploads[i].E_printed;
+                        var packchecked = all_uploads[i].E_packed;
+                        var prcheckstr = '';
+                        var pacheckstr = '';
+                        if(printchecked)
+                            prcheckstr = 'checked';
+                        if(packchecked)
+                            pacheckstr = 'checked';
+                        table += '<tbody><tr class="success"><td>Experimental</td><td class = "prcheck"><input '+prcheckstr+' data-q = "E" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPrinted(this)" name = "printed" type = "checkbox" /></td><td class = "prcheck"><input '+pacheckstr+' data-q = "E" data-ip = "'+all_uploads[i].ip.toString()+'" onclick = "sendPacked(this)" name = "packed" type = "checkbox" /></td></tr>';
                     }
                     else
                     {    
