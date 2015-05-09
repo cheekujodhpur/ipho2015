@@ -178,7 +178,8 @@
         <!-- jQuery -->
 		<script src = "/static/js/jquery.min.js"></script>
 		<script src = "/static/js/bootstrap.min.js"></script>
-		<script src = "/static/js/jquery.tablesorter.js"></script>
+        <script src = "/static/js/knockout-2.2.0.js"></script>
+        <script src = "/static/js/jquery.tablesorter.js"></script>
 		<script src = "/static/js/Chart.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
@@ -434,14 +435,29 @@
 			});
             socket.on('listed-all-uploads',function(all_uploads)
             {
-                var table = '<table class="table table-bordered table-hover" id = "all_uploads_table">';
+            var table = '<table class="table table-bordered " style="table-layout:fixed" id = "all_uploads_table">';
                 for(var i in all_uploads)
                 {
-                    table += '<thead><tr><th>' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
-                    table += "<tbody>";
+                    table += '<thead><tr data-toggle="collapse" data-target="#uploaded_files_"' + all_uploads[i].country_name.toString() + '" class="clickable"><th>' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
+                    table += '<tbody id="#uploaded_files_"' + all_uploads[i].country_name.toString() + '" class="collapse">' ;
                     if(all_uploads[i].T1)
                     {
-                        table += '<tbody><tr class="success"><td>Theory 1</td></tr>';
+                        if(all_uploads[i].T1_printed && all_uploads[i].T1_packed)
+                        {
+                        table += '<tbody><tr><td class="success">Theory 1</td><td><span class="glyphicon glyphicon-print"></span></td> <td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].T1_printed)
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 1</td><td class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].T1_packed)
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 1</td><td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 1</td></tr>';
+                        }
                     }
                     else
                     {   
@@ -449,7 +465,22 @@
                     }
                     if(all_uploads[i].T2)
                     {
-                        table += '<tr class="success"><td>Theory 2</td></tr>';
+                        if(all_uploads[i].T2_printed && all_uploads[i].T2_packed)
+                        {
+                        table += '<tbody><tr><td  class="success">Theory 1</td><td class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].T2_printed)
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 2</td><td class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].T2_packed)
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 2</td><td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 2</td></tr>';
+                        }
                     }
                     else
                     {    
@@ -457,7 +488,22 @@
                     }
                     if(all_uploads[i].T3)
                     {
-                        table += '<tr class="success"><td>Theory 3</td></tr>';
+                        if(all_uploads[i].T3_printed && all_uploads[i].T3_packed)
+                        {
+                        table += '<tbody><tr><td  class="success">Theory 1</td><td> class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].T3_printed)
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 3</td><td class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].T3_packed)
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 3</td><td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else
+                        {
+                            table += '<tbody><tr><td  class="success">Theory 3</td></tr>';
+                        }
                     }
                     else
                     {    
@@ -465,7 +511,22 @@
                     }
                     if(all_uploads[i].E)
                     {
-                        table += '<tr class="success"><td>Experimental</td></tr>';
+                        if(all_uploads[i].E_printed && all_uploads[i].E_packed)
+                        {
+                        table += '<tbody><tr><td  class="success">Experimental</td><td> class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].E_printed)
+                        {
+                            table += '<tbody><tr><td  class="success">Experimental</td><td class = "btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                        }
+                        else if(all_uploads[i].E_packed)
+                        {
+                            table += '<tbody><tr><td  class="success">Experimental</td><td class = "btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                        }
+                        else
+                        {
+                            table += '<tbody><tr><td  class="success">Experimental</td></tr>';
+                        }
                     }
                     else
                     {    
