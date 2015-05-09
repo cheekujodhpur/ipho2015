@@ -229,6 +229,18 @@
             socket.io.reconnect();
         });	
        
+        socket.on('T1_printed',function(){
+            $("#T1_form").html('Printed');
+        });
+        socket.on('T2_printed',function(){
+            $("#T2_form").html('Printed');
+        });
+        socket.on('T3_printed',function(){
+            $("#T3_form").html('Printed');
+        });
+        socket.on('E_printed',function(){
+            $("#E_form").html('Printed');
+        });
         socket.on('numofleaders',function(value)
         {
             num_of_leaders = value;

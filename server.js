@@ -187,21 +187,6 @@ app.post('/uploadedT1',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
-            var updates = db.collection('updates');
-            updates.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].T1_printed)
-                {
-                    socket.emit('T1-already-printed');
-                    console.log("'T1-already-printed' signal emitted in response to " + ip.toString());
-                    db.close();
-                    return;
-                }
-            });
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -294,21 +279,6 @@ app.post('/uploadedT2',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
-            var updates = db.collection('updates');
-            updates.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].T1_printed)
-                {
-                    socket.emit('T2-already-printed');
-                    console.log("'T2-already-printed' signal emitted in response to " + ip.toString());
-                    db.close();
-                    return;
-                }
-            });
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -401,21 +371,6 @@ app.post('/uploadedT3',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
-            var updates = db.collection('updates');
-            updates.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].T1_printed)
-                {
-                    socket.emit('T3-already-printed');
-                    console.log("'T3-already-printed' signal emitted in response to " + ip.toString());
-                    db.close();
-                    return;
-                }
-            });
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -509,22 +464,6 @@ app.post('/uploadedE',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
-            var updates = db.collection('updates');
-            updates.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].T1_printed)
-                {
-                    socket.emit('E-already-printed');
-                    console.log("'E-already-printed' signal emitted in response to " + ip.toString());
-                    db.close();
-                    return;
-                }
-            });
-            
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -604,7 +543,14 @@ io.on('connection',function(socket)
         var messages = db.collection('messages');
         var flags = db.collection('flags');
         var users = db.collection('users');
+        var uploads = db.collection('uploads');
 
+        uploads.find({"ip":ip}).toArray(function(err,items){
+            if(items[0].T1_printed)socket.emit('T1_printed');
+            if(items[0].T2_printed)socket.emit('T2_printed');
+            if(items[0].T3_printed)socket.emit('T3_printed');
+            if(items[0].E_printed)socket.emit('E_printed');
+        });
         users.find({"ip":ip}).toArray(function(err,items)
         {
             var val = items[0].number_of_votes;
@@ -755,6 +701,24 @@ io.on('connection',function(socket)
     socket.on('list-dir',function(directory_path)
     {
         var ip = socket.handshake.address;
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                    console.log(err);
+                    return 0;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var uploads = db.collection('uploads');
+
+            uploads.find({"ip":ip}).toArray(function(err,items){
+                if(items[0].T1_printed)socket.emit('T1_printed');
+                if(items[0].T2_printed)socket.emit('T2_printed');
+                if(items[0].T3_printed)socket.emit('T3_printed');
+                if(items[0].E_printed)socket.emit('E_printed');
+                db.close();
+            });
+        });
         console.log("'list-dir' signal received from " + ip.toString());
         if(directory_path == "/uploads")
         {
