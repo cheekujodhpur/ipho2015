@@ -133,14 +133,18 @@ app.get('/', function (req, res)
                     res.redirect('/chpass.html');
                 }
                 var type = items[0].type;
-                if(type)
+                if(type==1)
                 {
                     //redirect the user to his homepage
                     res.sendFile(__dirname + '/u/index.html');				
                 }
-                else
+                else if(type==0)
                 {
                     res.sendFile(__dirname + '/su/index.html');
+                }
+                else
+                {
+                    res.sendFile(__dirname + '/pr/index.html');
                 }
             }
             else
@@ -1037,6 +1041,40 @@ io.on('connection',function(socket)
 
 	});
 	
+    //packed and printed
+    socket.on('flagPrint',function(val,type,ip){
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+		    var uploads = db.collection('uploads');
+            var query = {};
+            var field = type + '_printed';
+            query[field] = val;
+		    uploads.update({"ip":ip},{$set:query},function(err,result){db.close();});
+        });
+    });
+    socket.on('flagPack',function(val,type,ip){
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+		    var uploads = db.collection('uploads');
+            var query = {};
+            var field = type + '_packed';
+            query[field] = val;
+		    uploads.update({"ip":ip},{$set:query},function(err,result){db.close();});
+        });
+    });
+
 	socket.on('refresh',function(){
 		var ip = socket.handshake.address;
 		if(!ip)return;
