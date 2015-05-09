@@ -64,7 +64,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="border:1px solid #000000">
+                            <td id = "T1_form" style="border:1px solid #000000">
                                 <form id        =  "upload_form"
                                     enctype   =  "multipart/form-data"
                                     action    =  "/uploadedT1"
@@ -81,7 +81,7 @@
                                 <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_T1();'/>
                                 </form>
                              </td>
-                             <td style="border:1px solid #000000"> 
+                             <td id = "T2_form" style="border:1px solid #000000"> 
                                <form id        =  "upload_form"
                                     enctype   =  "multipart/form-data"
                                     action    =  "/uploadedT2"
@@ -108,7 +108,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="border:1px solid #000000">
+                            <td id = "T3_form" style="border:1px solid #000000">
                                 <form id        =  "upload_form"
                                     enctype   =  "multipart/form-data"
                                     action    =  "/uploadedT3"
@@ -125,7 +125,7 @@
                                 <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_T3();'/>
                                 </form>
                              </td>
-                            <td style="border:1px solid #000000">
+                            <td id = "E_form" style="border:1px solid #000000">
                                 <form id        =  "upload_form"
                                     enctype   =  "multipart/form-data"
                                     action    =  "/uploadedE"
@@ -257,6 +257,31 @@
         });
        
         //SOCKET SCRIPTS
+        socket.on('T1-already-printed',function()
+        {
+           $("#T1_form").remove();
+           var html_data = '<p class="btn btn-info">Printed</p>';
+           $("#T1_form").append(html_data);
+        });
+        
+        socket.on('T2-already-printed',function()
+        {
+           $("#T2_form").remove();
+           var html_data = '<p class="btn btn-info">Printed</p>';
+           $("#T2_form").append(html_data);
+        });
+        socket.on('T3-already-printed',function()
+        {
+           $("#T3_form").remove();
+           var html_data = '<p class="btn btn-info">Printed</p>';
+           $("#T3_form").append(html_data);
+        });
+        socket.on('E-already-printed',function()
+        {
+           $("#E_form").remove();
+           var html_data = '<p class="btn btn-info">Printed</p>';
+           $("#E_form").append(html_data);
+        });
         //DIRECTORY LISTING
         //listed-dir signal which displays the directory listing
         socket.on('listed-dir',function(id,directory_path,files)

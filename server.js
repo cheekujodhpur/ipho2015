@@ -88,6 +88,7 @@ app.get('/static/css/simple-sidebar.css', function(req,res){res.sendFile(__dirna
 app.get('/static/css/main.css', function(req,res){res.sendFile(__dirname+'/static/css/main.css');});
 app.get('/static/js/jquery.min.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.min.js');});
 app.get('/static/js/bootstrap.min.js', function(req,res){res.sendFile(__dirname+'/static/js/bootstrap.min.js');});
+app.get('/static/js/knockout-2.2.0.js', function(req,res){res.sendFile(__dirname+'/static/js/knockout-2.2.0.js');});
 app.get('/static/js/jquery.tablesorter.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.tablesorter.js');});
 app.get('/static/js/Chart.min.js', function(req,res){res.sendFile(__dirname+'/static/js/Chart.min.js');});
 app.get('/media/ipho-logo1.png', function(req,res){res.sendFile(__dirname+'/media/ipho-logo1.png');});
@@ -182,6 +183,21 @@ app.post('/uploadedT1',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
+            var updates = db.collection('updates');
+            updates.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].T1_printed)
+                {
+                    socket.emit('T1-already-printed');
+                    console.log("'T1-already-printed' signal emitted in response to " + ip.toString());
+                    db.close();
+                    return;
+                }
+            });
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -274,6 +290,21 @@ app.post('/uploadedT2',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
+            var updates = db.collection('updates');
+            updates.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].T1_printed)
+                {
+                    socket.emit('T2-already-printed');
+                    console.log("'T2-already-printed' signal emitted in response to " + ip.toString());
+                    db.close();
+                    return;
+                }
+            });
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -366,6 +397,21 @@ app.post('/uploadedT3',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
+            var updates = db.collection('updates');
+            updates.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].T1_printed)
+                {
+                    socket.emit('T3-already-printed');
+                    console.log("'T3-already-printed' signal emitted in response to " + ip.toString());
+                    db.close();
+                    return;
+                }
+            });
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
@@ -459,6 +505,22 @@ app.post('/uploadedE',function(req,res)
             var ip = req.ip;
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var collection = db.collection('users');
+            var updates = db.collection('updates');
+            updates.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].T1_printed)
+                {
+                    socket.emit('E-already-printed');
+                    console.log("'E-already-printed' signal emitted in response to " + ip.toString());
+                    db.close();
+                    return;
+                }
+            });
+            
             collection.find({"ip":ip}).toArray(function(err,items)
             {
                 if(items.length == 0)
