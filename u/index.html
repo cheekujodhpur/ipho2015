@@ -145,7 +145,11 @@
                         </tr>
                     </tbody>   
                 </table>
-                    <!--Upload ends here-->
+
+                <table id='download_table' class='table table-hover'></table>
+                <table id='upload_table' class='table table-hover'></table>
+
+                <!--Upload ends here-->
                 </div>
                 <!-- Cast Vote tab -->
                 <div role="tabpanel" class="tab-pane" id = "cvote">
@@ -185,7 +189,7 @@
         </div>
         <div id="sidebar-wrapper" >
             <table class="table" id = "message-board">
-            <thead>
+            <thead id = "message-board-head">
                 <tr><th>Message Board</th></tr>
             </thead>
             <tbody id="message-board-body"></tbody> 
@@ -208,7 +212,62 @@
 	<script src = "/static/js/bootstrap.min.js"></script>
 	<script src = "/socket.io/socket.io.js"></script>
 	<script>
-	    //to protect from unload
+        //gets the element by its id
+        var T1_file = document.getElementById('file_upload_T1');
+
+        //binds to onchange event of the input field
+        T1_file.addEventListener('change', function() 
+        {
+            //this.files[0].size gets the size of your file.
+            if(this.files[0].size > 104857600)
+            {
+                alert("File limit(100 MB) exceeded.");
+            }
+            
+        });
+
+
+        var T2_file = document.getElementById('file_upload_T2');
+
+        //binds to onchange event of the input field
+        T2_file.addEventListener('change', function() 
+        {
+            //this.files[0].size gets the size of your file.
+            if(this.files[0].size > 104857600)
+            {
+                alert("File limit(100 MB) exceeded.");
+            }
+            
+        });
+
+        var T3_file = document.getElementById('file_upload_T3');
+
+        //binds to onchange event of the input field
+        T3_file.addEventListener('change', function() 
+        {
+            //this.files[0].size gets the size of your file.
+            if(this.files[0].size > 104857600)
+            {
+                alert("File limit(100 MB) exceeded.");
+            }
+            
+        });
+
+        var E_file = document.getElementById('file_upload_E');
+
+        //binds to onchange event of the input field
+        E_file.addEventListener('change', function() 
+        {
+            //this.files[0].size gets the size of your file.
+            if(this.files[0].size > 104857600)
+            {
+                alert("File limit(100 MB) exceeded.");
+            }
+            
+        });
+
+
+        //to protect from unload
         window.onbeforeunload = function() 
         {
             //send directory listing signal before refesh
@@ -294,31 +353,65 @@
            var html_data = '<p class="btn btn-info">Printed</p>';
            $("#E_form").append(html_data);
         });
+        socket.on('country-data',function(country)
+        {
+            var mt_head = document.getElementById("message-board-head");
+            mt_head.innerHTML = '';
+            var row = mt_head.insertRow(0);
+            var cell = row.insertCell(0);
+            cell.innerHTML = country.country_name; 
+            //ENTER COUNTRY IMAGE HERE
+            //var cell = row.insertCell(1);
+            //cell.innerHTML = country.country_code; 
+
+            var row = mt_head.insertRow(1);
+            var cell = row.insertCell(0);
+            cell.innerHTML = "Message Table"; 
+        });
+
         //DIRECTORY LISTING
         //listed-dir signal which displays the directory listing
         socket.on('listed-dir',function(id,directory_path,files)
         {
+
             if(id == "download")
             {
-                var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                //var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                var table = document.getElementById("download_table");
+                table.innerHTML = '';
+                     
                 for(var i = 0;i < files.length;i++)
                 {
-                    table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                    var row = table.insertRow(i);
+                    var cell = row.insertCell(0);
+                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                    //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                 }
-                table += "</table>";
-                $("#download_table").remove();
-                $("#home").append(table);
+                var row = table.insertRow(0);
+                var cell = row.insertCell(0);
+                cell.innerHTML ='<b>Downloads<b>';
+                //table += "</table>";
+                //$("#download_table").remove();
+                //$("#home").append(table);
             }
             else
             {
-                var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                var table = document.getElementById("upload_table");
+                table.innerHTML = '';
+                //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
                 for(var i = 0;i < files.length;i++)
                 {
-                    table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                    var row = table.insertRow(i);
+                    var cell = row.insertCell(0);
+                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                    //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                 }
-                table += "</table>";
-                $("#upload_table").remove();
-                $("#home").append(table); 
+                var row = table.insertRow(0);
+                var cell = row.insertCell(0);
+                cell.innerHTML ='<b>Uploads<b>';
+                //table += "</table>";
+                //$("#upload_table").remove();
+                //$("#home").append(table); 
             }
         });
 
@@ -445,6 +538,7 @@
         //show the message on board
         socket.on("message-sent",function(message_table)
         {
+        
         $("#message-board-body").html('');
         for(var i in message_table)
         {
@@ -490,7 +584,9 @@
         var id = $("#fbMenu").val();
         
         $("#comment").val('');
-        socket.emit('fbContent',id,fb_current,content);
+        var now = new Date();
+        //alert(now.toString());
+        socket.emit('fbContent',id,fb_current,content,now.toTimeString());
      });
         //FUNCTIONS
         function logVote(id)
@@ -512,7 +608,7 @@
             }
             else
             {
-                alert("File uploaded successfully");
+                alert("File is being uploaded successfully");
                 return true;
             }
         }
@@ -526,7 +622,7 @@
             }
             else
             {
-                alert("File uploaded successfully");
+                alert("File is being uploaded successfully");
                 return true;
             }
         }
@@ -540,7 +636,7 @@
             }
             else
             {
-                alert("File uploaded successfully");
+                alert("File is being uploaded successfully");
                 return true;
             }
         }
@@ -554,7 +650,7 @@
             }
             else
             {
-                alert("File uploaded successfully");
+                alert("File is being uploaded successfully");
                 return true;
             }
         }

@@ -1363,8 +1363,3 @@ io.on('connection',function(socket)
 		io.sockets.emit('refreshAll');
 	});
 });
-app.use("/uploads/192.168.0.101/",express.static(__dirname + "/uploads/192.168.0.101/"));console.log("File download enabled for /uploads/192.168.0.101/");
-app.use("/uploads/192.168.0.102/",express.static(__dirname + "/uploads/192.168.0.102/"));console.log("File download enabled for /uploads/192.168.0.102/");
-app.use("/uploads/192.168.0.103/",express.static(__dirname + "/uploads/192.168.0.103/"));console.log("File download enabled for /uploads/192.168.0.103/");
-app.use("/uploads/192.168.0.104/",express.static(__dirname + "/uploads/192.168.0.104/"));console.log("File download enabled for /uploads/192.168.0.104/");
-app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");

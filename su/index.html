@@ -54,13 +54,13 @@
                     <p id = "upload-body">Upload</p>
                     <form id        =  "upload_form"
                     enctype   =  "multipart/form-data"
-                    action    =  "/uploadedT1"
+                    action    =  "/uploaded"
                     method    =  "post"
                     >
                     <div style="position:relative;">
                         <a class='btn btn-default' href='javascript:;'>
                                     Choose File...
-                                            <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id="file_upload" name="user_file" size="40"  onchange='$("#upload-file-info").html($(this).val().replace("C:\\fakepath\\", ""));'>
+                                            <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id="file_upload_D" name="user_file" size="40"  onchange='$("#upload-file-info").html($(this).val().replace("C:\\fakepath\\", ""));'>
                          </a>
                          &nbsp;
                          <span class='label label-info' id="upload-file-info"></span>
@@ -84,11 +84,7 @@
 		                <div class = "controls" id = "options">
 			                <div id = "option">
 				                <input autocomplete="off" class = "input form-control" id = "opt1" name = "vote-opt-1" type = "text" placeholder = "Enter option" />
-				                <button id = "b1" class = "btn add-more" type = "button">+</button>
-			                </div>	
-		                </div>
-	                </div>
-	                <div class = "form-group">
+				                <button id = "b1" class = "btn add-more" type = "button">+</button> </div>	</div> </div> <div class = "form-group">
 		                <label for = "vote-time">Time(s)</label>
 		                <input class = "form-control" id = "vote-time" placeholder = "Enter duration of vote" type = "number" style = "width:200px;" />
 	                </div>
@@ -102,21 +98,7 @@
 					<form>
 						<div class="form-group" id = "cast-vote-opts">
 						</div>	
-					</form>
-					<br />
-					<font>Time to vote: <span id = "timer"></span> seconds</font>
-					<!--Cast Vote ends here-->
-				</div>
-				<div role="tabpanel" class="tab-pane" id = "rvote"></div>
-				<div role="tabpanel" class="tab-pane" id = "fb">
-			        <form id="form-feedback-toggle">
-                        <div class = "form-group" id = "feedback-togglers">
-                            <label class = "form-label" for = "fb-toggle">Turn Feedback on</label>
-                            <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" />Theory 1</label>
-                            </div>
-                            <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" />Theory 2</label>
+					</form> <br /> <font>Time to vote: <span id = "timer"></span> seconds</font> <!--Cast Vote ends here--> </div> <div role="tabpanel" class="tab-pane" id = "rvote"></div> <div role="tabpanel" class="tab-pane" id = "fb"> <form id="form-feedback-toggle"> <div class = "form-group" id = "feedback-togglers"> <label class = "form-label" for = "fb-toggle">Turn Feedback on</label> <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" />Theory 1</label> </div> <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" />Theory 2</label>
                             </div>
                             <div class = "radio">
                                 <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')" value="tq3" />Theory 3</label>
@@ -131,12 +113,14 @@
                         </div>
                     </form>
                     <div id = "fb_data">
-                        <table style = "table-layout:fixed" class = "table table-striped tablesorter" id = "fb_data_table">
+                        <table style = "table-layout:fixed" class = "table table-bordered table-hover tablesorter" id = "fb_data_table">
                             <thead>
                             <tr>
-                            <th>Country Code</th>
-                            <th>QID</th>
-                            <th>Content</th></tr>
+                                <th><div class="btn btn-info">Time <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th><div class="btn btn-info">Country Code <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th><div class="btn btn-info">QID <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th><div class="btn btn-info">Content <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                            </tr>
                             </thead>
                             <tbody id = "fb_data_table_body">
                             </tbody>
@@ -183,6 +167,22 @@
 		<script src = "/static/js/Chart.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
+
+            var D_file = document.getElementById('file_upload_D');
+
+            //binds to onchange event of the input field
+            D_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit(100 MB) exceeded.");
+                }
+                
+            });
+
+
+
             //to protect from unload
             window.onbeforeunload = function() 
             {
@@ -408,7 +408,7 @@
             });
             function emptyfile_check()
             {
-                var file = document.getElementById('file_upload');
+                var file = document.getElementById('file_upload_D');
                 if(file.value === null || file.value === "")
                 {
                     alert("It is not possible to upload an empty file.");
@@ -416,18 +416,10 @@
                 }
 				else
                 {
-                    alert("File uploaded successfully");
+                    alert("File is being uploaded successfully");
                     return true;
                 }
             }
-			socket.on('file-upload-success',function()
-			{
-				alert("File uploaded successfully");
-			});
-			socket.on('file-upload-failed',function()
-			{
-				alert("File upload failed as max filesize limit was exceeded");
-			});
 
 			socket.on('file-deleted',function()
 			{
@@ -599,15 +591,17 @@
             });
             
             socket.on('fbDisplay',function(feeds){
+                
                 $("#fb_data_table_body").html('');
                 for(var feed in feeds)
                 {
                     var ll = '';
                     for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
-                    var field = '<tr><td>'+feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                    var field = '<tr><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
                     var Field = $(field);
                     $("#fb_data_table_body").append(Field);
-                } 
+                }
+                $("#fb_data_table").trigger("update"); 
             });
 			
 		</script>
