@@ -29,8 +29,8 @@
 			</div>
 		</div>
 		<div id = "document" style = "width:100%">
-			<form id="form-chpass">
-				<div class="chpass-group">
+            <form id="form-chpass">
+                <div class="chpass-group">
 					<label for="oldpass" class = "control-label">Old Password</label>
 					<input type = "password" name="oldpass" class="form-control" id = "form-chpass-oldpass" /><br />
 				</div>
@@ -43,9 +43,14 @@
 					<input type = "password" name="newpassre" class="form-control" id = "form-chpass-newpassre" /><br />
 				</div>
 
-				<div id = "form-chpass-submit">
-					<button type="submit" class="btn btn-default">Confirm</button>
-				</div>
+                <div id = "form-chpass-submit"> 
+				    <table style="table-layout:fixed">
+                        <tr>    
+                            <td><button type="submit" class="btn btn-default">Confirm</button></td>
+                            <td><button class="btn btn-default" id="back-button" >Back</button></td>
+                        </tr>
+                    </table>
+                </div>
 			</form>
 		</div>
 		<footer id="sp-footer-wrapper" style="position:absolute;bottom:0px;">
@@ -55,13 +60,18 @@
 					<br /><span>Mumbai - India </span> </div>
                         	</div>
                 	</div>
-        	</footer>   	
+        </footer>   	
 		<!-- jQuery -->
 		<script src = "static/js/jquery.min.js"></script>
 		<script src = "static/js/bootstrap.min.js"></script>
 		<script src = "/socket.io/socket.io.js"></script>
 		<script>
-			var socket = io();
+			
+            $("#back-button").click(function()
+            {
+                window.location = '/';
+            });
+            var socket = io();
 
 			socket.on('chpass-err',function(){
 				$("#form-chpass-oldpass").parent().addClass("has-error");

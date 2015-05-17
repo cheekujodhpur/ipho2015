@@ -390,7 +390,7 @@ app.post('/uploadedT2',function(req,res)
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T2":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
-                        res.redirect('/')
+                        //res.redirect('/')
                         done = false;
                     }
                 }
