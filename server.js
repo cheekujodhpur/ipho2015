@@ -586,6 +586,7 @@ io.on('connection',function(socket)
         var users = db.collection('users');
         var uploads = db.collection('uploads');
 
+        
         uploads.find({"ip":ip}).toArray(function(err,items)
         {
             if(items == null)
@@ -606,7 +607,9 @@ io.on('connection',function(socket)
             }
             var val = items[0].number_of_votes;
             socket.emit('numberofleaders',val);
+            socket.emit('country-data',items[0]);
             console.log("'numberofleaders' signal broadcasted from the server in response to " + ip.toString());
+            console.log("'country-data' signal broadcasted from the server in response to " + ip.toString());
         });
         messages.find({}).toArray(function(err,items)
         {   
@@ -837,16 +840,6 @@ io.on('connection',function(socket)
                 }
                 console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
                 var collection = db.collection('users');
-                collection.find({"ip":ip}).toArray(function(err,items)
-                {
-                    if(items == null)
-                    {
-                        console.log(err);
-                        console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
-                        return;
-                    }
-                    socket.emit('country-data',items[0]);
-                });
                 
                 collection.find({}).toArray(function(err,items)
                 {
@@ -865,8 +858,8 @@ io.on('connection',function(socket)
                             files.splice(country_index,1);
                         }
                     }
+                    db.close();           
                 });
-                //db.close();           
 
 
             }); 
@@ -896,7 +889,7 @@ io.on('connection',function(socket)
                     if(items[0].T2_printed)socket.emit('T2_printed');
                     if(items[0].T3_printed)socket.emit('T3_printed');
                     if(items[0].E_printed)socket.emit('E_printed');
-                    //db.close();
+                    db.close();
                 });
             });
             id = "upload";
