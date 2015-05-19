@@ -93,6 +93,7 @@ app.get('/media/tifr-logo-s.png', function(req,res){res.sendFile(__dirname+'/med
 app.get('/static/fonts/glyphicons-halflings-regular.woff2', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff2');});
 app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff');});
 
+app.use("/media/flags/",express.static(__dirname + "/media/flags/"));console.log("File download enabled for /media/flags");
 //authentication page
 app.get('/auth.html',function(req,res)
 {
@@ -390,7 +391,7 @@ app.post('/uploadedT2',function(req,res)
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T2":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
-                        //res.redirect('/')
+                        res.redirect('/')
                         done = false;
                     }
                 }
@@ -841,7 +842,7 @@ io.on('connection',function(socket)
                 console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
                 var collection = db.collection('users');
                 
-                collection.find({}).toArray(function(err,items)
+                collection.find({"ip":ip}).toArray(function(err,items)
                 {
                     if(items == null)
                     {
@@ -849,23 +850,48 @@ io.on('connection',function(socket)
                         console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
                         return;
                     }
-                    for (i in items)
+                    if(items[0].type == 0)
                     {
-                        //default file name is Marks_country_code.xls
-                        var country_index = files.indexOf("Marks_" + items[0].country_code.toString() + ".xls") 
-                        if(country_index > -1 && items[0].ip != ip)
-                        {
-                            files.splice(country_index,1);
-                        }
+                        id = "download";
+                        directory_path = "/downloads/";
+                        socket.emit('listed-dir',id,directory_path,files);
+                        db.close();       
+                        return;    
                     }
-                    db.close();           
+                    else
+                    {
+                        collection.find({}).toArray(function(err,items)
+                        {
+                            if(items == null)
+                            {
+                                console.log(err);
+                                console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                                return;
+                            }
+                            for (i in items)
+                            {
+                                //default file name is Marks_country_code.xls
+                                var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
+                                //console.log("Marks_" + items[i].country_code.toString() + ".xls");
+                                //console.log(items[i].ip); 
+                                //console.log(country_index); 
+                                if(country_index > -1 && items[i].ip != ip)
+                                {
+                                    //console.log("splicing");
+                                    files.splice(country_index,1);
+                                }
+                            }
+                            id = "download";
+                            directory_path = "/downloads/";
+                            socket.emit('listed-dir',id,directory_path,files);
+                            db.close();           
+                        });
+
+                    }
                 });
 
 
             }); 
-            id = "download";
-            directory_path = "/downloads/";
-            socket.emit('listed-dir',id,directory_path,files);
         }
         else
         {

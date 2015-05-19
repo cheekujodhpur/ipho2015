@@ -129,10 +129,7 @@
                                         method    =  "post"
                                     >
                                     <div style="position:relative;">
-                                                <a class='btn btn-default' href='javascript:;'>
-                                                    Choose File...
-                                                    <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_E" name="user_file" size="40"  onchange='$("#upload-file-info_E").html($(this).val().replace("C:\\fakepath\\",""));'>
-                                                </a>
+                                                <a class='btn btn-default' href='javascript:;'> Choose File...  <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_E" name="user_file" size="40"  onchange='$("#upload-file-info_E").html($(this).val().replace("C:\\fakepath\\",""));'> </a>
                                                 &nbsp;
                                                 <span class='label label-info' id="upload-file-info_E"></span>
                                     </div>
@@ -358,13 +355,14 @@
                 mt_head.innerHTML = '';
                 var row = mt_head.insertRow(0);
                 var cell = row.insertCell(0);
-                cell.innerHTML = country.country_name; 
+                cell.innerHTML = '<img style="width:40px;height:20px""alt="country image" src= "/media/flags/' + country.country_name + '.png"/>'; 
                 //ENTER COUNTRY IMAGE HERE
-                //var cell = row.insertCell(1);
-                //cell.innerHTML = country.country_code; 
+                var cell = row.insertCell(1);
+                cell.innerHTML = country.country_code; 
 
                 var row = mt_head.insertRow(1);
                 var cell = row.insertCell(0);
+                var cell = row.insertCell(1);
                 cell.innerHTML = "Message Table"; 
             });
 
