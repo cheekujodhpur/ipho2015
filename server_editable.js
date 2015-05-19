@@ -588,11 +588,7 @@ io.on('connection',function(socket)
         var uploads = db.collection('uploads');
 
         
-        uploads.find({"ip":ip}).toArray(function(err,items)
-        {
-            if(items == null)
-            {
-                return;
+        uploads.find({"ip":ip}).toArray(function(err,items) { if(items == null) { return;
             }
             if(items[0].T1_printed)socket.emit('T1_printed');
             if(items[0].T2_printed)socket.emit('T2_printed');
@@ -640,6 +636,46 @@ io.on('connection',function(socket)
                     console.log("'fbDisable' signal sent from the server in response to " + ip.toString());
             }
         db.close();
+        });
+    });
+    socket.on('upload-alert',function(client_ip,id)
+    {
+        if(socket.handshake.address != null)
+        {
+            var ip = socket.handshake.address.toString();
+        }
+        else
+        {
+            console.log("Null IP Error in io.on connection.Carry on");
+            return;
+        }
+        console.log("'upload-alert' signal received from" + ip.toString());
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var uploads = db.collection('uploads');
+		    if(id == "T1")
+            {
+                uploads.update({"ip":client_ip},{$set:{"T1_alert":true}},function(err,result){db.close();});
+            }
+            else if(id == "T2")
+            {
+                uploads.update({"ip":client_ip},{$set:{"T2_alert":true}},function(err,result){db.close();});
+            }
+            else if(id == "T3")
+            {
+                uploads.update({"ip":client_ip},{$set:{"T3_alert":true}},function(err,result){db.close();});
+            }
+            else if(id == "E")
+            {
+                uploads.update({"ip":client_ip},{$set:{"E_alert":true}},function(err,result){db.close();});
+            }
         });
     });
 
@@ -915,6 +951,27 @@ io.on('connection',function(socket)
                     if(items[0].T2_printed)socket.emit('T2_printed');
                     if(items[0].T3_printed)socket.emit('T3_printed');
                     if(items[0].E_printed)socket.emit('E_printed');
+
+                    if(items[0].T1_alert)
+                    {
+                        uploads.update({"ip":ip},{$set:{"T1_alert":false}},function(err,result){});
+                        socket.emit('T1-alert');
+                    }
+                    if(items[0].T2_alert)
+                    {
+                        uploads.update({"ip":ip},{$set:{"T2_alert":false}},function(err,result){});
+                        socket.emit('T2-alert');
+                    }
+                    if(items[0].T3_alert)
+                    {
+                        uploads.update({"ip":ip},{$set:{"T3_alert":false}},function(err,result){});
+                        socket.emit('T3-alert');
+                    }
+                    if(items[0].E_alert)
+                    {
+                        uploads.update({"ip":ip},{$set:{"E_alert":false}},function(err,result){});
+                        socket.emit('E-alert');
+                    }
                     db.close();
                 });
             });

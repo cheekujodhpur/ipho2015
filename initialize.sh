@@ -9,7 +9,6 @@ mkdir ./downloads
 chmod 777 server.js
 cp server_editable.js server.js
 
-
 #drop the old databases
 inp='db.users.drop()'
 echo $inp
@@ -32,6 +31,14 @@ echo $inp
 mongo test --eval $inp
 
 inp='db.messages_archive.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.fbs.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.flags.drop()'
 echo $inp
 mongo test --eval $inp
 
