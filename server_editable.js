@@ -569,37 +569,59 @@ io.on('connection',function(socket)
     else
     {
         console.log("Null IP Error in io.on connection.Carry on");
+        socket.disconnect();
         return;
     }
+    //TODO
+    //THIS DOES NOT WORK.FIND A SOLUTION.
+    if(ip == null){socket.io.close();return;}
     console.log("Connection established to the socket in reponse to " + ip);
     var message_table = [];
     // Connect to the db
+     
     MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
     {
         if(err)
         {
             console.log(err);
+            db.close();
             return 0;
         }
         console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
-        var messages = db.collection('messages');
-        var flags = db.collection('flags');
-        var users = db.collection('users');
         var uploads = db.collection('uploads');
-
         
-        uploads.find({"ip":ip}).toArray(function(err,items) { if(items == null) { return;
+        uploads.find({"ip":ip}).toArray(function(err,items) 
+        { 
+            if(items == null) 
+            { 
+                db.close();
+                return;
             }
             if(items[0].T1_printed)socket.emit('T1_printed');
             if(items[0].T2_printed)socket.emit('T2_printed');
             if(items[0].T3_printed)socket.emit('T3_printed');
             if(items[0].E_printed)socket.emit('E_printed');
+            db.close();
         });
+    }); 
+    
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            db.close();
+            return 0;
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var users = db.collection('users');
+        
         users.find({"ip":ip}).toArray(function(err,items)
         {
 
             if(items == null)
             {
+                db.close();
                 return;
             }
             var val = items[0].number_of_votes;
@@ -607,37 +629,65 @@ io.on('connection',function(socket)
             socket.emit('country-data',items[0]);
             console.log("'numberofleaders' signal broadcasted from the server in response to " + ip.toString());
             console.log("'country-data' signal broadcasted from the server in response to " + ip.toString());
+            db.close(); 
         });
+    }); 
+    
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            db.close();
+            return 0;
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var messages = db.collection('messages');
+        
         messages.find({}).toArray(function(err,items)
         {   
             message_table = items;
             io.sockets.emit('message-sent',message_table); 
             console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
+            db.close();
         });
+    }); 
+       
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            db.close();
+            return 0;
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var flags = db.collection('flags');
         flags.find({"name":"feedback"}).toArray(function(err,items)
         {
-            if(items.length == 0)
+            if(items != '')
             {
-                return;
-            }
-            if(items!=''){
                 if(parseInt(items[0].value)==0){
                     socket.emit('fbDisable');
                     console.log("'fbDisable' signal sent from the server in response to " + ip.toString());
+                    db.close();
                 }
-                else{
+                else
+                {
                     socket.emit('fbEnable',items[0].value);
                     console.log("'fbEnable' signal sent from the server in response to " + ip.toString());
+                    db.close();
                 }
             }
             else
             {
                     socket.emit('fbDisable');
                     console.log("'fbDisable' signal sent from the server in response to " + ip.toString());
+                    db.close();
             }
-        db.close();
         });
     });
+     
     socket.on('upload-alert',function(client_ip,id)
     {
         if(socket.handshake.address != null)
@@ -1146,13 +1196,15 @@ io.on('connection',function(socket)
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
 		    var collection = db.collection('users');
-		    collection.find({"ip":ip}).toArray(function(err,items)
+		    var uploads = db.collection('uploads');
+            collection.find({"ip":ip}).toArray(function(err,items)
 		    {
 			    var truePass = items[0].pass;
 			    if(truePass == pass)
 			    {
 			
 					collection.update({"ip":ip},{$set:{"logged":true}},function(err,result){});
+					uploads.update({"ip":ip},{$set:{"logged":true}},function(err,result){});
 				    socket.emit('fin');
 		            console.log("'fin' signal emitted from server in response to " + ip.toString());
 			    }
@@ -1189,6 +1241,7 @@ io.on('connection',function(socket)
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
 		    var collection = db.collection('users');
+		    var uploads = db.collection('uploads');
             /*
             The ip of the user need not be checked of its existence in the database
             as the user could only have logged in when he was in the database.
@@ -1197,7 +1250,8 @@ io.on('connection',function(socket)
             */
 		    collection.find({"ip":ip}).toArray(function(err,items)
 		    {
-		        collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){db.close();});
+		        collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){});
+			    uploads.update({"ip":ip},{$set:{"logged":true}},function(err,result){});db.close();
 		    });
             //send the end acknowleged signal
             socket.emit('end-ack');

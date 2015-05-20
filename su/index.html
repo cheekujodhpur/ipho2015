@@ -203,7 +203,7 @@
 	            socket.emit('list-dir','/uploads');
 	            socket.emit('list-dir','/downloads');
 				socket.emit('list-all-uploads');
-                },10000);
+                },15000);
 
                 $("#fb_data_table").tablesorter();
                 //for adding options
@@ -430,103 +430,113 @@
             var table = '<table class="table table-bordered " style="table-layout:fixed" id = "all_uploads_table">';
                 for(var i in all_uploads)
                 {
-                    table += '<thead><tr><th  data-toggle="collapse" data-target="#uploaded_files_' + all_uploads[i].country_name.toString() + '" class="btn btn-info clickable">' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
-                    table += '<tbody id="#uploaded_files_' + all_uploads[i].country_name.toString() + '" class="collapse">' ;
-                    if(all_uploads[i].T1)
+                    if(all_uploads[i].country_code != "NULL")
                     {
-                        if(all_uploads[i].T1_printed && all_uploads[i].T1_packed)
+                        if(all_uploads[i].logged)
                         {
-                        table += '<tbody><tr><td class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].T1_printed) { table += '<tbody><tr><td  class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>'; }
-                        else if(all_uploads[i].T1_packed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            table += '<thead><tr><th style="width:100%" data-toggle="collapse" data-target="#uploaded_files_' + all_uploads[i].country_name.toString() + '" class="btn btn-primary">' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
                         }
                         else
                         {
-                            table += '<tbody><tr><td onclick = ' + 'socket.emit("upload-alert","T1") ' + 'class="btn btn-warning">Theory 1</td></tr>';
+                            table += '<thead><tr><th style="width:100%" data-toggle="collapse" data-target="#uploaded_files_' + all_uploads[i].country_name.toString() + '" class="btn btn-info">' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
                         }
-                    }
-                    else
-                    {   
-                        var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T1')"; 
-                        table += '<tbody><tr><td onclick = ' + '"' + str +'"'+' class="btn btn-warning">Theory 1</td></tr>';
-                    }
-                   
-                    if(all_uploads[i].T2)
-                    {
-                        if(all_uploads[i].T2_printed && all_uploads[i].T2_packed)
+                        table += '<tbody id="uploaded_files_' + all_uploads[i].country_name.toString() + '" class="collapse ">' ;
+                        if(all_uploads[i].T1)
                         {
-                        table += '<tbody><tr><td  class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].T2_printed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 2</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].T2_packed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 2</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            if(all_uploads[i].T1_printed && all_uploads[i].T1_packed)
+                            {
+                            table += '<tr><td style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].T1_printed) { table += '<tbody><tr><td  style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>'; }
+                            else if(all_uploads[i].T1_packed)
+                            {
+                                table += '<tr><td style="width:100%"  class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else
+                            {
+                                table += '<tr><td style="width:100%" onclick = ' + 'socket.emit("upload-alert","T1") ' + 'class="btn btn-warning">Theory 1</td></tr>';
+                            }
                         }
                         else
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 2</td></tr>';
+                        {   
+                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T1')"; 
+                            table += '<tr><td style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning">Theory 1</td></tr>';
                         }
-                    }
-                    else
-                    {    
-                        var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T2')"; 
-                        table += '<tr><td onclick = ' + '"' + str +'"'+' class="btn btn-warning" >Theory 2</td></tr>';
-                    }
-                    if(all_uploads[i].T3)
-                    {
-                        if(all_uploads[i].T3_printed && all_uploads[i].T3_packed)
+                       
+                        if(all_uploads[i].T2)
                         {
-                        table += '<tbody><tr><td  class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].T3_printed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 3</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].T3_packed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 3</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                        }
-                        else
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Theory 3</td></tr>';
-                        }
-                    }
-                    else
-                    {   
-                        var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T3')"; 
-                        table += '<tr><td onclick = ' + '"' + str +'"'+' class="btn btn-warning">Theory 3</td></tr>';
-                    }
-                    if(all_uploads[i].E)
-                    {
-                        if(all_uploads[i].E_printed && all_uploads[i].E_packed)
-                        {
-                        table += '<tbody><tr><td  class="btn btn-success">Experimental</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].E_printed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Experimental</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
-                        }
-                        else if(all_uploads[i].E_packed)
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Experimental</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            if(all_uploads[i].T2_printed && all_uploads[i].T2_packed)
+                            {
+                            table += '<tr><td  style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].T2_printed)
+                            {
+                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 2</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].T2_packed)
+                            {
+                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 2</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else
+                            {
+                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 2</td></tr>';
+                            }
                         }
                         else
-                        {
-                            table += '<tbody><tr><td  class="btn btn-success">Experimental</td></tr>';
+                        {    
+                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T2')"; 
+                            table += '<tr><td  style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning" >Theory 2</td></tr>';
                         }
+                        if(all_uploads[i].T3)
+                        {
+                            if(all_uploads[i].T3_printed && all_uploads[i].T3_packed)
+                            {
+                            table += '<tr><td  style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].T3_printed)
+                            {
+                                table += '<tr><td style="width:100%"  class="btn btn-success">Theory 3</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].T3_packed)
+                            {
+                                table += '<tr><td style="width:100%"  class="btn btn-success">Theory 3</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else
+                            {
+                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 3</td></tr>';
+                            }
+                        }
+                        else
+                        {   
+                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T3')"; 
+                            table += '<tr><td style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning">Theory 3</td></tr>';
+                        }
+                        if(all_uploads[i].E)
+                        {
+                            if(all_uploads[i].E_printed && all_uploads[i].E_packed)
+                            {
+                            table += '<tr><td  style="width:100%" class="btn btn-success">Experimental</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].E_printed)
+                            {
+                                table += '<tr><td  style="width:100%" class="btn btn-success">Experimental</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
+                            }
+                            else if(all_uploads[i].E_packed)
+                            {
+                                table += '<tr><td style="width:100%"  class="btn btn-success">Experimental</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
+                            }
+                            else
+                            {
+                                table += '<tr><td  style="width:100%" class="btn btn-success">Experimental</td></tr>';
+                            }
+                        }
+                        else
+                        {    
+                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','E')"; 
+                            table += '<tr><td style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning">Experimental</td></tr>';
+                        }
+                        table += "</tbody>";
                     }
-                    else
-                    {    
-                        var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','E')"; 
-                        table += '<tr><td onclick = ' + '"' + str +'"'+' class="btn btn-warning">Experimental</td></tr>';
-                    }
-                    table += "</tbody>";
                 }
                 table += "</table>";
                 var Table = $(table);
