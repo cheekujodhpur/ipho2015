@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset = "utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>IPhO 2015 - Mumbai, India</title>
+
+		<!--Bootstrap-->
+		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
+		<!!--Custom CSS-->
+		<link href = "/static/css/main.css" rel = "stylesheet" />
+	</head>
+
+    <body>
+        <div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
+			<div class = "container-fluid">
+                <div class = "navbar-header">
+                    <a class="navbar-brand" href = "http://www.ipho2015.in">
+                        <img alt="ipho-logo" src = "/media/ipho-logo1.png" />
+                    </a>
+                </div>
+			</div>
+			<div id = "tifr-mast">
+				<div id = "tifr-logo"><img class = "right" alt="tifr-logo" src = "/media/tifr-logo-s.png" />
+				<br />
+				<div id = "out-button" class="right">
+				<button id = "chpass-button" type = "button" class = "btn btn-default btn-sm">Change Password</button>
+				<button id = "logout-button" type = "button"  class = "btn btn-default btn-sm">
+					<span class="glyphicon glyphicon-log-out"></span> Log out
+				</button>
+				</div>
+				<br />
+				</div>
+				<div id = "hbc-tifr" style = "position:relative;left:110px;">
+					<div id = "hbc">Homi Bhabha Centre for Science Education</div>
+					<div id = "tifr">Tata Institute of Fundamental Research</div>
+				</div>
+			</div>
+		</div>
+		
+        <div id = "document">
+            <div role = "tabpanel">
+                    <ul class = "nav nav-pills" id = "nemo">
+                        <li role = "presentation" class = "active"><a href = "#marks" aria-controls="marks" role="tab" data-toggle="tab">Marks</a></li>
+                    </ul>
+            </div>
+            
+            <div class = "tab-content">
+                <div role="tabpanel" class="tab-pane active" id = "marks">
+                    <table class = "table table-striped" id = "mark_table" style="table-layout:fixed;width:400px">
+                        <colgroup> 
+                            <col style="width:40%">
+                            <col style="width:30%">
+                            <col style="width:30%">
+                        </colgroup> 
+                        <thead>
+                            <tr>
+                                <th>Subpart</th>
+                                <th>Host Marks</th>
+                                <th>Your Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody id = "mark_table_body">
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-default" id="save_button">Save</button>
+                    <button type="submit" class="btn btn-success" id="submit_button">Submit</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sidebar-wrapper" >
+            <table class="table" id = "message-board">
+            <thead id = "message-board-head">
+                <tr><th>Message Board</th></tr>
+            </thead>
+            <tbody id="message-board-body"></tbody> 
+            </table>
+        </div>
+    
+        <footer id="sp-footer-wrapper">
+            <div class="container">
+                <div class="row-fluid" id="footer">
+                    <div id="sp-footer1" class="span6">
+                        <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                        <br /><span>Mumbai - India </span> 
+                    </div>
+                </div>
+            </div>
+        </footer>   	
+        
+        <!-- jQuery -->
+        <script src = "/static/js/jquery.min.js"></script>
+        <script src = "/static/js/Chart.min.js"></script>
+        <script src = "/static/js/bootstrap.min.js"></script>
+        <script src = "/socket.io/socket.io.js"></script>
+        <script>
+
+            //to protect from unload
+            window.onbeforeunload = function() 
+            {
+                //send directory listing signal before refesh
+                if($("#cvoteb").is(":visible"))
+                    return 'You will lose your chance to vote if you continue. Are you sure?';
+            };
+            
+            var socket = io();
+            var fb_current = '';
+            var num_of_leaders = '';
+            socket.on('end-ack',function()
+            {
+                window.location = '/auth.html';
+            });
+            socket.on('disconnect',function()
+            {
+                console.log('Disconnected');
+                socket.io.reconnect();
+            });	
+           
+            socket.on('numofleaders',function(value)
+            {
+                num_of_leaders = value;
+            });
+            //DONT PUT THIS IN DOCUMENT READY SCRIPT
+            //function to disableF5
+            function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
+                
+            //document ready script
+            $(document).ready(function()
+            {
+                var uptimer = setInterval(function()
+                {
+                    socket.emit('list-dir','/uploads');
+                    socket.emit('list-dir','/downloads');
+                },10000);
+                $('#nemo a:first').tab('show');
+                //socket.io controls
+                $("#logout-button").click(function()
+                {
+                    socket.emit('end');
+                });
+                $("#chpass-button").click(function()
+                {
+                    window.location = '/chpass.html';
+                });
+                $.ajax
+                ({
+                    url : 'sheetEditableT1'
+                }).done(function(data)
+                {
+                    console.log(data);        
+                    var table_body = "";
+                    for(var i in data.subparts)
+                    {
+                        table_body += "<tr><td>" + data.subparts[i] + "</td>";
+                        table_body += "<td>" + data.ourMarks[i] + "</td>";
+                        table_body += '<td><input type="message" class="form-control" id=leaderMarks_' + data.leaderMarks[i] + '" placeholder="Enter Marks Here"></td></tr>';
+                    }
+                    $("#mark_table_body").html(table_body);
+                });
+            });
+           
+            socket.on('country-data',function(country)
+            {
+                var mt_head = document.getElementById("message-board-head");
+                mt_head.innerHTML = '';
+                var row = mt_head.insertRow(0);
+                var cell = row.insertCell(0);
+                cell.innerHTML = '<img style="width:40px;height:20px""alt="country image" src= "/media/flags/' + country.country_name + '.png"/>'; 
+                //ENTER COUNTRY IMAGE HERE
+                var cell = row.insertCell(1);
+                cell.innerHTML = country.country_code; 
+
+                var row = mt_head.insertRow(1);
+                var cell = row.insertCell(0);
+                var cell = row.insertCell(1);
+                cell.innerHTML = "Message Table"; 
+            });
+
+            //MESSAGE BOARD SIGNAL			
+            //show the message on board
+            socket.on("message-sent",function(message_table)
+            {
+                $("#message-board-body").html('');
+                for(var i in message_table)
+                {
+                    $("#message-board-body").append("<tr><td>" + message_table[i].message + "</td></tr>");
+                }
+            });
+
+            //FEEDBACK ENABLE
+            socket.on('fbEnable',function(q){
+                if(q=='tq1')
+                    $("#fbHead").text("Feedback for Theory Question 1");
+                if(q=='tq2')
+                    $("#fbHead").text("Feedback for Theory Question 2");
+                if(q=='tq3')
+                    $("#fbHead").text("Feedback for Theory Question 3");
+                if(q=='ep1')
+                    $("#fbHead").text("Feedback for Practical Question 1");
+            });            
+        </script>
+	   
+	</body>
+</html>

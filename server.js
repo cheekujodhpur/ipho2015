@@ -170,6 +170,38 @@ app.get('/', function (req, res)
 	});
 });
 
+//request present table
+app.get('/sheetEditableT1',function(req,res)
+{
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return 0;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+            return;
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+        var table = db.collection('marks_T1');
+        table.find({"ip":ip}).toArray(function(err,items){
+            subparts = items[0].subparts;
+            ourMarks = items[0].ourMarks;
+            leaderMarks = items[0].leaderMarks;
+            if(leaderMarks.length!=subparts.length){;}
+            //after certain checks, pass it
+            res.json(items[0]);
+        });
+    });
+});
+
 //copies the uploaded file from /tmp to /downloads for the convener
 app.post('/uploaded',function(req,res)
 {
@@ -1493,8 +1525,6 @@ io.on('connection',function(socket)
 		io.sockets.emit('refreshAll');
 	});
 });
-app.use("/uploads/192.168.0.101/",express.static(__dirname + "/uploads/192.168.0.101/"));console.log("File download enabled for /uploads/192.168.0.101/");
-app.use("/uploads/192.168.0.102/",express.static(__dirname + "/uploads/192.168.0.102/"));console.log("File download enabled for /uploads/192.168.0.102/");
-app.use("/uploads/192.168.0.103/",express.static(__dirname + "/uploads/192.168.0.103/"));console.log("File download enabled for /uploads/192.168.0.103/");
-app.use("/uploads/192.168.0.104/",express.static(__dirname + "/uploads/192.168.0.104/"));console.log("File download enabled for /uploads/192.168.0.104/");
+app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
+app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
 app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");
