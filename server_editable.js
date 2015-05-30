@@ -170,7 +170,18 @@ app.get('/', function (req, res)
 	});
 });
 
-//request present table
+//app.post('/save_mark_T1',function(req,res){
+//    var jsonString = '';
+//    req.on('data',function(data)
+//        {
+//            jsonString += data;
+//        });
+//    req.on('end',function(){
+//        console.log(jsonString);
+//    });
+//});
+//
+////request present table
 app.get('/sheetEditableT1',function(req,res)
 {
     MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -192,12 +203,16 @@ app.get('/sheetEditableT1',function(req,res)
         console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
         var table = db.collection('marks_T1');
         table.find({"ip":ip}).toArray(function(err,items){
-            subparts = items[0].subparts;
-            ourMarks = items[0].ourMarks;
-            leaderMarks = items[0].leaderMarks;
-            if(leaderMarks.length!=subparts.length){;}
+            var query = {};
+            if(items.length>=1)
+            {
+                subparts = items[0].subparts;
+                leaderMarks = items[0].leaderMarks;
+                query['subparts'] = subparts;
+                query['leaderMarks'] = leaderMarks;
+            }
             //after certain checks, pass it
-            res.json(items[0]);
+            res.json(query);
         });
     });
 });
@@ -1525,3 +1540,6 @@ io.on('connection',function(socket)
 		io.sockets.emit('refreshAll');
 	});
 });
+app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
+app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
+app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");
