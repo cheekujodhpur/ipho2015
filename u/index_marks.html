@@ -144,6 +144,18 @@
                 {
                     window.location = '/chpass.html';
                 });
+
+                $("#save_button").click(function()
+                {
+                    $.post("save_mark_T1", 
+                            $("#testform").serialize())
+
+                    .done(function(){
+                        alert("Saved!");
+                        });
+                });
+
+
                 $.ajax
                 ({
                     url : 'sheetEditableT1'

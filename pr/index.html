@@ -140,10 +140,10 @@
             });
             socket.on('listed-all-uploads',function(all_uploads)
             {
-                var table = '<table class="table table-bordered table-hover" id = "all_uploads_table">';
+                var table = '<table class="table table-bordered table-hover" id = "all_uploads_table" style="table-layout:fixed;width:500px">';
                 for(var i in all_uploads)
                 {
-                    table += '<thead><tr><th>' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
+                table += '<thead><tr><th>' + all_uploads[i].country_code.toString() + '</th><th>Printed</th><th>Packed</th></tr></thead>';
                     table += "<tbody>";
                     if(all_uploads[i].T1)
                     {

@@ -94,6 +94,7 @@ app.get('/static/fonts/glyphicons-halflings-regular.woff2', function(req,res){re
 app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff');});
 
 app.use("/media/flags/",express.static(__dirname + "/media/flags/"));console.log("File download enabled for /media/flags");
+app.use("/static",express.static(__dirname + "/static"));console.log("File download enabled for /static");
 //authentication page
 app.get('/auth.html',function(req,res)
 {
@@ -200,6 +201,12 @@ app.get('/sheetEditableT1',function(req,res)
             res.json(items[0]);
         });
     });
+});
+
+app.post('/save_mark_T1',function(req,res)
+{
+    var data = res.body;
+    console.log(data);
 });
 
 //copies the uploaded file from /tmp to /downloads for the convener
