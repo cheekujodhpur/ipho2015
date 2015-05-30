@@ -60,7 +60,7 @@
                     <div style="position:relative;">
                         <a class='btn btn-default' href='javascript:;'>
                                     Choose File...
-                                            <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id="file_upload_D" name="user_file" size="40"  onchange='$("#upload-file-info").html($(this).val().replace("C:\\fakepath\\", ""));'>
+                                    <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id="file_upload_D" name="user_file" size="40"  onchange='$("#upload-file-info").html($(this).val().replace("C:\\fakepath\\", ""));'>
                          </a>
                          &nbsp;
                          <span class='label label-info' id="upload-file-info"></span>
@@ -98,7 +98,10 @@
 					<form>
 						<div class="form-group" id = "cast-vote-opts">
 						</div>	
-					</form> <br /> <font>Time to vote: <span id = "timer"></span> seconds</font> <!--Cast Vote ends here--> </div> <div role="tabpanel" class="tab-pane" id = "rvote"></div> <div role="tabpanel" class="tab-pane" id = "fb"> <form id="form-feedback-toggle"> <div class = "form-group" id = "feedback-togglers"> <label class = "form-label" for = "fb-toggle">Turn Feedback on</label> <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" />Theory 1</label> </div> <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" />Theory 2</label>
+					</form> <br /> <font>Time to vote: <span id = "timer"></span> seconds</font> <!--Cast Vote ends here--> </div> <div role="tabpanel" class="tab-pane" id = "rvote"></div> <div role="tabpanel" class="tab-pane" id = "fb"> <form id="form-feedback-toggle"> <div class = "form-group" id = "feedback-togglers"> <label class = "form-label" for = "fb-toggle">Turn Feedback on</label> 
+                            <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" />Theory 1</label> 
+                            </div> 
+                            <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" />Theory 2</label>
                             </div>
                             <div class = "radio">
                                 <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')" value="tq3" />Theory 3</label>
@@ -128,6 +131,36 @@
                     </div>    
 				</div>
 				<div role="tabpanel" class="tab-pane" id = "all_uploads">
+                    <table class="table table-stripped" style="table-layout:fixed;width:500px">
+                    <thead>
+                        <tr><td>Legend</td></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><button type="button" class="btn btn-danger"> Not Uploaded </button></td>
+                        <td><button type="button" class="btn btn-warning"> Uploaded </button></td>
+                        <td><button type="button" class="btn btn-primary"> Printed </button></td>
+                        <td><button type="button" class="btn btn-success"> Packed </button></td></tr>
+                    </tbody> 
+
+
+                    <table id = "all_uploads_table" class="table table-stripped table-hover" style="table-layout:fixed;width:700px" >
+                        <col style="width:30%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:25%">
+                        <thead>
+                        <tr>
+                            <td>Country Code</td>
+                            <td>T1</td>
+                            <td>T2</td>
+                            <td>T3</td>
+                            <td>E</td>
+                        </tr>
+                        </thead>    
+                        <tbody id="all_uploads_table_body">
+                        </tbody>
+                    </table>
                 </div>
 			</div>	
 		</div>
@@ -416,7 +449,7 @@
                 }
 				else
                 {
-                    alert("File is being uploaded successfully");
+                    alert("File uploaded successfully.");
                     return true;
                 }
             }
@@ -427,6 +460,147 @@
 			});
             socket.on('listed-all-uploads',function(all_uploads)
             {
+                var table = '';
+                var users_logged = 0;
+                var T1_u = 0;
+                var T1_pr = 0;
+                var T1_pck = 0;
+                var T2_u = 0;
+                var T2_pr = 0;
+                var T2_pck = 0;
+                var T3_u = 0;
+                var T3_pr = 0;
+                var T3_pck = 0;
+                var E_u = 0;
+                var E_pr = 0;
+                var E_pck = 0;
+                for(var i in all_uploads)
+                {
+                    if(all_uploads[i].country_code != "NULL")
+                    { 
+                        if(all_uploads[i].logged)
+                        {
+                            table += '<tr><td><button type="button" class = "btn btn-info">' + all_uploads[i].country_code + '</button></td>';
+                            users_logged += 1;
+                        }
+                        else
+                        {
+                            table += '<tr><td><button type="button" class = "btn btn-primary">' + all_uploads[i].country_code + '</button></td>';
+                        }
+                        
+                        if(all_uploads[i].T1)
+                        {
+                            if(all_uploads[i].T1_printed && all_uploads[i].T1_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">Theory 1</button></td>';
+                                T1_u += 1;
+                                T1_pr += 1;
+                                T1_pck += 1;
+
+                            }
+                            else if(all_uploads[i].T1_printed) 
+                            { 
+                                T1_u += 1;
+                                T1_pr += 1;
+                                table += '<td><button type="button" class="btn btn-primary">Theory 1</button></td>';
+                            }
+                            else
+                            {
+                                T1_u += 1;
+                                table += '<td><button type="button" class="btn btn-warning">Theory 1</button></td>';
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Theory 1</button></td>';
+                        }
+                    
+                        if(all_uploads[i].T2)
+                        {
+                            if(all_uploads[i].T2_printed && all_uploads[i].T2_packed)
+                            {
+                                T2_u += 1;
+                                T2_pr += 1;
+                                T2_pck += 1;
+                                table += '<td><button type="button" class="btn btn-success">Theory 2</button></td>';
+                            }
+                            else if(all_uploads[i].T2_printed) 
+                            { 
+                                T2_u += 1;
+                                T2_pr += 1;
+                                table += '<td><button type="button" class="btn btn-primary">Theory 2</button></td>';
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">Theory 2</button></td>';
+                                T2_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Theory 2</button></td>';
+                        }
+                        if(all_uploads[i].T3)
+                        {
+                            if(all_uploads[i].T3_printed && all_uploads[i].T3_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">Theory 3</button></td>';
+                                T3_u += 1;
+                                T3_pr += 1;
+                                T3_pck += 1;
+                            }
+                            else if(all_uploads[i].T3_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">Theory 3</button></td>';
+                                T3_u += 1;
+                                T3_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">Theory 3</button></td>';
+                                T3_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Theory 3</button></td>';
+                        }
+                        if(all_uploads[i].E)
+                        {
+                            if(all_uploads[i].E_printed && all_uploads[i].E_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">Experiment</button></td>';
+                                E_u += 1;
+                                E_pr += 1;
+                                E_pck += 1;
+                            }
+                            else if(all_uploads[i].E_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">Experiment</button></td>';
+                                E_u += 1;
+                                E_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">Experiment</button></td>';
+                                E_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Experiment</button></td>';
+                        }
+                        table += '</tr>';
+                    } 
+                }
+                table += '<tr><th>Users Logged: ' + users_logged + '</th>';
+                table += '<th>Uploaded: ' + T1_u + '<br />Printed: ' + T1_pr + '<br />Packed: ' + T1_pck + '</th>';
+                table += '<th>Uploaded: ' + T2_u + '<br />Printed: ' + T2_pr + '<br />Packed: ' + T2_pck + '</th>';
+                table += '<th>Uploaded: ' + T3_u + '<br />Printed: ' + T3_pr + '<br />Packed: ' + T3_pck + '</th>';
+                table += '<th>Uploaded: ' + E_u + '<br />Printed: ' + E_pr + '<br />Packed: ' + E_pck + '</th></tr>';
+                $("#all_uploads_table_body").html(table);
+            }); 
+            /*
             var table = '<table class="table table-bordered " style="table-layout:fixed" id = "all_uploads_table">';
                 for(var i in all_uploads)
                 {
@@ -541,8 +715,9 @@
                 table += "</table>";
                 var Table = $(table);
                 $("#all_uploads").html(Table);
-             });
-
+             
+            });
+            */
 	        socket.on('listed-dir',function(id,directory_path,files)
             {
                 if(id == "download")
