@@ -58,6 +58,7 @@
                             <thead>
                                 <tr>
                                     <th>Subpart</th>
+                                    <th>Max Marks</th>
                                     <th>Your Marks</th>
                                 </tr>
                             </thead>
@@ -147,7 +148,32 @@
                 });
 
                 $("#save_button").click(function(){
-                    $.post('/save_mark_T1',$("#form_marks").serialize()).done(function(){
+                    var data = $("#form_marks").serializeArray();
+                    var maxMarks = []
+                    var leaderMarks = [];
+                    for(var i in data)
+                    {
+                        if(data[i].name=='maxMarks')maxMarks.push(parseFloat(data[i].value));
+                        else if(data[i].name=='leaderMarks')
+                        {
+                            leaderMarks.push(parseFloat(data[i].value));
+                            if((data[i].value.split('.')[1] || []).length > 1)
+                            {
+                                alert("Least count is 0.1");
+                                return;
+                            }
+                        }
+                    }
+                    for(var i in leaderMarks)
+                    {
+                        if(maxMarks[i]<leaderMarks[i])
+                        {
+                            alert("Marks should be less than max marks");
+                            return;
+                        }
+                    }
+                    console.log(jsonData); 
+                    $.post('/save_mark_T1',data).done(function(){
                         alert("saved!");
                         });    
                 });
@@ -157,12 +183,14 @@
                     url : 'sheetEditableT1'
                 }).done(function(data)
                 {
-                    console.log(data);        
                     var table_body = "";
                     for(var i in data.subparts)
                     {
                         table_body += "<tr><td>" + data.subparts[i] + "</td>";
-                        table_body += '<td><input type="message" class="form-control" name = "leaderMarks['+i.toString()+']" placeholder="Enter Marks Here"></td></tr>';
+                        table_body += "<td>" + data.maxMarks[i] + "</td>";
+                        table_body += '<td><input type="message" class="form-control" name = "leaderMarks" placeholder="Enter Marks Here"></td>';
+                        table_body += '<input type = "hidden" name = "maxMarks" value = "'+data.maxMarks[i]+'" />';
+                        table_body += '</tr>';
                     }
                     $("#mark_table_body").html(table_body);
                 });
