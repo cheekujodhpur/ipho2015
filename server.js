@@ -203,10 +203,192 @@ app.post('/save_mark_T1',function(req,res){
             var table = db.collection('marks_T1');
             table.update({"ip":ip},{$set:{"leaderMarks":dbData}},function(err,result){db.close();});
         });
-        
     });
 });
 
+//receive list_dir request
+app.post('/list_dir',function(req,res)
+{
+    var jsonString = '';
+    var ip = req.ip;
+    console.log("'/list_dir' request received from " + ip.toString());  
+
+    req.on('data',function(data)
+    {
+       jsonString += data;
+    });
+    req.on('end',function()
+    {
+       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
+       var directory_path = jsonData['folder'];
+       if(directory_path=='uploads')
+       {
+            directory_path = __dirname + "/uploads/" + ip.toString() + "/";
+       }
+       else if(directory_path=='downloads')
+       {
+            directory_path = __dirname + "/downloads";
+       }
+        fs.readdir(directory_path, function(err,files)
+        {
+           if(err)
+            {
+                console.log(err);
+            } 
+
+        files.map(function(file)
+        {
+            return path.join(directory_path,file);
+        }).filter(function(file)
+        {
+            return fs.statSync(file).isFile();
+        });
+        
+        if(directory_path == __dirname + "/downloads")
+        {
+            
+            //filtering of filenames to show only country specific files
+            MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+            {
+                if(err)
+                {
+                    console.log(err);
+                    return 0;
+                }
+                console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+                var collection = db.collection('users');
+                
+                collection.find({"ip":ip}).toArray(function(err,items)
+                {
+                    if(items == null)
+                    {
+                        console.log(err);
+                        console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                        return;
+                    }
+                    if(items[0].type == 0)
+                    {
+                        id = "download";
+                        directory_path = "/downloads/";
+                        var result = {};
+                        result['id'] = id;
+                        result['directory_path'] = directory_path;
+                        result['files'] = files;
+                        res.json(result);
+                        console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
+                        db.close();       
+                        return;    
+                    }
+                    else
+                    {
+                        collection.find({}).toArray(function(err,items)
+                        {
+                            if(items == null)
+                            {
+                                console.log(err);
+                                console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                                return;
+                            }
+                            for (i in items)
+                            {
+                                //default file name is Marks_country_code.xls
+                                var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
+                                if(country_index > -1 && items[i].ip != ip)
+                                {
+                                    //console.log("splicing");
+                                    files.splice(country_index,1);
+                                }
+                            }
+                            id = "download";
+                            directory_path = "/downloads/";
+                            var result = {};
+                            result['id'] = id;
+                            result['directory_path'] = directory_path;
+                            result['files'] = files;
+                            res.json(result);
+                            console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
+                            db.close();           
+                        });
+
+                    }
+                });
+            }); 
+        }
+        else
+        {
+            MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+            {
+                if(err)
+                {
+                    console.log(err);
+                    return 0;
+                }
+                console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+                var uploads = db.collection('uploads');
+                
+                uploads.find({"ip":ip}).toArray(function(err,items){
+
+                    var result = {};
+                    
+                    if(err)
+                    {
+                         console.log(err);
+                    }
+                    if(items[0].T1_printed)result['T1_printed']=true;else result['T1_printed']=false;
+                    if(items[0].T2_printed)result['T2_printed']=true;else result['T2_printed']=false;
+                    if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
+                    if(items[0].E_printed)result['E_printed']=true;else result['E_printed']=false;
+
+                    id = "upload";
+                    directory_path = "/uploads/" + ip.toString() + "/";
+                    result['id'] = id;
+                    result['directory_path'] = directory_path;
+                    result['files'] = files;
+                    res.json(result);
+
+                    db.close();
+                });
+            });
+        }
+       });  
+    });
+});
+
+//receive request for fb
+app.post('/request_fb',function(req,res)
+{
+    var jsonString = '';
+    var ip = req.ip;
+    console.log("'/request_fb' request received from " + ip.toString());  
+
+    req.on('data',function(data)
+    {
+       jsonString += data;
+    });
+    req.on('end',function()
+    {
+       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
+       var current = jsonData['current'];
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+		    var fbs = db.collection('fbs');
+		    fbs.find({qno:current}).toArray(function(err,feeds)
+		    {
+                var result = {};
+                result['feeds'] = feeds;
+                res.json(result);
+                console.log("Response to '/request_fb' sent in response to request from " + ip.toString());  
+			    db.close();
+		    });
+		});
+    });
+});
 
 //request present table
 app.get('/sheetEditableT1',function(req,res)
@@ -304,7 +486,6 @@ app.post('/uploaded',function(req,res)
                                return console.error(err);
                             }
                             //print the uploaded file metadata on the console
-                            console.log('%j',req.files.user_file);
                             console.log(file_name + " successfully copied to /downloads/");
                         });
 

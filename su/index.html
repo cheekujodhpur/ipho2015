@@ -233,10 +233,13 @@
 			$(document).ready(function()
             {
                 var uptimer = setInterval(function(){
-	            socket.emit('list-dir','/uploads');
-	            socket.emit('list-dir','/downloads');
+                //send_list_dir('downloads');
+                send_list_dir('uploads');
 				socket.emit('list-all-uploads');
-                },15000);
+                },10000);
+
+                send_list_dir('downloads');
+                send_list_dir('uploads');
 
                 $("#fb_data_table").tablesorter();
                 //for adding options
@@ -272,8 +275,104 @@
 				$("#chpass-button").click(function(){
 					window.location = '/chpass.html';
 				});
+
 		    });
 
+            //AJAX requests
+            function send_list_dir(folder)
+            {
+                var uData = {};
+                uData["folder"] = folder;
+                $.ajax({
+                        method:"POST",
+                        url:'/list_dir',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                            var id = data['id'];
+                            var directory_path = data['directory_path'];
+                            var files = data['files'];
+                            if(id == "download")
+                            {
+                                var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                                for(var i = 0;i < files.length;i++)
+                                {
+                                    table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td><td><button type="button" class="btn btn-default btn-sm file-remove" id = "'+directory_path+files[i].toString()+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>'
+                                }
+                                table += "</table>";
+
+                                $("#download_table").remove();
+                                $("#home").append(table);
+                                //delete-file
+                                $(".file-remove").click(function(e){
+                                    e.preventDefault();
+                                    socket.emit('file-delete',$(this).attr("id"));
+                                });
+                            }
+                            //else
+                            //{
+                            //    var table = document.getElementById("upload_table");
+                            //    table.innerHTML = '';
+                            //    //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                            //    for(var i = 0;i < files.length;i++)
+                            //    {
+                            //        var row = table.insertRow(i);
+                            //        var cell = row.insertCell(0);
+                            //        cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                            //        //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                            //    }
+                            //    var row = table.insertRow(0);
+                            //    var cell = row.insertCell(0);
+                            //    cell.innerHTML ='<b>Uploads<b>';
+                            //    //table += "</table>";
+                            //    //$("#upload_table").remove();
+                            //    //$("#home").append(table); 
+                            //}
+                            if(data['T1_printed'] == true)
+                            {
+                                $("#T1_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['T2_printed'] == true)
+                            {
+                                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['T3_printed'] == true)
+                            {
+                                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['E_printed'] == true)
+                            {
+                                $("#E_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                        });
+            }
+
+            function request_fb(current)
+            {
+                var uData = {};
+                uData['current'] = current;
+                $.ajax({
+                        method:"POST",
+                        url:'/request_fb',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                       var feeds = data['feeds'];
+                 
+                        $("#fb_data_table_body").html('');
+                        for(var feed in feeds)
+                        {
+                            var ll = '';
+                            for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
+                            var field = '<tr><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                            var Field = $(field);
+                            $("#fb_data_table_body").append(Field);
+                        }
+                        $("#fb_data_table").trigger("update"); 
+                                }); 
+            }
             //SOCKET SIGNALS
             socket.on('disconnect',function()
             {
@@ -456,7 +555,7 @@
 
 			socket.on('file-deleted',function()
 			{
-				socket.emit('list-dir',"/downloads");
+				send_list_dir('downloads');
 			});
             socket.on('listed-all-uploads',function(all_uploads)
             {
@@ -773,8 +872,9 @@
                     $("input:radio[name='fb-toggle']:eq(3)").attr('checked','checked');       
                 fb_current = q;
                 fbtimer = setInterval(function(){
-                    socket.emit('fbRequest',fb_current);    
+                    request_fb(fb_current);    
                 },10000);
+                request_fb(fb_current);
             });
             
             socket.on('fbDisplay',function(feeds){
