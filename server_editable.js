@@ -171,18 +171,44 @@ app.get('/', function (req, res)
 	});
 });
 
-//app.post('/save_mark_T1',function(req,res){
-//    var jsonString = '';
-//    req.on('data',function(data)
-//        {
-//            jsonString += data;
-//        });
-//    req.on('end',function(){
-//        console.log(jsonString);
-//    });
-//});
-//
-////request present table
+app.post('/save_mark_T1',function(req,res){
+
+    var jsonString = '';
+    req.on('data',function(data)
+        {
+            jsonString += data;
+        });
+    req.on('end',function(){
+        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+        var dbData = [];
+        for(var i in jsonData)
+            dbData.push(parseInt(jsonData[i]));
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var table = db.collection('marks_T1');
+            table.update({"ip":ip},{$set:{"leaderMarks":dbData}},function(err,result){db.close();});
+        });
+        
+    });
+});
+
+
+//request present table
 app.get('/sheetEditableT1',function(req,res)
 {
     MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -209,19 +235,16 @@ app.get('/sheetEditableT1',function(req,res)
             {
                 subparts = items[0].subparts;
                 leaderMarks = items[0].leaderMarks;
+                maxMarks = items[0].maxMarks;
                 query['subparts'] = subparts;
                 query['leaderMarks'] = leaderMarks;
+                query['maxMarks'] = maxMarks;
             }
             //after certain checks, pass it
             res.json(query);
+            db.close();
         });
     });
-});
-
-app.post('/save_mark_T1',function(req,res)
-{
-    var data = res.body;
-    console.log(data);
 });
 
 //copies the uploaded file from /tmp to /downloads for the convener
