@@ -9,14 +9,18 @@
 		<!--Bootstrap-->
 		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
 		<!!--Custom CSS-->
-		<link href = "/static/css/main.css" rel = "stylesheet" />
+        <link href = "/static/css/main.css" rel = "stylesheet" />
+
+        <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+        <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/>   
     </head>
-	<body>
+
+    <body>
 		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
 			<div class = "container-fluid">
 				<div class = "navbar-header">
 					<a class="navbar-brand" href = "http://www.ipho2015.in">
-						<img alt="logo" src = "media/ipho-logo1.png" />
+						<img alt="ipho-logo" src = "media/ipho-logo1.png" />
 					</a>
 				</div>
 			</div>
@@ -37,10 +41,11 @@
 				</div>
 			</div>
 		</div>
-        <div id = "document">
+        
+        <div id = "document" style="width:80%">
 			<div role = "tabpanel">
 				<ul class = "nav nav-pills" id = "nemo">
-					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/downloads");'>Home</a></li>
+					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'send_list_dir"downloads");'>Home</a></li>
 					<li id = "svoteb" role = "presentation"><a href = "#vote" aria-controls="vote" role="tab" data-toggle="tab">Vote</a></li>
 					<li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
@@ -48,9 +53,10 @@
                     <li id = "all_uploads_b" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab" onclick = 'socket.emit("list-all-uploads");'>Uploads</a></li>
                 </ul>
 			</div>
-			<div class = "tab-content">
-				<div role="tabpanel" class="tab-pane active" id = "home">
-					<!--Upload starts here-->
+			
+            <div class = "tab-content">
+				
+                <div role="tabpanel" class="tab-pane active" id = "home">
                     <p id = "upload-body">Upload</p>
                     <form id        =  "upload_form"
                     enctype   =  "multipart/form-data"
@@ -67,11 +73,9 @@
                     </div> 
                     <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check();'/>
                     </form>
-                    <!--Upload ends here-->
-
 				</div>
+                
                 <div role="tabpanel" class="tab-pane" id = "vote">
-                    <!--Section for Vote on Administrator End///starts here-->
                     <h3>Create Vote question</h3>
                     <form style = "width:500px;" id = "form-vote">
 	                <div class = "form-group">
@@ -90,10 +94,9 @@
 	                </div>
 	                <button type = "submit" class = "btn btn-default">Submit</button>
                     </form>
-                    <!--Section for Vote on Administrator End///ends here-->
 				</div>
-				<div role="tabpanel" class="tab-pane" id = "cvote">
-					<!--Cast Vote starts here-->
+			
+                <div role="tabpanel" class="tab-pane" id = "cvote">
 					<p id = "cast-vote-body"></p>
 					<form>
 						<div class="form-group" id = "cast-vote-opts">
@@ -115,6 +118,7 @@
 
                         </div>
                     </form>
+                    
                     <div id = "fb_data">
                         <table style = "table-layout:fixed" class = "table table-bordered table-hover tablesorter" id = "fb_data_table">
                             <thead>
@@ -169,14 +173,15 @@
                 </div>
 			</div>	
 		</div>
+        
         <div id="sidebar-wrapper" >
-            <button type="button" class="btn btn-default" id = "refresh-button">Clear All</button>
+            <button type="button" class="btn btn-danger" id = "refresh-button">Clear All</button>
             <form id="form-message-submit">
                 <div class="form-group">
                     <label for="message_input">Message</label>
                     <input type="message" class="form-control" id="message_input" placeholder="Enter message here">
                 </div>
-                <button type="submit" class="btn btn-default" >Submit</button>
+                <button type="submit" class="btn btn-primary" >Submit</button>
             </form>
             <table class="table" id = "message-board">
             <thead>
@@ -186,16 +191,16 @@
             </tbody>
             </table>
         </div>
-        <div id="sp-footer-wrapper">
-            <div class="container">
-                <div class="row-fluid" id="footer">
-				    <div id="sp-footer1" class="span6">
-                        <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
-					    <br /><span>Mumbai - India </span> 
-                    </div>
-                </div>
-            </div>
-        </div>   	
+        <footer id="sp-footer-wrapper" style="bottom:0px;">
+                	<div class="container">
+                        <div class="row-fluid" id="footer">
+                             <div id="sp-footer1" class="span6" style="text-align:center">
+                                 <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                                 <br /><span>Mumbai - India </span> 
+                             </div>
+                         </div>
+                	</div>
+        </footer>   	
 		
         <!-- jQuery -->
 		<script src = "/static/js/jquery.min.js"></script>
@@ -240,12 +245,11 @@
             {
                 var uptimer = setInterval(function(){
                 //send_list_dir('downloads');
-                send_list_dir('uploads');
+                send_list_dir('downloads');
 				socket.emit('list-all-uploads');
                 },10000);
 
                 send_list_dir('downloads');
-                send_list_dir('uploads');
 
                 $("#fb_data_table").tablesorter();
                 //for adding options
@@ -301,7 +305,7 @@
                             var files = data['files'];
                             if(id == "download")
                             {
-                                var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                            var table = '<table id="download_table" class="table table-hover"><col style="width:90%"><col style="width:90%"><thead><tr><th>Uploads</th></tr></thead>';
                                 for(var i = 0;i < files.length;i++)
                                 {
                                     table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td><td><button type="button" class="btn btn-default btn-sm file-remove" id = "'+directory_path+files[i].toString()+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>'
@@ -316,25 +320,6 @@
                                     socket.emit('file-delete',$(this).attr("id"));
                                 });
                             }
-                            //else
-                            //{
-                            //    var table = document.getElementById("upload_table");
-                            //    table.innerHTML = '';
-                            //    //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
-                            //    for(var i = 0;i < files.length;i++)
-                            //    {
-                            //        var row = table.insertRow(i);
-                            //        var cell = row.insertCell(0);
-                            //        cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
-                            //        //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
-                            //    }
-                            //    var row = table.insertRow(0);
-                            //    var cell = row.insertCell(0);
-                            //    cell.innerHTML ='<b>Uploads<b>';
-                            //    //table += "</table>";
-                            //    //$("#upload_table").remove();
-                            //    //$("#home").append(table); 
-                            //}
                             if(data['T1_printed'] == true)
                             {
                                 $("#T1_form").html('<p class="btn btn-success">Printed</p>');
@@ -480,9 +465,11 @@
 	    for(var i in counts)
 	    {
 		if(i!='_id' && i!='id')
-		    if(parseInt(counts[i])>maxcount)
+		    if(parseInt(counts[i])>maxcount && options[j] != "Abstain")
 			maxcount = parseInt(counts[i]);
+            j += 1;
 	    }
+        j = 0;
                 for(var i in counts)
                     if(i!='_id' && i!='id')
                     {
@@ -707,158 +694,7 @@
                 table = table_stat + table;
                 $("#all_uploads_table_body").html(table);
             }); 
-            /*
-            var table = '<table class="table table-bordered " style="table-layout:fixed" id = "all_uploads_table">';
-                for(var i in all_uploads)
-                {
-                    if(all_uploads[i].country_code != "NULL")
-                    {
-                        if(all_uploads[i].logged)
-                        {
-                            table += '<thead><tr><th style="width:100%" data-toggle="collapse" data-target="#uploaded_files_' + all_uploads[i].country_name.toString() + '" class="btn btn-primary">' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
-                        }
-                        else
-                        {
-                            table += '<thead><tr><th style="width:100%" data-toggle="collapse" data-target="#uploaded_files_' + all_uploads[i].country_name.toString() + '" class="btn btn-info">' + all_uploads[i].country_name.toString() + '</th></tr></thead>';
-                        }
-                        table += '<tbody id="uploaded_files_' + all_uploads[i].country_name.toString() + '" class="collapse ">' ;
-                        if(all_uploads[i].T1)
-                        {
-                            if(all_uploads[i].T1_printed && all_uploads[i].T1_packed)
-                            {
-                            table += '<tr><td style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].T1_printed) { table += '<tbody><tr><td  style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>'; }
-                            else if(all_uploads[i].T1_packed)
-                            {
-                                table += '<tr><td style="width:100%"  class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else
-                            {
-                                table += '<tr><td style="width:100%" onclick = ' + 'socket.emit("upload-alert","T1") ' + 'class="btn btn-warning">Theory 1</td></tr>';
-                            }
-                        }
-                        else
-                        {   
-                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T1')"; 
-                            table += '<tr><td style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning">Theory 1</td></tr>';
-                        }
-                       
-                        if(all_uploads[i].T2)
-                        {
-                            if(all_uploads[i].T2_printed && all_uploads[i].T2_packed)
-                            {
-                            table += '<tr><td  style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].T2_printed)
-                            {
-                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 2</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].T2_packed)
-                            {
-                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 2</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else
-                            {
-                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 2</td></tr>';
-                            }
-                        }
-                        else
-                        {    
-                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T2')"; 
-                            table += '<tr><td  style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning" >Theory 2</td></tr>';
-                        }
-                        if(all_uploads[i].T3)
-                        {
-                            if(all_uploads[i].T3_printed && all_uploads[i].T3_packed)
-                            {
-                            table += '<tr><td  style="width:100%" class="btn btn-success">Theory 1</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].T3_printed)
-                            {
-                                table += '<tr><td style="width:100%"  class="btn btn-success">Theory 3</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].T3_packed)
-                            {
-                                table += '<tr><td style="width:100%"  class="btn btn-success">Theory 3</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else
-                            {
-                                table += '<tr><td  style="width:100%" class="btn btn-success">Theory 3</td></tr>';
-                            }
-                        }
-                        else
-                        {   
-                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','T3')"; 
-                            table += '<tr><td style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning">Theory 3</td></tr>';
-                        }
-                        if(all_uploads[i].E)
-                        {
-                            if(all_uploads[i].E_printed && all_uploads[i].E_packed)
-                            {
-                            table += '<tr><td  style="width:100%" class="btn btn-success">Experimental</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td> <td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].E_printed)
-                            {
-                                table += '<tr><td  style="width:100%" class="btn btn-success">Experimental</td><td class = "prcheck btn btn-success"><span class="glyphicon glyphicon-print"></span></td></tr>';
-                            }
-                            else if(all_uploads[i].E_packed)
-                            {
-                                table += '<tr><td style="width:100%"  class="btn btn-success">Experimental</td><td class = "prcheck btn btn-info"><span class="glyphicon glyphicon-send"></span></td></tr>';
-                            }
-                            else
-                            {
-                                table += '<tr><td  style="width:100%" class="btn btn-success">Experimental</td></tr>';
-                            }
-                        }
-                        else
-                        {    
-                            var str = "socket.emit('upload-alert','"+ all_uploads[i].ip.toString()+"','E')"; 
-                            table += '<tr><td style="width:100%" onclick = ' + '"' + str +'"'+' class="btn btn-warning">Experimental</td></tr>';
-                        }
-                        table += "</tbody>";
-                    }
-                }
-                table += "</table>";
-                var Table = $(table);
-                $("#all_uploads").html(Table);
-             
-            });
-            */
-	        socket.on('listed-dir',function(id,directory_path,files)
-            {
-                if(id == "download")
-                {
-                    var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
-                    for(var i = 0;i < files.length;i++)
-                    {
-                        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td><td><button type="button" class="btn btn-default btn-sm file-remove" id = "'+directory_path+files[i].toString()+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>'
-                    }
-                    table += "</table>";
-
-                    $("#download_table").remove();
-                    $("#home").append(table);
-					//delete-file
-            		$(".file-remove").click(function(e){
-                		e.preventDefault();
-                		socket.emit('file-delete',$(this).attr("id"));
-            		});
-
-                }
-                //else
-                //{
-                //    var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
-                //    for(var i = 0;i < files.length;i++)
-                //    {
-                //        table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
-                //   }
-                //    table += "</table>";
-                //    $("#upload_table").remove();
-                //    $("#home").append(table);
-                    
-                //}
-            }); 
-				
+	        
             socket.on('refreshAll',function(){
                 $("#rvote").html('');
                 $("#cast-vote-body").html('');
@@ -898,7 +734,6 @@
                 }
                 $("#fb_data_table").trigger("update"); 
             });
-			
 		</script>
 	</body>
 </html>

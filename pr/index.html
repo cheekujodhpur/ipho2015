@@ -10,6 +10,9 @@
 		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
 		<!!--Custom CSS-->
 		<link href = "/static/css/main.css" rel = "stylesheet" />
+
+        <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+        <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/>
     </head>
 	<body>
 		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
@@ -61,16 +64,16 @@
             </tbody>
             </table>
         </div>
-        <div id="sp-footer-wrapper">
-            <div class="container">
-                <div class="row-fluid" id="footer">
-				    <div id="sp-footer1" class="span6">
-                        <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
-					    <br /><span>Mumbai - India </span> 
-                    </div>
-                </div>
-            </div>
-        </div>   	
+       <footer id="sp-footer-wrapper" style="bottom:0px;">
+                	<div class="container">
+                        <div class="row-fluid" id="footer">
+                             <div id="sp-footer1" class="span6" style="text-align:center">
+                                 <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                                 <br /><span>Mumbai - India </span> 
+                             </div>
+                         </div>
+                	</div>
+        </footer>   	
 		
         <!-- jQuery -->
 		<script src = "/static/js/jquery.min.js"></script>
@@ -143,6 +146,8 @@
                 var table = '<table class="table table-bordered table-hover" id = "all_uploads_table" style="table-layout:fixed;width:500px">';
                 for(var i in all_uploads)
                 {
+                if(all_uploads[i].country_code != "NULL")
+                {
                 table += '<thead><tr><th>' + all_uploads[i].country_code.toString() + '</th><th>Printed</th><th>Packed</th></tr></thead>';
                     table += "<tbody>";
                     if(all_uploads[i].T1)
@@ -210,6 +215,7 @@
                         table += '<tr class="warning"><td>Experimental</td></tr>';
                     }
                     table += "</tbody>";
+                }
                 }
                 table += "</table>";
                 var Table = $(table);

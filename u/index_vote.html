@@ -206,15 +206,15 @@
             </table>
         </div>
     
-        <footer id="sp-footer-wrapper" style="position:absolute;bottom:0px;">
-                <div class="container">
-                    <div class="row-fluid" id="footer">
-                         <div id="sp-footer1" class="span6" style="text-align:center">
-                             <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
-                             <br /><span>Mumbai - India </span> 
+       <footer id="sp-footer-wrapper" style="bottom:0px;">
+                	<div class="container">
+                        <div class="row-fluid" id="footer">
+                             <div id="sp-footer1" class="span6" style="text-align:center">
+                                 <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                                 <br /><span>Mumbai - India </span> 
+                             </div>
                          </div>
-                     </div>
-                </div>
+                	</div>
         </footer>   	
         
         <!-- jQuery -->
@@ -417,35 +417,6 @@
 
             });
 
-            //DIRECTORY LISTING
-            //listed-dir signal which displays the directory listing
-            socket.on('listed-dir',function(id,directory_path,files)
-            {
-                if(id == "download")
-                {
-                    var table = document.getElementById("download_table_body");
-                    table.innerHTML = '';
-                         
-                    for(var i = 0;i < files.length;i++)
-                    {
-                        var row = table.insertRow(i);
-                        var cell = row.insertCell(0);
-                        cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
-                    }
-                }
-                else
-                {
-                    var table = document.getElementById("upload_table_body");
-                    table.innerHTML = '';
-                    for(var i = 0;i < files.length;i++)
-                    {
-                        var row = table.insertRow(i);
-                        var cell = row.insertCell(0);
-                        cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
-                    }
-                }
-            });
-
             //VOTING
             //on receiving vote request
             socket.on('govote',function(id,body,options,time)
@@ -539,12 +510,13 @@
                 var maxcount = 0;
                 for(var i in counts)
                 {
-                if(i!='_id' && i!='id')
-                    if(parseInt(counts[i])>maxcount && options[j] != 'Abstain')
+                if(i!='_id' && i!='id' && i!='Abstain')
+                    if(parseInt(counts[i])>maxcount) 
+                    {
                     maxcount = parseInt(counts[i]);
-                    j++;
+                    }
                 }
-                j = 0;
+                console.log(maxcount);
                 for(var i in counts)
                     if(i!='_id' && i!='id')
                     {

@@ -1,0 +1,77 @@
+js-bson: Failed to load c++ bson extension, using pure JS version
+
+events.js:72
+        throw er; // Unhandled 'error' event
+              ^
+Error: listen EADDRINUSE
+    at errnoException (net.js:901:11)
+    at Server._listen2 (net.js:1039:14)
+    at listen (net.js:1061:10)
+    at Server.listen (net.js:1135:5)
+    at Object.<anonymous> (/home/ipho/ipho2015/server.js:43:8)
+    at Module._compile (module.js:456:26)
+    at Object.Module._extensions..js (module.js:474:10)
+    at Module.load (module.js:356:32)
+    at Function.Module._load (module.js:312:12)
+    at Function.Module.runMain (module.js:497:10)
+js-bson: Failed to load c++ bson extension, using pure JS version
+[ Sun May 31 2015 23:46:06 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:46:36 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:48:28 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:48:39 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:49:59 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:50:21 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:51:19 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:51:39 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:52:08 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:52:22 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:52:35 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
+[ Sun May 31 2015 23:54:13 GMT+0530 (IST) ] Error: Can't set headers after they are sent.
+    at SendStream.headersAlreadySent (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:313:13)
+    at SendStream.send (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:494:17)
+    at onstat (/home/ipho/ipho2015/node_modules/express/node_modules/send/index.js:585:10)
+    at Object.oncomplete (fs.js:107:15)
