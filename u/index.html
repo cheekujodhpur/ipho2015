@@ -42,7 +42,7 @@
         <div id = "document">
             <div role = "tabpanel">
                     <ul class = "nav nav-pills" id = "nemo">
-                        <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");'>Home</a></li>
+                        <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'send_list_dir("uploads");send_list_dir("downloads");'>Home</a></li>
                         <li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
                         <li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
                         <li id = "fbb" role = "presentation" style = "display:none;"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
@@ -283,22 +283,6 @@
                 socket.io.reconnect();
             });	
            
-            socket.on('T1_printed',function(){
-                $("#T1_form").html('Printed');
-            });
-            socket.on('T2_printed',function(){
-                $("#T2_form").html('Printed');
-            });
-            socket.on('T3_printed',function(){
-                $("#T3_form").html('Printed');
-            });
-            socket.on('E_printed',function(){
-                $("#E_form").html('Printed');
-            });
-            socket.on('numofleaders',function(value)
-            {
-                num_of_leaders = value;
-            });
             //DONT PUT THIS IN DOCUMENT READY SCRIPT
             //function to disableF5
             function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
@@ -308,9 +292,11 @@
             {
                 var uptimer = setInterval(function()
                 {
-                    socket.emit('list-dir','/uploads');
-                    socket.emit('list-dir','/downloads');
+                    //send_list_dir('uploads');
+                    send_list_dir('downloads');
                 },10000);
+                send_list_dir('uploads');
+                send_list_dir('downloads');
                 $('#nemo a:first').tab('show');
                 //socket.io controls
                 $("#logout-button").click(function()
@@ -322,33 +308,80 @@
                     window.location = '/chpass.html';
                 });
             });
-           
-            //SOCKET SCRIPTS
-            socket.on('T1-already-printed',function()
-            {
-               $("#T1_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#T1_form").append(html_data);
-            });
             
-            socket.on('T2-already-printed',function()
+            //AJAX requests
+            function send_list_dir(folder)
             {
-               $("#T2_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#T2_form").append(html_data);
-            });
-            socket.on('T3-already-printed',function()
-            {
-               $("#T3_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#T3_form").append(html_data);
-            });
-            socket.on('E-already-printed',function()
-            {
-               $("#E_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#E_form").append(html_data);
-            });
+                var uData = {};
+                uData["folder"] = folder;
+                $.ajax({
+                        method:"POST",
+                        url:'/list_dir',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                            var id = data['id'];
+                            var directory_path = data['directory_path'];
+                            var files = data['files'];
+                            if(id == "download")
+                            {
+                                //var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                                var table = document.getElementById("download_table");
+                                table.innerHTML = '';
+                                     
+                                for(var i = 0;i < files.length;i++)
+                                {
+                                    var row = table.insertRow(i);
+                                    var cell = row.insertCell(0);
+                                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                                    //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                                }
+                                var row = table.insertRow(0);
+                                var cell = row.insertCell(0);
+                                cell.innerHTML ='<b>Downloads<b>';
+                                //table += "</table>";
+                                //$("#download_table").remove();
+                                //$("#home").append(table);
+                            }
+                            else
+                            {
+                                var table = document.getElementById("upload_table");
+                                table.innerHTML = '';
+                                //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                                for(var i = 0;i < files.length;i++)
+                                {
+                                    var row = table.insertRow(i);
+                                    var cell = row.insertCell(0);
+                                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                                    //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                                }
+                                var row = table.insertRow(0);
+                                var cell = row.insertCell(0);
+                                cell.innerHTML ='<b>Uploads<b>';
+                                //table += "</table>";
+                                //$("#upload_table").remove();
+                                //$("#home").append(table); 
+                            }
+                            if(data['T1_printed'] == true)
+                            {
+                                $("#T1_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['T2_printed'] == true)
+                            {
+                                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['T3_printed'] == true)
+                            {
+                                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['E_printed'] == true)
+                            {
+                                $("#E_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                        });
+            }
+
             
             socket.on('country-data',function(country)
             {
@@ -566,22 +599,6 @@
                     
                 fb_current = q;
                 $("#fbb").show();
-            });
-            socket.on('T1-alert',function()
-            {
-                alert("You are requested to upload T1 file.");
-            });
-            socket.on('T2-alert',function()
-            {
-                alert("You are requested to upload T2 file.");
-            });
-            socket.on('T3-alert',function()
-            {
-                alert("You are requested to upload T3 file.");
-            });
-            socket.on('E-alert',function()
-            {
-                alert("You are requested to upload E file.");
             });
             //FEEDBACK DISABLE
             socket.on('fbDisable',function(){
