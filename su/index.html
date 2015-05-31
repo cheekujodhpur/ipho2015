@@ -131,9 +131,14 @@
                     </div>    
 				</div>
 				<div role="tabpanel" class="tab-pane" id = "all_uploads">
-                    <table class="table table-stripped" style="table-layout:fixed;width:500px">
+                    <table class="table table-stripped" style="table-layout:fixed;width:100%">
+                    <col style="width:20%"> 
+                    <col style="width:20%"> 
+                    <col style="width:20%"> 
+                    <col style="width:20%"> 
+                    <col style="width:20%"> 
                     <thead>
-                        <tr><td>Legend</td></tr>
+                        <tr><th>Legend</th></tr>
                     </thead>
                     <tbody>
                         <tr><td><button type="button" class="btn btn-danger"> Not Uploaded </button></td>
@@ -151,11 +156,11 @@
                         <col style="width:25%">
                         <thead>
                         <tr>
-                            <td>Country Code</td>
-                            <td>T1</td>
-                            <td>T2</td>
-                            <td>T3</td>
-                            <td>E</td>
+                            <th>Country Code</th>
+                            <th>T1</th>
+                            <th>T2</th>
+                            <th>T3</th>
+                            <th>E</th>
                         </tr>
                         </thead>    
                         <tbody id="all_uploads_table_body">
@@ -209,7 +214,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit(100 MB) exceeded.");
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
                 }
                 
             });
@@ -480,12 +486,12 @@
                     { 
                         if(all_uploads[i].logged)
                         {
-                            table += '<tr><td><button type="button" class = "btn btn-info">' + all_uploads[i].country_code + '</button></td>';
+                            table += '<tr><td><button type="button" class = "btn btn-primary">' + all_uploads[i].country_code + '</button></td>';
                             users_logged += 1;
                         }
                         else
                         {
-                            table += '<tr><td><button type="button" class = "btn btn-primary">' + all_uploads[i].country_code + '</button></td>';
+                            table += '<tr><td><button type="button" class = "btn btn-info">' + all_uploads[i].country_code + '</button></td>';
                         }
                         
                         if(all_uploads[i].T1)
@@ -593,11 +599,13 @@
                         table += '</tr>';
                     } 
                 }
-                table += '<tr><th>Users Logged: ' + users_logged + '</th>';
-                table += '<th>Uploaded: ' + T1_u + '<br />Printed: ' + T1_pr + '<br />Packed: ' + T1_pck + '</th>';
-                table += '<th>Uploaded: ' + T2_u + '<br />Printed: ' + T2_pr + '<br />Packed: ' + T2_pck + '</th>';
-                table += '<th>Uploaded: ' + T3_u + '<br />Printed: ' + T3_pr + '<br />Packed: ' + T3_pck + '</th>';
-                table += '<th>Uploaded: ' + E_u + '<br />Printed: ' + E_pr + '<br />Packed: ' + E_pck + '</th></tr>';
+                var table_stat = '';
+                table_stat += '<tr><td>Users Logged: ' + users_logged + '</td>';
+                table_stat += '<td>Uploaded: ' + T1_u + '<br />Printed: ' + T1_pr + '<br />Packed: ' + T1_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + T2_u + '<br />Printed: ' + T2_pr + '<br />Packed: ' + T2_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + T3_u + '<br />Printed: ' + T3_pr + '<br />Packed: ' + T3_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + E_u + '<br />Printed: ' + E_pr + '<br />Packed: ' + E_pck + '</td></tr>';
+                table = table_stat + table;
                 $("#all_uploads_table_body").html(table);
             }); 
             /*

@@ -10,6 +10,9 @@
 		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
 		<!!--Custom CSS-->
 		<link href = "/static/css/main.css" rel = "stylesheet" />
+
+        <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+        <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/>	
 	</head>
 
     <body>
@@ -39,7 +42,7 @@
 			</div>
 		</div>
 		
-        <div id = "document">
+        <div id = "document" style="width:80%">
             <div role = "tabpanel">
                     <ul class = "nav nav-pills" id = "nemo">
                         <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");'>Home</a></li>
@@ -52,16 +55,18 @@
             <div class = "tab-content">
                 <!-- Home tab -->
                 <div role="tabpanel" class="tab-pane active" id = "home" >
-                    <table class ="table table-bordered table-condensed" style="table-layout: fixed;">
+                    <table class ="table table-stripped" style="table-layout:fixed;">
+                        <col style="width:50%"> 
+                        <col style="width:50%"> 
                         <thead>
-                            <tr style = "border-top:solid 1px black;">
-                                <th style="border-left:1px solid #000000;border-right:1px solid #000000">Theory 1 Upload</th>
-                                <th style="border-right:1px solid #000000">Theory 2 Upload</th>
+                            <tr>
+                                <th>Theory 1 Upload</th>
+                                <th>Theory 2 Upload</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td id = "T1_form" style="border:1px solid #000000">
+                                <td id = "T1_form">
                                     <form id        =  "upload_form"
                                         enctype   =  "multipart/form-data"
                                         action    =  "/uploadedT1"
@@ -75,7 +80,7 @@
                                     <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_T1();'/>
                                     </form>
                                  </td>
-                                 <td id = "T2_form" style="border:1px solid #000000"> 
+                                 <td id = "T2_form"> 
                                    <form id        =  "upload_form"
                                         enctype   =  "multipart/form-data"
                                         action    =  "/uploadedT2"
@@ -96,13 +101,13 @@
                         </tbody>
                         <thead>
                             <tr>
-                                <th style="border-left:1px solid #000000;border-right:1px solid #000000">Theory 3 Upload</th>
-                                <th style="border-right:1px solid #000000">Experimental Upload</th>
+                                <th>Theory 3 Upload</th>
+                                <th>Experimental Upload</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td id = "T3_form" style="border:1px solid #000000">
+                                <td id = "T3_form">
                                     <form id        =  "upload_form"
                                         enctype   =  "multipart/form-data"
                                         action    =  "/uploadedT3"
@@ -119,7 +124,7 @@
                                     <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_T3();'/>
                                     </form>
                                  </td>
-                                <td id = "E_form" style="border:1px solid #000000">
+                                <td id = "E_form">
                                     <form id        =  "upload_form"
                                         enctype   =  "multipart/form-data"
                                         action    =  "/uploadedE"
@@ -137,16 +142,24 @@
                         </tbody>   
                     </table>
 
-                    <hr style="border:1px solid #000000"></hr>
-                    <table id='download_table' class='table table-bordered table-hover'></table>
-                    <hr style="border:1px solid #000000"></hr>
-                    <table id='upload_table' class='table table-bordered table-hover'></table>
+                    <table id='download_table' class='table table-bordered table-hover'>
+                        <thead>
+                            <tr><th>Downloads</th></tr>
+                        </thead>
+                        <tbody id="download_table_body">
+                        </tbody>
+                    </table>
+                    <table id='upload_table' class='table table-bordered table-hover'>        
+                        <thead>
+                            <tr><th>Uploads</th></tr>
+                        </thead>
+                        <tbody id="upload_table_body">
+                        </tbody>
+                    </table>
 
                 </div>
-                <!-- Cast Vote tab -->
-
+                
                 <div role="tabpanel" class="tab-pane" id = "cvote">
-                    <!--Cast Vote starts here-->
                         <p id = "vote-body"></p>
                         <form>
                             <div class="form-group" id = "vote-opts">
@@ -154,7 +167,6 @@
                         </form>
                         <br />
                         <font>Time to vote: <span id = "timer"></span> seconds.</font>
-                    <!--Cast Vote ends here-->
                 </div>
                 
                 <div role="tabpanel" class="tab-pane" id = "rvote"></div>
@@ -181,7 +193,11 @@
             </div>
         </div>
         
-        <div id="sidebar-wrapper" >
+        <div id="sidebar-wrapper" style="width:20%">
+            <table class="table table-hover" id = "country_data_table" style="table-layout:fixed;">
+            <col style="width:50%">
+            <col style="width:50%">
+            </table>
             <table class="table" id = "message-board">
             <thead id = "message-board-head">
                 <tr><th>Message Board</th></tr>
@@ -190,15 +206,15 @@
             </table>
         </div>
     
-        <footer id="sp-footer-wrapper">
-            <div class="container">
-                <div class="row-fluid" id="footer">
-                    <div id="sp-footer1" class="span6">
-                        <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
-                        <br /><span>Mumbai - India </span> 
-                    </div>
+        <footer id="sp-footer-wrapper" style="position:absolute;bottom:0px;">
+                <div class="container">
+                    <div class="row-fluid" id="footer">
+                         <div id="sp-footer1" class="span6" style="text-align:center">
+                             <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                             <br /><span>Mumbai - India </span> 
+                         </div>
+                     </div>
                 </div>
-            </div>
         </footer>   	
         
         <!-- jQuery -->
@@ -215,10 +231,9 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit(100 MB) exceeded.");
-                    window.location('/');
-                }
-                
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';                
+                } 
             });
 
 
@@ -229,8 +244,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit(100 MB) exceeded.");
-                    window.location('/');
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
                 }
                 
             });
@@ -242,8 +257,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit(100 MB) exceeded.");
-                    window.location('/');
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
                 }
                 
             });
@@ -255,8 +270,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit(100 MB) exceeded.");
-                    window.location('/');
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
                 }
                 
             });
@@ -284,16 +299,16 @@
             });	
            
             socket.on('T1_printed',function(){
-                $("#T1_form").html('Printed');
+                    $("#T1_form").html('<p class="btn btn-success">Printed</p>');
             });
             socket.on('T2_printed',function(){
-                $("#T2_form").html('Printed');
+                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
             });
             socket.on('T3_printed',function(){
-                $("#T3_form").html('Printed');
+                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
             });
             socket.on('E_printed',function(){
-                $("#E_form").html('Printed');
+                $("#E_form").html('<p class="btn btn-success">Printed</p>');
             });
             socket.on('numofleaders',function(value)
             {
@@ -306,6 +321,8 @@
             //document ready script
             $(document).ready(function()
             {
+  
+                socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");
                 var uptimer = setInterval(function()
                 {
                     socket.emit('list-dir','/uploads');
@@ -323,48 +340,18 @@
                 });
             });
            
-            //SOCKET SCRIPTS
-            socket.on('T1-already-printed',function()
-            {
-               $("#T1_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#T1_form").append(html_data);
-            });
-            
-            socket.on('T2-already-printed',function()
-            {
-               $("#T2_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#T2_form").append(html_data);
-            });
-            socket.on('T3-already-printed',function()
-            {
-               $("#T3_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#T3_form").append(html_data);
-            });
-            socket.on('E-already-printed',function()
-            {
-               $("#E_form").remove();
-               var html_data = '<p class="btn btn-info">Printed</p>';
-               $("#E_form").append(html_data);
-            });
             
             socket.on('country-data',function(country)
             {
-                var mt_head = document.getElementById("message-board-head");
+                var mt_head = document.getElementById("country_data_table");
                 mt_head.innerHTML = '';
                 var row = mt_head.insertRow(0);
                 var cell = row.insertCell(0);
-                cell.innerHTML = '<img style="width:40px;height:20px""alt="country image" src= "/media/flags/' + country.country_name + '.png"/>'; 
+                cell.innerHTML = '<p style="text-align:right"><img style="width:40px;height:20px;" alt="country image" src= "/media/flags/' + country.country_name + '.png" /></p>'; 
                 //ENTER COUNTRY IMAGE HERE
                 var cell = row.insertCell(1);
-                cell.innerHTML = country.country_code; 
+                cell.innerHTML = '<th style="text-align:left">' + country.country_code + '</th>'; 
 
-                var row = mt_head.insertRow(1);
-                var cell = row.insertCell(0);
-                var cell = row.insertCell(1);
-                cell.innerHTML = "Message Table"; 
             });
 
             //DIRECTORY LISTING
@@ -373,8 +360,7 @@
             {
                 if(id == "download")
                 {
-                    //var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
-                    var table = document.getElementById("download_table");
+                    var table = document.getElementById("download_table_body");
                     table.innerHTML = '';
                          
                     for(var i = 0;i < files.length;i++)
@@ -382,33 +368,18 @@
                         var row = table.insertRow(i);
                         var cell = row.insertCell(0);
                         cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
-                        //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                     }
-                    var row = table.insertRow(0);
-                    var cell = row.insertCell(0);
-                    cell.innerHTML ='<b>Downloads<b>';
-                    //table += "</table>";
-                    //$("#download_table").remove();
-                    //$("#home").append(table);
                 }
                 else
                 {
-                    var table = document.getElementById("upload_table");
+                    var table = document.getElementById("upload_table_body");
                     table.innerHTML = '';
-                    //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
                     for(var i = 0;i < files.length;i++)
                     {
                         var row = table.insertRow(i);
                         var cell = row.insertCell(0);
                         cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
-                        //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                     }
-                    var row = table.insertRow(0);
-                    var cell = row.insertCell(0);
-                    cell.innerHTML ='<b>Uploads<b>';
-                    //table += "</table>";
-                    //$("#upload_table").remove();
-                    //$("#home").append(table); 
                 }
             });
 
@@ -506,9 +477,11 @@
                 for(var i in counts)
                 {
                 if(i!='_id' && i!='id')
-                    if(parseInt(counts[i])>maxcount)
+                    if(parseInt(counts[i])>maxcount && options[j] != 'Abstain')
                     maxcount = parseInt(counts[i]);
+                    j++;
                 }
+                j = 0;
                 for(var i in counts)
                     if(i!='_id' && i!='id')
                     {
@@ -567,22 +540,6 @@
                 fb_current = q;
                 $("#fbb").show();
             });
-            socket.on('T1-alert',function()
-            {
-                alert("You are requested to upload T1 file.");
-            });
-            socket.on('T2-alert',function()
-            {
-                alert("You are requested to upload T2 file.");
-            });
-            socket.on('T3-alert',function()
-            {
-                alert("You are requested to upload T3 file.");
-            });
-            socket.on('E-alert',function()
-            {
-                alert("You are requested to upload E file.");
-            });
             //FEEDBACK DISABLE
             socket.on('fbDisable',function(){
                 $("#nemo a:first").tab('show');
@@ -620,7 +577,7 @@
                 }
                 else
                 {
-                    alert("File is being uploaded successfully");
+                    alert("File uploaded successfully.");
                     return true;
                 }
             }
@@ -634,7 +591,7 @@
                 }
                 else
                 {
-                    alert("File is being uploaded successfully");
+                    alert("File uploaded successfully.");
                     return true;
                 }
             }
@@ -648,7 +605,7 @@
                 }
                 else
                 {
-                    alert("File is being uploaded successfully");
+                    alert("File uploaded successfully.");
                     return true;
                 }
             }
@@ -662,7 +619,7 @@
                 }
                 else
                 {
-                    alert("File is being uploaded successfully");
+                    alert("File uploaded successfully.");
                     return true;
                 }
             }

@@ -42,7 +42,7 @@
 			</div>
 		</div>
 		
-        <div id = "document" style="width:80%">
+        <div id = "document" style="width:70%">
             <div role = "tabpanel">
                     <ul class = "nav nav-pills" id = "nemo">
                         <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");'>Home</a></li>
@@ -146,15 +146,11 @@
                         <thead>
                             <tr><th>Downloads</th></tr>
                         </thead>
-                        <tbody id="download_table_body">
-                        </tbody>
                     </table>
                     <table id='upload_table' class='table table-bordered table-hover'>        
                         <thead>
                             <tr><th>Uploads</th></tr>
                         </thead>
-                        <tbody id="upload_table_body">
-                        </tbody>
                     </table>
 
                 </div>
@@ -193,11 +189,7 @@
             </div>
         </div>
         
-        <div id="sidebar-wrapper" style="width:20%">
-            <table class="table table-hover" id = "country_data_table" style="table-layout:fixed;">
-            <col style="width:50%">
-            <col style="width:50%">
-            </table>
+        <div id="sidebar-wrapper" style="width:30%">
             <table class="table" id = "message-board">
             <thead id = "message-board-head">
                 <tr><th>Message Board</th></tr>
@@ -231,9 +223,10 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit (100 MB) exceeded.");
-                    window.location = '/';                
-                } 
+                    alert("File limit(100 MB) exceeded.");
+                    window.location('/');
+                }
+                
             });
 
 
@@ -244,8 +237,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit (100 MB) exceeded.");
-                    window.location = '/';
+                    alert("File limit(100 MB) exceeded.");
+                    window.location('/');
                 }
                 
             });
@@ -257,8 +250,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit (100 MB) exceeded.");
-                    window.location = '/';
+                    alert("File limit(100 MB) exceeded.");
+                    window.location('/');
                 }
                 
             });
@@ -270,8 +263,8 @@
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
                 {
-                    alert("File limit (100 MB) exceeded.");
-                    window.location = '/';
+                    alert("File limit(100 MB) exceeded.");
+                    window.location('/');
                 }
                 
             });
@@ -299,16 +292,16 @@
             });	
            
             socket.on('T1_printed',function(){
-                    $("#T1_form").html('<p class="btn btn-success">Printed</p>');
+                $("#T1_form").html('Printed');
             });
             socket.on('T2_printed',function(){
-                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
+                $("#T2_form").html('Printed');
             });
             socket.on('T3_printed',function(){
-                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
+                $("#T3_form").html('Printed');
             });
             socket.on('E_printed',function(){
-                $("#E_form").html('<p class="btn btn-success">Printed</p>');
+                $("#E_form").html('Printed');
             });
             socket.on('numofleaders',function(value)
             {
@@ -322,7 +315,6 @@
             $(document).ready(function()
             {
   
-                socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");
                 var uptimer = setInterval(function()
                 {
                     socket.emit('list-dir','/uploads');
@@ -340,18 +332,48 @@
                 });
             });
            
+            //SOCKET SCRIPTS
+            socket.on('T1-already-printed',function()
+            {
+               $("#T1_form").remove();
+               var html_data = '<p class="btn btn-info">Printed</p>';
+               $("#T1_form").append(html_data);
+            });
+            
+            socket.on('T2-already-printed',function()
+            {
+               $("#T2_form").remove();
+               var html_data = '<p class="btn btn-info">Printed</p>';
+               $("#T2_form").append(html_data);
+            });
+            socket.on('T3-already-printed',function()
+            {
+               $("#T3_form").remove();
+               var html_data = '<p class="btn btn-info">Printed</p>';
+               $("#T3_form").append(html_data);
+            });
+            socket.on('E-already-printed',function()
+            {
+               $("#E_form").remove();
+               var html_data = '<p class="btn btn-info">Printed</p>';
+               $("#E_form").append(html_data);
+            });
             
             socket.on('country-data',function(country)
             {
-                var mt_head = document.getElementById("country_data_table");
+                var mt_head = document.getElementById("message-board-head");
                 mt_head.innerHTML = '';
                 var row = mt_head.insertRow(0);
                 var cell = row.insertCell(0);
-                cell.innerHTML = '<p style="text-align:right"><img style="width:40px;height:20px;" alt="country image" src= "/media/flags/' + country.country_name + '.png" /></p>'; 
+                cell.innerHTML = '<img style="width:40px;height:20px""alt="country image" src= "/media/flags/' + country.country_name + '.png"/>'; 
                 //ENTER COUNTRY IMAGE HERE
                 var cell = row.insertCell(1);
-                cell.innerHTML = '<th style="text-align:left">' + country.country_code + '</th>'; 
+                cell.innerHTML = country.country_code; 
 
+                var row = mt_head.insertRow(1);
+                var cell = row.insertCell(0);
+                var cell = row.insertCell(1);
+                cell.innerHTML = "Message Table"; 
             });
 
             //DIRECTORY LISTING
@@ -360,7 +382,8 @@
             {
                 if(id == "download")
                 {
-                    var table = document.getElementById("download_table_body");
+                    //var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                    var table = document.getElementById("download_table");
                     table.innerHTML = '';
                          
                     for(var i = 0;i < files.length;i++)
@@ -368,18 +391,33 @@
                         var row = table.insertRow(i);
                         var cell = row.insertCell(0);
                         cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                        //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                     }
+                    var row = table.insertRow(0);
+                    var cell = row.insertCell(0);
+                    cell.innerHTML ='<b>Downloads<b>';
+                    //table += "</table>";
+                    //$("#download_table").remove();
+                    //$("#home").append(table);
                 }
                 else
                 {
-                    var table = document.getElementById("upload_table_body");
+                    var table = document.getElementById("upload_table");
                     table.innerHTML = '';
+                    //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
                     for(var i = 0;i < files.length;i++)
                     {
                         var row = table.insertRow(i);
                         var cell = row.insertCell(0);
                         cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                        //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                     }
+                    var row = table.insertRow(0);
+                    var cell = row.insertCell(0);
+                    cell.innerHTML ='<b>Uploads<b>';
+                    //table += "</table>";
+                    //$("#upload_table").remove();
+                    //$("#home").append(table); 
                 }
             });
 
@@ -477,11 +515,9 @@
                 for(var i in counts)
                 {
                 if(i!='_id' && i!='id')
-                    if(parseInt(counts[i])>maxcount && options[j] != 'Abstain')
+                    if(parseInt(counts[i])>maxcount)
                     maxcount = parseInt(counts[i]);
-                    j++;
                 }
-                j = 0;
                 for(var i in counts)
                     if(i!='_id' && i!='id')
                     {
@@ -540,6 +576,22 @@
                 fb_current = q;
                 $("#fbb").show();
             });
+            socket.on('T1-alert',function()
+            {
+                alert("You are requested to upload T1 file.");
+            });
+            socket.on('T2-alert',function()
+            {
+                alert("You are requested to upload T2 file.");
+            });
+            socket.on('T3-alert',function()
+            {
+                alert("You are requested to upload T3 file.");
+            });
+            socket.on('E-alert',function()
+            {
+                alert("You are requested to upload E file.");
+            });
             //FEEDBACK DISABLE
             socket.on('fbDisable',function(){
                 $("#nemo a:first").tab('show');
@@ -577,7 +629,7 @@
                 }
                 else
                 {
-                    alert("File uploaded successfully.");
+                    alert("File is being uploaded successfully");
                     return true;
                 }
             }
@@ -591,7 +643,7 @@
                 }
                 else
                 {
-                    alert("File uploaded successfully.");
+                    alert("File is being uploaded successfully");
                     return true;
                 }
             }
@@ -605,7 +657,7 @@
                 }
                 else
                 {
-                    alert("File uploaded successfully.");
+                    alert("File is being uploaded successfully");
                     return true;
                 }
             }
@@ -619,7 +671,7 @@
                 }
                 else
                 {
-                    alert("File uploaded successfully.");
+                    alert("File is being uploaded successfully");
                     return true;
                 }
             }

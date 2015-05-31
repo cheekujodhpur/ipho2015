@@ -89,11 +89,12 @@ app.get('/static/js/knockout-2.2.0.js', function(req,res){res.sendFile(__dirname
 app.get('/static/js/jquery.tablesorter.js', function(req,res){res.sendFile(__dirname+'/static/js/jquery.tablesorter.js');});
 app.get('/static/js/Chart.min.js', function(req,res){res.sendFile(__dirname+'/static/js/Chart.min.js');});
 app.get('/media/ipho-logo1.png', function(req,res){res.sendFile(__dirname+'/media/ipho-logo1.png');});
+app.get('/media/favicon.ico', function(req,res){res.sendFile(__dirname+'/media/favicon.ico');});
 app.get('/media/tifr-logo-s.png', function(req,res){res.sendFile(__dirname+'/media/tifr-logo-s.png');});
 app.get('/static/fonts/glyphicons-halflings-regular.woff2', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff2');});
 app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res.sendFile(__dirname+'/static/fonts/glyphicons-halflings-regular.woff');});
 
-app.use("/media/flags/",express.static(__dirname + "/media/flags/"));console.log("File download enabled for /media/flags");
+app.use("/media",express.static(__dirname + "/media"));console.log("File download enabled for /media");
 app.use("/static",express.static(__dirname + "/static"));console.log("File download enabled for /static");
 //authentication page
 app.get('/auth.html',function(req,res)
@@ -1305,7 +1306,7 @@ io.on('connection',function(socket)
 		    collection.find({"ip":ip}).toArray(function(err,items)
 		    {
 		        collection.update({"ip":ip},{$set:{"logged":false}},function(err,result){});
-			    uploads.update({"ip":ip},{$set:{"logged":true}},function(err,result){});db.close();
+			    uploads.update({"ip":ip},{$set:{"logged":false}},function(err,result){});db.close();
 		    });
             //send the end acknowleged signal
             socket.emit('end-ack');
@@ -1336,11 +1337,7 @@ io.on('connection',function(socket)
 
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-		    if(err)
-		    {
-			    console.log(err);
-			    return 0;
-		    }
+		    if(err) { console.log(err); return 0; }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
 		    var question_db = db.collection('voteq');
 			var count_db = db.collection('votec');
