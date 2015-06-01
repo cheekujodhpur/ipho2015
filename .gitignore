@@ -7,3 +7,4 @@ src_php/*
 uploads/*
 downloads/*
 tmp/*
+*.log
