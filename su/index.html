@@ -234,9 +234,11 @@
                     return 'You will lose your chance to vote if you continue. Are you sure?';
             };
             
+            //my globals
             var socket = io();
             var fb_current = '';
-            var fbtimer;     
+            var fbtimer;
+            var current_sort_order = [];     
             //function to disableF5
             function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
 			
@@ -252,6 +254,9 @@
                 send_list_dir('downloads');
 
                 $("#fb_data_table").tablesorter();
+                $("#fb_data_table").on("sortEnd",function(event){
+                    current_sort_order = event.target.config.sortList;
+                    });
                 //for adding options
 				var next = 1;
 				$(".add-more").click(function(e){
@@ -361,8 +366,9 @@
                             var Field = $(field);
                             $("#fb_data_table_body").append(Field);
                         }
-                        $("#fb_data_table").trigger("update"); 
-                                }); 
+                        $("#fb_data_table").trigger('update');
+                        setTimeout(function(){ $("#fb_data_table").trigger( 'sorton', [ current_sort_order ] ) },10);
+                        });
             }
             //SOCKET SIGNALS
             socket.on('disconnect',function()
