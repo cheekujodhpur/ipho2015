@@ -884,7 +884,7 @@ io.on('connection',function(socket)
                 return;
             }
             var val = items[0].number_of_votes;
-            socket.emit('numberofleaders',val);
+            socket.emit('num_of_leaders',val);
             socket.emit('country-data',items[0]);
             console.log("'numberofleaders' signal broadcasted from the server in response to " + ip.toString());
             console.log("'country-data' signal broadcasted from the server in response to " + ip.toString());
@@ -1610,26 +1610,33 @@ io.on('connection',function(socket)
 			    return 0;
 		    }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-		    var collection = db.collection('votec');
-		    var query = {};
-            if(undefined!=option)
+            var users = db.collection('users');
+            users.find({"ip":ip}).toArray(function(err,items)
             {
-                //vote from both users is same
-		    	if(option==option2)
-		        	query[option] = 2;
-			    else{
-                    //vote from second user
-			    	query[option]=1;
-			    	if(undefined!=option2)	//single window votes
-			    		query[option2]=1;
-			    }
-		        collection.update({"id":id},{$inc:query},function(err,result){db.close();});
-            }
-            else if(undefined!=option2)
-            {
-                query[option2] = 1;
-                collection.update({"id":id},{$inc:query},function(err,result){db.close();});
-            }
+                if(items[0].logged==true)
+                {
+                    var collection = db.collection('votec');
+                    var query = {};
+                    if(undefined!=option)
+                    {
+                        //vote from both users is same
+                        if(option==option2)
+                            query[option] = 2;
+                        else{
+                            //vote from second user
+                            query[option]=1;
+                            if(undefined!=option2)	//single window votes
+                                query[option2]=1;
+                        }
+                        collection.update({"id":id},{$inc:query},function(err,result){db.close();});
+                    }
+                    else if(undefined!=option2)
+                    {
+                        query[option2] = 1;
+                        collection.update({"id":id},{$inc:query},function(err,result){db.close();});
+                    }
+                }
+            });
 		});
 	});
 

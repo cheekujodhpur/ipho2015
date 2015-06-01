@@ -298,7 +298,7 @@
                 socket.io.reconnect();
             });	
            
-            socket.on('numofleaders',function(value)
+            socket.on('num_of_leaders',function(value)
             {
                 num_of_leaders = value;
             });
@@ -510,13 +510,19 @@
                 var maxcount = 0;
                 for(var i in counts)
                 {
-                if(i!='_id' && i!='id' && i!='Abstain')
-                    if(parseInt(counts[i])>maxcount) 
+                    if(i!='_id' && i!='id')
                     {
-                    maxcount = parseInt(counts[i]);
+                        if(parseInt(counts[i])>maxcount) 
+                        {
+                            console.log(options[j]);
+                            if(options[j]!='Abstain')
+                                maxcount = parseInt(counts[i]);
+                        }
+                        j++;
                     }
                 }
                 console.log(maxcount);
+                j = 0;
                 for(var i in counts)
                     if(i!='_id' && i!='id')
                     {

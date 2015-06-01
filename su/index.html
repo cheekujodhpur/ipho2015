@@ -464,10 +464,12 @@
 	    var maxcount = 0;
 	    for(var i in counts)
 	    {
-		if(i!='_id' && i!='id')
-		    if(parseInt(counts[i])>maxcount && options[j] != "Abstain")
-			maxcount = parseInt(counts[i]);
-            j += 1;
+            if(i!='_id' && i!='id')
+            {
+                if(parseInt(counts[i])>maxcount && options[j] != "Abstain")
+                maxcount = parseInt(counts[i]);
+                j += 1;
+            }
 	    }
         j = 0;
                 for(var i in counts)
