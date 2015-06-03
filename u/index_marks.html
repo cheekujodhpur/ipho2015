@@ -151,6 +151,7 @@
 
                 $("#save_button").click(function(){
                     var data = $("#form_marks").serializeArray();
+                    var ajaxData = {};
                     var maxMarks = []
                     var leaderMarks = [];
                     for(var i in data)
@@ -164,6 +165,7 @@
                                 alert("Least count is 0.1");
                                 return;
                             }
+                            ajaxData[i] = parseFloat(data[i].value);
                         }
                     }
                     for(var i in leaderMarks)
@@ -174,8 +176,7 @@
                             return;
                         }
                     }
-                    console.log(jsonData); 
-                    $.post('/save_mark_T1',data).done(function(){
+                    $.post('/save_mark_T1',ajaxData).done(function(){
                         alert("saved!");
                         });    
                 });
@@ -195,6 +196,11 @@
                         table_body += '</tr>';
                     }
                     $("#mark_table_body").html(table_body);
+                    var i = 0;
+                    $("input[name=leaderMarks]").each(function(){
+                        $(this).val(data.leaderMarks[i]);
+                        i++;
+                    });
                 });
             });
            

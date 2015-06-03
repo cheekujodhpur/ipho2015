@@ -183,7 +183,7 @@ app.post('/save_mark_T1',function(req,res){
         var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
         var dbData = [];
         for(var i in jsonData)
-            dbData.push(parseInt(jsonData[i]));
+            dbData.push(parseFloat(jsonData[i]));
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
