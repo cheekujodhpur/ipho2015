@@ -101,20 +101,49 @@
 					<form>
 						<div class="form-group" id = "cast-vote-opts">
 						</div>	
-					</form> <br /> <font>Time to vote: <span id = "timer"></span> seconds</font> <!--Cast Vote ends here--> </div> <div role="tabpanel" class="tab-pane" id = "rvote"></div> <div role="tabpanel" class="tab-pane" id = "fb"> <form id="form-feedback-toggle"> <div class = "form-group" id = "feedback-togglers"> <label class = "form-label" for = "fb-toggle">Turn Feedback on</label> 
-                            <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" />Theory 1</label> 
-                            </div> 
-                            <div class = "radio"> <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" />Theory 2</label>
-                            </div>
-                            <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')" value="tq3" />Theory 3</label>
-                            </div>
-                            <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','ep1')" value="ep1" />Experiment 1</label>
-                            </div>
-                            <div class = "radio">
-                                <label><input name = "fb-toggle" type = "radio" checked="checked" onclick = "socket.emit('fbEnd');clearInterval(fbtimer);"/>None</label>
-                            </div>
+					</form> <br /> <font>Time to vote: <span id = "timer"></span> seconds</font> <!--Cast Vote ends here--> </div>
+                    <div role="tabpanel" class="tab-pane" id = "rvote"></div>
+                    <div role="tabpanel" class="tab-pane" id = "fb"> 
+                        <form id="form-feedback-toggle"> <div class = "form-group" id = "feedback-togglers"> 
+                            <label class = "form-label" for = "fb-toggle">Turn Feedback on</label>
+                            <table class = "table">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>To Leaders</th>
+                                        <th>Display</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Theory 1</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq1';reset_fb_timer();" value="tq1" /></td>
+                                    </tr> 
+                                    <tr>
+                                        <td>Theory 2</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq2';reset_fb_timer();" value="tq2" /></td>
+                                    </tr> 
+                                    <tr>
+                                        <td>Theory 3</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')" value="tq3" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq3';reset_fb_timer();" value="tq3" /></td>
+                                    </tr> 
+                                    <tr>
+                                        <td>Experimemt</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','ep1')" value="ep1" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'ep1';reset_fb_timer();" value="ep1" /></td>
+                                    </tr> 
+                                    <tr>
+                                        <td>None</td>
+                                        <td colspan="2">
+                                            <div class = "radio">
+                                                <label><input name = "fb-toggle" type = "radio" checked="checked" onclick = "socket.emit('fbEnd');"/>None</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                            </tbody>
 
                         </div>
                     </form>
@@ -291,7 +320,22 @@
 					window.location = '/chpass.html';
 				});
 
+                fbtimer = setInterval(function(){
+                    request_fb(fb_current);    
+                },10000);
+                request_fb(fb_current);
+
 		    });
+
+            function reset_fb_timer()
+            {
+                clearInterval(fbtimer);
+                
+                fbtimer = setInterval(function(){
+                    request_fb(fb_current);    
+                },10000);
+                request_fb(fb_current);
+            }
 
             //AJAX requests
             function send_list_dir(folder)
@@ -722,11 +766,6 @@
                     $("input:radio[name='fb-toggle']:eq(2)").attr('checked','checked');       
                 if(q=='ep1')
                     $("input:radio[name='fb-toggle']:eq(3)").attr('checked','checked');       
-                fb_current = q;
-                fbtimer = setInterval(function(){
-                    request_fb(fb_current);    
-                },10000);
-                request_fb(fb_current);
             });
             
             socket.on('fbDisplay',function(feeds){
