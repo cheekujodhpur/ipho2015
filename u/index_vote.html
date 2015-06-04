@@ -187,7 +187,7 @@
                             <label for = "comment">Comment:</label>
                             <textarea class = "form-control" rows = "5" id = "comment"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-default" id = "fb_submit">Submit</button>
+                        <button type="submit" class="btn btn-default" id = "fb_submit" onclick='alert("Your feedback has been submitted successfully.")'>Submit</button>
                     </form>
                 </div>
             </div>
@@ -314,7 +314,7 @@
                 socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");
                 var uptimer = setInterval(function()
                 {
-                    //send_list_dir('uploads');
+                    send_list_dir('uploads');
                     send_list_dir('downloads');
                 },10000);
                 send_list_dir('uploads');
