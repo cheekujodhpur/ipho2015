@@ -1,4 +1,5 @@
 #IP country_name country_code number_of_votes number_of_students
+192.168.200.71 NULL NULL 2 5
 192.168.200.200 Armenia ARM 2 5
 192.168.200.201 Australia AUS 2 5
 192.168.200.202 Austria AUT 2 5
@@ -13,8 +14,10 @@
 192.168.200.211 Cambodia KHM 2 5
 192.168.200.212 Canada CAN 2 5
 192.168.200.213 Chinese_Taipei TWN 2 5
+#192.168.200.213 NULL NULL 2 5
 192.168.200.214 Colombia COL 2 2
-192.168.200.215 Costa Rica CRI 0 0
+#192.168.200.214 NULL NULL 2 2
+192.168.200.215 Costa_Rica CRI 0 0
 192.168.200.216 Croatia HRV 2 5
 192.168.200.217 Cuba CUB 1 1
 192.168.200.218 Cyprus CYP 2 4
@@ -86,4 +89,3 @@
 192.168.200.127 United_States_of_America USA 2 5
 192.168.200.128 Uzbekistan UZB 2 5
 192.168.200.129 Vietnam ZWE 2 5
-

@@ -118,7 +118,7 @@
                                     <tr>
                                         <td>Theory 1</td>
                                         <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq1';reset_fb_timer();" value="tq1" /></td>
+                                        <td><input checked = "checked" name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq1';reset_fb_timer();" value="tq1" /></td>
                                     </tr> 
                                     <tr>
                                         <td>Theory 2</td>
@@ -142,20 +142,22 @@
                                                 <label><input name = "fb-toggle" type = "radio" checked="checked" onclick = "socket.emit('fbEnd');"/>None</label>
                                             </div>
                                         </td>
-                                    </tr>
-                            </tbody>
 
                         </div>
                     </form>
                     
                     <div id = "fb_data">
-                        <table style = "table-layout:fixed" class = "table table-bordered table-hover tablesorter" id = "fb_data_table">
+                        <table style = "table-layout:fixed;" class = "table table-bordered table-hover tablesorter" id = "fb_data_table">
+                            <col style="width:20%"> 
+                            <col style="width:10%"> 
+                            <col style="width:10%"> 
+                            <col style="width:60%"> 
                             <thead>
                             <tr>
-                                <th><div class="btn btn-info">Time <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th><div class="btn btn-info">Country Code <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th><div class="btn btn-info">QID <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th><div class="btn btn-info">Content <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th style="text-align:center"><div class="btn btn-info">Time <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th style="text-align:center"><div class="btn btn-info">Country Code <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th style="text-align:center"><div class="btn btn-info">QID <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th style="text-align:center"><div class="btn btn-info">Content <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
                             </tr>
                             </thead>
                             <tbody id = "fb_data_table_body">
@@ -323,8 +325,8 @@
                 fbtimer = setInterval(function(){
                     request_fb(fb_current);    
                 },10000);
+                fb_current = 'tq1';
                 request_fb(fb_current);
-
 		    });
 
             function reset_fb_timer()
@@ -369,22 +371,6 @@
                                     socket.emit('file-delete',$(this).attr("id"));
                                 });
                             }
-                            if(data['T1_printed'] == true)
-                            {
-                                $("#T1_form").html('<p class="btn btn-success">Printed</p>');
-                            }
-                            if(data['T2_printed'] == true)
-                            {
-                                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
-                            }
-                            if(data['T3_printed'] == true)
-                            {
-                                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
-                            }
-                            if(data['E_printed'] == true)
-                            {
-                                $("#E_form").html('<p class="btn btn-success">Printed</p>');
-                            }
                         });
             }
 
@@ -406,7 +392,7 @@
                         {
                             var ll = '';
                             for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
-                            var field = '<tr><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
                             var Field = $(field);
                             $("#fb_data_table_body").append(Field);
                         }
@@ -606,6 +592,7 @@
             {
                 var table = '';
                 var users_logged = 0;
+                var num_votes = 0;
                 var T1_u = 0;
                 var T1_pr = 0;
                 var T1_pck = 0;
@@ -624,8 +611,9 @@
                     { 
                         if(all_uploads[i].logged)
                         {
-                            table += '<tr><td><button type="button" class = "btn btn-primary">' + all_uploads[i].country_code + '</button></td>';
+                            table += '<tr><td><button type="button" class = "btn btn-primary">' + all_uploads[i].country_code + '(' + all_uploads[i].number_of_votes + ')' + '</button></td>';
                             users_logged += 1;
+                            num_votes += parseInt(all_uploads[i].number_of_votes);
                         }
                         else
                         {
@@ -738,7 +726,7 @@
                     } 
                 }
                 var table_stat = '';
-                table_stat += '<tr><td>Users Logged: ' + users_logged + '</td>';
+                table_stat += '<tr><td>Users Logged: ' + users_logged + '<br /> Total Votes: ' + num_votes +' </td>';
                 table_stat += '<td>Uploaded: ' + T1_u + '<br />Printed: ' + T1_pr + '<br />Packed: ' + T1_pck + '</td>';
                 table_stat += '<td>Uploaded: ' + T2_u + '<br />Printed: ' + T2_pr + '<br />Packed: ' + T2_pck + '</td>';
                 table_stat += '<td>Uploaded: ' + T3_u + '<br />Printed: ' + T3_pr + '<br />Packed: ' + T3_pck + '</td>';

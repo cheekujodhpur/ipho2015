@@ -201,12 +201,45 @@ app.post('/save_mark_T1',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var table = db.collection('marks_T1');
-            table.update({"ip":ip},{$set:{"leaderMarks":dbData}},function(err,result){db.close();});
+            var marks = db.collection('marks_T1');
+            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+                res.json({"success":true});
+                db.close();});
         });
     });
 });
 
+//send subparts
+//app.post('/get_subparts',function(req,res)
+//{
+//    var jsonString = '';
+//    var ip = req.ip;
+//    console.log("'/get_subparts' request received from " + ip.toString());  
+//
+//    req.on('data',function(data)
+//    {
+//       jsonString += data;
+//    });
+//    req.on('end',function()
+//    {
+//       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
+//       var type = jsonData['val'];
+//    });
+//    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+//    {
+//        if(err)
+//        {
+//            console.log(err);
+//            return 0;
+//        }
+//        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+//        var collection = db.collection('subparts');
+//        collection.find({'type':type}).toArray(function(err,items){
+//            res.json(items[0].subparts);
+//            db.close();
+//        });
+//    });
+//});
 //receive list_dir request
 app.post('/list_dir',function(req,res)
 {
@@ -214,6 +247,36 @@ app.post('/list_dir',function(req,res)
     var ip = req.ip;
     console.log("'/list_dir' request received from " + ip.toString());  
 
+    var reject = false;
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return 0;
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+        var collection = db.collection('users');
+        
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items == null)
+            {
+                console.log(err);
+                console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                return;
+            }
+            if(items[0].logged == false)
+            {
+                db.close();    
+                reject = true; 
+                console.log("User not logged in with ip " + ip.toString() + ".Rejecting list_dir request.");
+                  
+                return;
+            }
+        });
+    });
+    if(reject == true){return;}
     req.on('data',function(data)
     {
        jsonString += data;
@@ -267,39 +330,10 @@ app.post('/list_dir',function(req,res)
                         console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
                         return;
                     }
-                    if(items[0].type == 0)
+                    if(items[0].logged == true)
                     {
-                        id = "download";
-                        directory_path = "/downloads/";
-                        var result = {};
-                        result['id'] = id;
-                        result['directory_path'] = directory_path;
-                        result['files'] = files;
-                        res.json(result);
-                        console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
-                        db.close();       
-                        return;    
-                    }
-                    else
-                    {
-                        collection.find({}).toArray(function(err,items)
+                        if(items[0].type == 0)
                         {
-                            if(items == null)
-                            {
-                                console.log(err);
-                                console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
-                                return;
-                            }
-                            for (i in items)
-                            {
-                                //default file name is Marks_country_code.xls
-                                var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
-                                if(country_index > -1 && items[i].ip != ip)
-                                {
-                                    //console.log("splicing");
-                                    files.splice(country_index,1);
-                                }
-                            }
                             id = "download";
                             directory_path = "/downloads/";
                             var result = {};
@@ -308,10 +342,48 @@ app.post('/list_dir',function(req,res)
                             result['files'] = files;
                             res.json(result);
                             console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
-                            db.close();           
-                        });
+                            db.close();       
+                            return;    
+                        }
+                        else
+                        {
+                            collection.find({}).toArray(function(err,items)
+                            {
+                                if(items == null)
+                                {
+                                    console.log(err);
+                                    console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                                    return;
+                                }
+                                for (i in items)
+                                {
+                                    //default file name is Marks_country_code.xls
+                                    var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
+                                    if(country_index > -1 && items[i].ip != ip)
+                                    {
+                                        //console.log("splicing");
+                                        files.splice(country_index,1);
+                                    }
+                                }
+                                id = "download";
+                                directory_path = "/downloads/";
+                                var result = {};
+                                result['id'] = id;
+                                result['directory_path'] = directory_path;
+                                result['files'] = files;
+                                res.json(result);
+                                console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
+                                db.close();           
+                            });
 
-                    }
+                        }
+                     }
+                     else
+                     {
+                         console.log("Request rejected!");
+                         db.close();
+                     }
+                    
                 });
             }); 
         }
@@ -328,25 +400,31 @@ app.post('/list_dir',function(req,res)
                 var uploads = db.collection('uploads');
                 
                 uploads.find({"ip":ip}).toArray(function(err,items){
-
+                
                     var result = {};
                     
                     if(err)
                     {
                          console.log(err);
                     }
-                    if(items[0].T1_printed)result['T1_printed']=true;else result['T1_printed']=false;
-                    if(items[0].T2_printed)result['T2_printed']=true;else result['T2_printed']=false;
-                    if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
-                    if(items[0].E_printed)result['E_printed']=true;else result['E_printed']=false;
+                    if(items[0].logged == true)
+                    {
+                        if(items[0].T1_printed)result['T1_printed']=true;else result['T1_printed']=false;
+                        if(items[0].T2_printed)result['T2_printed']=true;else result['T2_printed']=false;
+                        if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
+                        if(items[0].E_printed)result['E_printed']=true;else result['E_printed']=false;
+                        if(items[0].T1_packed)result['T1_packed']=true;else result['T1_packed']=false;
+                        if(items[0].T2_packed)result['T2_packed']=true;else result['T2_packed']=false;
+                        if(items[0].T3_packed)result['T3_packed']=true;else result['T3_packed']=false;
+                        if(items[0].E_packed)result['E_packed']=true;else result['E_packed']=false;
 
-                    id = "upload";
-                    directory_path = "/uploads/" + ip.toString() + "/";
-                    result['id'] = id;
-                    result['directory_path'] = directory_path;
-                    result['files'] = files;
-                    res.json(result);
-
+                        id = "upload";
+                        directory_path = "/uploads/" + ip.toString() + "/";
+                        result['id'] = id;
+                        result['directory_path'] = directory_path;
+                        result['files'] = files;
+                        res.json(result);
+                    }
                     db.close();
                 });
             });
@@ -411,21 +489,35 @@ app.get('/sheetEditableT1',function(req,res)
             return;
         }
         console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var table = db.collection('marks_T1');
-        table.find({"ip":ip}).toArray(function(err,items){
-            var query = {};
-            if(items.length>=1)
-            {
-                subparts = items[0].subparts;
-                leaderMarks = items[0].leaderMarks;
-                maxMarks = items[0].maxMarks;
-                query['subparts'] = subparts;
-                query['leaderMarks'] = leaderMarks;
-                query['maxMarks'] = maxMarks;
-            }
-            //after certain checks, pass it
-            res.json(query);
-            db.close();
+        var subparts = db.collection('subparts');
+        var marks = db.collection('marks_T1');
+        var users = db.collection('users');
+        
+        var query = {};
+
+        subparts.find({"type":"t1"}).toArray(function(err,items){
+            var subparts = items[0].subparts;
+            var maxMarks = items[0].maxMarks;
+            users.find({"ip":ip}).toArray(function(err,data){
+                var country_code = data[0].country_code;
+                //var students = data[0].students;
+                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                marks.find({"ip":ip}).toArray(function(err,items2){
+                    if(items2.length>=1)
+                    {
+                        var leaderMarks = items2[0].leaderMarks;
+                    }
+                    else
+                        var leaderMarks = [];
+                    query['subparts'] = subparts;
+                    query['leaderMarks'] = leaderMarks;
+                    query['maxMarks'] = maxMarks;
+                    query['students'] = students;
+                    query['country_code'] = country_code;
+                    res.json(query);
+                    db.close();
+                });
+            });
         });
     });
 });
@@ -1757,61 +1849,4 @@ io.on('connection',function(socket)
 });
 app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
 app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
-app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");
-app.use("/uploads/192.168.200.200/",express.static(__dirname + "/uploads/192.168.200.200/"));console.log("File download enabled for /uploads/192.168.200.200/");
-app.use("/uploads/192.168.200.201/",express.static(__dirname + "/uploads/192.168.200.201/"));console.log("File download enabled for /uploads/192.168.200.201/");
-app.use("/uploads/192.168.200.202/",express.static(__dirname + "/uploads/192.168.200.202/"));console.log("File download enabled for /uploads/192.168.200.202/");
-app.use("/uploads/192.168.200.203/",express.static(__dirname + "/uploads/192.168.200.203/"));console.log("File download enabled for /uploads/192.168.200.203/");
-app.use("/uploads/192.168.200.204/",express.static(__dirname + "/uploads/192.168.200.204/"));console.log("File download enabled for /uploads/192.168.200.204/");
-app.use("/uploads/192.168.200.205/",express.static(__dirname + "/uploads/192.168.200.205/"));console.log("File download enabled for /uploads/192.168.200.205/");
-app.use("/uploads/192.168.200.206/",express.static(__dirname + "/uploads/192.168.200.206/"));console.log("File download enabled for /uploads/192.168.200.206/");
-app.use("/uploads/192.168.200.207/",express.static(__dirname + "/uploads/192.168.200.207/"));console.log("File download enabled for /uploads/192.168.200.207/");
-app.use("/uploads/192.168.200.208/",express.static(__dirname + "/uploads/192.168.200.208/"));console.log("File download enabled for /uploads/192.168.200.208/");
-app.use("/uploads/192.168.200.209/",express.static(__dirname + "/uploads/192.168.200.209/"));console.log("File download enabled for /uploads/192.168.200.209/");
-app.use("/uploads/192.168.200.210/",express.static(__dirname + "/uploads/192.168.200.210/"));console.log("File download enabled for /uploads/192.168.200.210/");
-app.use("/uploads/192.168.200.211/",express.static(__dirname + "/uploads/192.168.200.211/"));console.log("File download enabled for /uploads/192.168.200.211/");
-app.use("/uploads/192.168.200.212/",express.static(__dirname + "/uploads/192.168.200.212/"));console.log("File download enabled for /uploads/192.168.200.212/");
-app.use("/uploads/192.168.200.213/",express.static(__dirname + "/uploads/192.168.200.213/"));console.log("File download enabled for /uploads/192.168.200.213/");
-app.use("/uploads/192.168.200.214/",express.static(__dirname + "/uploads/192.168.200.214/"));console.log("File download enabled for /uploads/192.168.200.214/");
-app.use("/uploads/192.168.200.215/",express.static(__dirname + "/uploads/192.168.200.215/"));console.log("File download enabled for /uploads/192.168.200.215/");
-app.use("/uploads/192.168.200.216/",express.static(__dirname + "/uploads/192.168.200.216/"));console.log("File download enabled for /uploads/192.168.200.216/");
-app.use("/uploads/192.168.200.217/",express.static(__dirname + "/uploads/192.168.200.217/"));console.log("File download enabled for /uploads/192.168.200.217/");
-app.use("/uploads/192.168.200.218/",express.static(__dirname + "/uploads/192.168.200.218/"));console.log("File download enabled for /uploads/192.168.200.218/");
-app.use("/uploads/192.168.200.219/",express.static(__dirname + "/uploads/192.168.200.219/"));console.log("File download enabled for /uploads/192.168.200.219/");
-app.use("/uploads/192.168.200.220/",express.static(__dirname + "/uploads/192.168.200.220/"));console.log("File download enabled for /uploads/192.168.200.220/");
-app.use("/uploads/192.168.200.221/",express.static(__dirname + "/uploads/192.168.200.221/"));console.log("File download enabled for /uploads/192.168.200.221/");
-app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
-app.use("/uploads/192.168.200.223/",express.static(__dirname + "/uploads/192.168.200.223/"));console.log("File download enabled for /uploads/192.168.200.223/");
-app.use("/uploads/192.168.200.224/",express.static(__dirname + "/uploads/192.168.200.224/"));console.log("File download enabled for /uploads/192.168.200.224/");
-app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
-app.use("/uploads/192.168.200.226/",express.static(__dirname + "/uploads/192.168.200.226/"));console.log("File download enabled for /uploads/192.168.200.226/");
-app.use("/uploads/192.168.200.227/",express.static(__dirname + "/uploads/192.168.200.227/"));console.log("File download enabled for /uploads/192.168.200.227/");
-app.use("/uploads/192.168.200.228/",express.static(__dirname + "/uploads/192.168.200.228/"));console.log("File download enabled for /uploads/192.168.200.228/");
-app.use("/uploads/192.168.200.229/",express.static(__dirname + "/uploads/192.168.200.229/"));console.log("File download enabled for /uploads/192.168.200.229/");
-app.use("/uploads/192.168.200.230/",express.static(__dirname + "/uploads/192.168.200.230/"));console.log("File download enabled for /uploads/192.168.200.230/");
-app.use("/uploads/192.168.200.231/",express.static(__dirname + "/uploads/192.168.200.231/"));console.log("File download enabled for /uploads/192.168.200.231/");
-app.use("/uploads/192.168.200.232/",express.static(__dirname + "/uploads/192.168.200.232/"));console.log("File download enabled for /uploads/192.168.200.232/");
-app.use("/uploads/192.168.200.233/",express.static(__dirname + "/uploads/192.168.200.233/"));console.log("File download enabled for /uploads/192.168.200.233/");
-app.use("/uploads/192.168.200.234/",express.static(__dirname + "/uploads/192.168.200.234/"));console.log("File download enabled for /uploads/192.168.200.234/");
-app.use("/uploads/192.168.200.235/",express.static(__dirname + "/uploads/192.168.200.235/"));console.log("File download enabled for /uploads/192.168.200.235/");
-app.use("/uploads/192.168.200.236/",express.static(__dirname + "/uploads/192.168.200.236/"));console.log("File download enabled for /uploads/192.168.200.236/");
-app.use("/uploads/192.168.200.237/",express.static(__dirname + "/uploads/192.168.200.237/"));console.log("File download enabled for /uploads/192.168.200.237/");
-app.use("/uploads/192.168.200.238/",express.static(__dirname + "/uploads/192.168.200.238/"));console.log("File download enabled for /uploads/192.168.200.238/");
-app.use("/uploads/192.168.200.239/",express.static(__dirname + "/uploads/192.168.200.239/"));console.log("File download enabled for /uploads/192.168.200.239/");
-app.use("/uploads/192.168.200.240/",express.static(__dirname + "/uploads/192.168.200.240/"));console.log("File download enabled for /uploads/192.168.200.240/");
-app.use("/uploads/192.168.200.241/",express.static(__dirname + "/uploads/192.168.200.241/"));console.log("File download enabled for /uploads/192.168.200.241/");
-app.use("/uploads/192.168.200.242/",express.static(__dirname + "/uploads/192.168.200.242/"));console.log("File download enabled for /uploads/192.168.200.242/");
-app.use("/uploads/192.168.200.243/",express.static(__dirname + "/uploads/192.168.200.243/"));console.log("File download enabled for /uploads/192.168.200.243/");
-app.use("/uploads/192.168.200.244/",express.static(__dirname + "/uploads/192.168.200.244/"));console.log("File download enabled for /uploads/192.168.200.244/");
-app.use("/uploads/192.168.200.245/",express.static(__dirname + "/uploads/192.168.200.245/"));console.log("File download enabled for /uploads/192.168.200.245/");
-app.use("/uploads/192.168.200.246/",express.static(__dirname + "/uploads/192.168.200.246/"));console.log("File download enabled for /uploads/192.168.200.246/");
-app.use("/uploads/192.168.200.247/",express.static(__dirname + "/uploads/192.168.200.247/"));console.log("File download enabled for /uploads/192.168.200.247/");
-app.use("/uploads/192.168.200.248/",express.static(__dirname + "/uploads/192.168.200.248/"));console.log("File download enabled for /uploads/192.168.200.248/");
-app.use("/uploads/192.168.200.249/",express.static(__dirname + "/uploads/192.168.200.249/"));console.log("File download enabled for /uploads/192.168.200.249/");
-app.use("/uploads/192.168.200.250/",express.static(__dirname + "/uploads/192.168.200.250/"));console.log("File download enabled for /uploads/192.168.200.250/");
-app.use("/uploads/192.168.200.251/",express.static(__dirname + "/uploads/192.168.200.251/"));console.log("File download enabled for /uploads/192.168.200.251/");
-app.use("/uploads/192.168.200.252/",express.static(__dirname + "/uploads/192.168.200.252/"));console.log("File download enabled for /uploads/192.168.200.252/");
-app.use("/uploads/192.168.200.253/",express.static(__dirname + "/uploads/192.168.200.253/"));console.log("File download enabled for /uploads/192.168.200.253/");
-app.use("/uploads/192.168.200.254/",express.static(__dirname + "/uploads/192.168.200.254/"));console.log("File download enabled for /uploads/192.168.200.254/");
-app.use("/uploads/192.168.200.255/",express.static(__dirname + "/uploads/192.168.200.255/"));console.log("File download enabled for /uploads/192.168.200.255/");
 app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");

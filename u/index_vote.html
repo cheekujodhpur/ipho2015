@@ -330,8 +330,27 @@
                     window.location = '/chpass.html';
                 });
             });
-            
+          
+
             //AJAX requests
+
+            function get_subparts(val) 
+            {
+                var uData = {};
+                uData["val"] = val;
+                $.ajax({
+                        method:"POST",
+                        url:'get_subparts',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                        var subparts = data['subparts'];
+                        console.log(subparts); 
+                        });
+
+            }
+
             function send_list_dir(folder)
             {
                 var uData = {};
