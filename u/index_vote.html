@@ -189,6 +189,23 @@
                         </div>
                         <button type="submit" class="btn btn-default" id = "fb_submit" onclick='alert("Your feedback has been submitted successfully.")'>Submit</button>
                     </form>
+                    
+                    <div id = "fb_data">
+                        <table style = "table-layout:fixed;" class = "table table-bordered table-hover" id = "fb_data_table">
+                            <col style="width:30%"> 
+                            <col style="width:10%"> 
+                            <col style="width:60%"> 
+                            <thead>
+                            <tr>
+                                <th style="text-align:center"><div class="btn btn-info">Time</div></th>
+                                <th style="text-align:center"><div class="btn btn-info">QID</div></th>
+                                <th style="text-align:center"><div class="btn btn-info">Content</div></th>
+                            </tr>
+                            </thead>
+                            <tbody id = "fb_data_table_body">
+                            </tbody>
+                        </table>
+                    </div>    
                 </div>
             </div>
         </div>
@@ -329,8 +346,34 @@
                 {
                     window.location = '/chpass.html';
                 });
+
             });
-          
+         
+            
+            function request_fb(current)
+            {
+                var uData = {};
+                uData['current'] = current;
+                $.ajax({
+                        method:"POST",
+                        url:'/request_fb_leader',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                       var feeds = data['feeds'];
+                 
+                        $("#fb_data_table_body").html('');
+                        for(var feed in feeds)
+                        {
+                            var ll = '';
+                            for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                            var Field = $(field);
+                            $("#fb_data_table_body").append(Field);
+                        }
+                        });
+            }
 
             //AJAX requests
 
@@ -598,6 +641,7 @@
                     $("#fbHead").text("Feedback for Practical Question 1");
                     
                 fb_current = q;
+                request_fb(fb_current);
                 $("#fbb").show();
             });
             //FEEDBACK DISABLE
@@ -615,6 +659,7 @@
                 var now = new Date();
                 //alert(now.toString());
                 socket.emit('fbContent',id,fb_current,content,now.toTimeString());
+                request_fb(fb_current);
             });
             
             //FUNCTIONS

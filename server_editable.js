@@ -473,6 +473,41 @@ app.post('/request_fb',function(req,res)
 		});
     });
 });
+
+app.post('/request_fb_leader',function(req,res)
+{
+    var jsonString = '';
+    var ip = req.ip;
+    console.log("'/request_fb' request received from " + ip.toString());  
+
+    req.on('data',function(data)
+    {
+       jsonString += data;
+    });
+    req.on('end',function()
+    {
+       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
+       var current = jsonData['current'];
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+		    var fbs = db.collection('fbs');
+		    fbs.find({qno:current,"ip":ip}).toArray(function(err,feeds)
+		    {
+                var result = {};
+                result['feeds'] = feeds;
+                res.json(result);
+                console.log("Response to '/request_fb' sent in response to request from " + ip.toString());  
+			    db.close();
+		    });
+		});
+    });
+});
 //request present table
 app.get('/sheetEditableT1',function(req,res)
 {
