@@ -52,12 +52,7 @@
             <div class = "tab-content">
                 <div role="tabpanel" class="tab-pane active" id = "marks">
                     <form id = "form_marks_T1">
-                        <table class = "table table-striped" id = "mark_table" style="table-layout:fixed;width:400px">
-                            <colgroup> 
-                                <col style="width:40%">
-                                <col style="width:30%">
-                                <col style="width:30%">
-                            </colgroup> 
+                        <table class = "table table-striped" id = "mark_table" style="table-layout:fixed;">
                             <thead>
                                 <tr>
                                     <th>Students</th>
@@ -65,6 +60,14 @@
                                 </tr>
                             </thead>
                             <tbody id = "mark_table_body_T1">
+                                <tr id = "subparts_row_T1">
+                                    <td colspan = "2"></td>
+                                    <td>Subparts</td>
+                                </tr>
+                                <tr id = "maxMarks_row_T1">
+                                    <td colspan = "2"></td>
+                                    <td>Maximum Marks</td>
+                                </tr>
                             </tbody>
                         </table>
                     </form>
@@ -110,6 +113,7 @@
             
             var socket = io();
             var fb_current = '';
+            var country_code_global = '';
             var num_of_leaders = '';
             socket.on('end-ack',function()
             {
@@ -175,6 +179,7 @@
                             return;
                         }
                     }
+                    console.log(ajaxData);
                     $.ajax({
                             method:"POST",
                             timeout:4000,
@@ -187,29 +192,46 @@
                     //    });    
                 });
 
+            });
+           
+            function send_sheetEditable()
+            {
                 $.ajax
                 ({
                     url : 'sheetEditableT1'
                 }).done(function(data)
                 {
-                    var table_body = "";
+                    var table_subparts_body = "";
+                    var table_maxMarks_body = "";
                     for(var i in data.subparts)
                     {
-                        table_body += "<tr><td>" + data.subparts[i] + "</td>";
-                        table_body += "<td>" + data.maxMarks[i] + "</td>";
-                        table_body += '<td><input type="message" class="form-control" name = "leaderMarks" placeholder="Enter Marks Here"></td>';
-                        table_body += '<input type = "hidden" name = "maxMarks" value = "'+data.maxMarks[i]+'" />';
-                        table_body += '</tr>';
+                        table_subparts_body += "<td>" + data.subparts[i] + "</td>";
+                        table_maxMarks_body += "<td>" + data.maxMarks[i] + "</td>";
                     }
-                    $("#mark_table_body").html(table_body);
+                    $("#subparts_row_T1").append(table_subparts_body);
+                    $("#maxMarks_row_T1").append(table_maxMarks_body);
+                    var table_body = ""; 
+                    for(var i in data.students)
+                    {
+                        table_body += "<tr><td>" + data.students[i] + "</td><td>"+country_code_global+"_"+i.toString()+"</td><td></td>";
+                        for(var j in data.subparts)
+                        {
+                            table_body += '<td><input type = "text" class = "form-control" name = "leaderMarks" placeholder = "Enter marks" /></td>';
+                        }
+                        table_body += "</tr>";
+                    }
+                    $("#mark_table_body_T1").append(table_body);
                     var i = 0;
-                    $("input[name=leaderMarks]").each(function(){
-                        $(this).val(data.leaderMarks[i]);
-                        i++;
-                    });
+                    if(data.leaderMarks.length!=0)
+                    {
+                        $("input[name=leaderMarks]").each(function(){
+                                     $(this).val(data.leaderMarks[i]);
+                                     i++;
+                                });
+                    }
                 });
-            });
-           
+            }
+
             socket.on('country-data',function(country)
             {
                 var mt_head = document.getElementById("message-board-head");
@@ -220,11 +242,14 @@
                 //ENTER COUNTRY IMAGE HERE
                 var cell = row.insertCell(1);
                 cell.innerHTML = country.country_code; 
+                country_code_global = country.country_code;
 
                 var row = mt_head.insertRow(1);
                 var cell = row.insertCell(0);
                 var cell = row.insertCell(1);
                 cell.innerHTML = "Message Table"; 
+
+                send_sheetEditable();
             });
 
             //MESSAGE BOARD SIGNAL			
