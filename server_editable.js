@@ -39,6 +39,8 @@ var express = require('express')
   , log_timestamp = require('log-timestamp')(function() { return '[ ' + (new Date).toLocaleString() + ' ] %s'});
 var io = require('socket.io').listen(server);
 
+
+var ObjectID = require('mongodb').ObjectID;
 //server running at port 8080
 server.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');
@@ -241,6 +243,7 @@ app.post('/save_mark_T1',function(req,res){
 //    });
 //});
 //receive list_dir request
+
 app.post('/list_dir',function(req,res)
 {
     var jsonString = '';
@@ -248,6 +251,7 @@ app.post('/list_dir',function(req,res)
     console.log("'/list_dir' request received from " + ip.toString());  
 
     var reject = false;
+    /*
     MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
     {
         if(err)
@@ -264,6 +268,7 @@ app.post('/list_dir',function(req,res)
             {
                 console.log(err);
                 console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                db.close();
                 return;
             }
             if(items[0].logged == false)
@@ -271,11 +276,12 @@ app.post('/list_dir',function(req,res)
                 db.close();    
                 reject = true; 
                 console.log("User not logged in with ip " + ip.toString() + ".Rejecting list_dir request.");
-                  
+                db.close();      
                 return;
             }
         });
     });
+    */
     if(reject == true){return;}
     req.on('data',function(data)
     {
@@ -432,7 +438,6 @@ app.post('/list_dir',function(req,res)
        });  
     });
 });
-
 //receive request for fb
 app.post('/request_fb',function(req,res)
 {
@@ -468,7 +473,6 @@ app.post('/request_fb',function(req,res)
 		});
     });
 });
-
 //request present table
 app.get('/sheetEditableT1',function(req,res)
 {
@@ -1038,7 +1042,52 @@ io.on('connection',function(socket)
             }
         });
     });
-     
+    socket.on('fb_stat_toggle',function(fb_id)
+    {
+        if(socket.handshake.address != null)
+        {
+            var ip = socket.handshake.address.toString();
+        }
+        else
+        {
+            console.log("Null IP Error in io.on connection.Carry on");
+            return;
+        }
+        console.log("'fb_stat_toggle' signal received from " + ip.toString());
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var fbs= db.collection('fbs');
+            var _id = new ObjectID(fb_id);
+            
+            fbs.find({"_id":_id}).toArray(function(err,items)
+            { 
+                if(items[0].done == true)
+                {
+                    fbs.update({"_id":_id},{$set: {"done": false}},function(err){db.close();});
+                }
+                else
+                {
+                    fbs.update({"_id":_id},{$set: {"done": true}},function(err){db.close();});
+                }
+            });
+            /*
+            var doc = fbs.findOne({"_id": _id});
+            console.log(doc);
+            console.log(fb_id);
+            fbs.update({"_id":ObjectID(fb_id)},{$set: {done: !doc.done}});
+            */
+            console.log("done toggled sucessfully for feedback id " + fb_id);
+            return;
+        });
+       
+    }); 
     socket.on('upload-alert',function(client_ip,id)
     {
         if(socket.handshake.address != null)
@@ -1495,6 +1544,7 @@ io.on('connection',function(socket)
                 query['qid'] = id;  //question id
                 query['qno'] = current;
                 query['time'] = time;
+                query['done'] = false;
                 var query2 = {};
                 query2['content'] = content;
                 fbs.update(query,{$push:query2},{upsert:true},function(err,result){db.close();});

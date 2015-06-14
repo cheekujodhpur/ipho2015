@@ -151,13 +151,15 @@
                             <col style="width:20%"> 
                             <col style="width:10%"> 
                             <col style="width:10%"> 
-                            <col style="width:60%"> 
+                            <col style="width:56%"> 
+                            <col style="width:4%"> 
                             <thead>
                             <tr>
                                 <th style="text-align:center"><div class="btn btn-info">Time <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
                                 <th style="text-align:center"><div class="btn btn-info">Country Code <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
                                 <th style="text-align:center"><div class="btn btn-info">QID <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
                                 <th style="text-align:center"><div class="btn btn-info">Content <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th><div class="btn btn-info">S</div></th>
                             </tr>
                             </thead>
                             <tbody id = "fb_data_table_body">
@@ -392,7 +394,14 @@
                         {
                             var ll = '';
                             for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
-                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                            if(feeds[feed].done == false)
+                            {
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center" class="btn btn-danger glyphicon glyphicon-remove" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"></td></tr>';
+                            } 
+                            else 
+                            {
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center" class="btn btn-success glyphicon glyphicon-ok" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"></td></tr>';
+                            } 
                             var Field = $(field);
                             $("#fb_data_table_body").append(Field);
                         }
