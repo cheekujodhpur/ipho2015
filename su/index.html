@@ -396,11 +396,11 @@
                             for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
                             if(feeds[feed].done == false)
                             {
-                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center" class="btn btn-danger glyphicon glyphicon-remove" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"></td></tr>';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center;" class="btn btn-danger glyphicon glyphicon-remove" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"></td></tr>';
                             } 
                             else 
                             {
-                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center" class="btn btn-success glyphicon glyphicon-ok" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"></td></tr>';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center" class="btn btn-success glyphicon glyphicon-ok" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"><span style = "font-size:0">1</span></td></tr>';
                             } 
                             var Field = $(field);
                             $("#fb_data_table_body").append(Field);
