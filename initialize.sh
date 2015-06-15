@@ -51,6 +51,11 @@ do
     fi    
 done < country_code_ip.txt 
 
+./add_subparts.sh <data/t1_subparts.txt
+./add_subparts.sh <data/t2_subparts.txt
+./add_subparts.sh <data/t3_subparts.txt
+./add_subparts.sh <data/e_subparts.txt
+
 echo 'app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");' >> server.js
 #make server.js read and executable
 chmod 555 server.js

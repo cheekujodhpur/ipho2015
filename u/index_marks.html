@@ -52,7 +52,7 @@
             <div class = "tab-content">
                 <div role="tabpanel" class="tab-pane active" id = "marks">
                     <form id = "form_marks_T1">
-                        <table class = "table table-striped" id = "mark_table" style="table-layout:fixed;">
+                        <table class = "table table-striped" id = "mark_table_T1" style="table-layout:fixed;">
                             <thead>
                                 <tr>
                                     <th>Students</th>
@@ -71,8 +71,74 @@
                             </tbody>
                         </table>
                     </form>
-                    <button type="submit" class="btn btn-default" id="save_button">Save</button>
-                    <button type="submit" class="btn btn-success" id="submit_button">Submit</button>
+                    <button type="submit" class="btn btn-default save_button" data-type = "t1">Save</button>
+                    <button type="submit" class="btn btn-success submit_button">Submit</button>
+                    <form id = "form_marks_T2">
+                        <table class = "table table-striped" id = "mark_table_T2" style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Students</th>
+                                    <th>Code</th>
+                                </tr>
+                            </thead>
+                            <tbody id = "mark_table_body_T2">
+                                <tr id = "subparts_row_T2">
+                                    <td colspan = "2"></td>
+                                    <td>Subparts</td>
+                                </tr>
+                                <tr id = "maxMarks_row_T2">
+                                    <td colspan = "2"></td>
+                                    <td>Maximum Marks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <button type="submit" class="btn btn-default save_button" data-type = "t2">Save</button>
+                    <button type="submit" class="btn btn-success submit_button">Submit</button>
+                    <form id = "form_marks_T3">
+                        <table class = "table table-striped" id = "mark_table_T3" style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Students</th>
+                                    <th>Code</th>
+                                </tr>
+                            </thead>
+                            <tbody id = "mark_table_body_T3">
+                                <tr id = "subparts_row_T3">
+                                    <td colspan = "2"></td>
+                                    <td>Subparts</td>
+                                </tr>
+                                <tr id = "maxMarks_row_T3">
+                                    <td colspan = "2"></td>
+                                    <td>Maximum Marks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <button type="submit" class="btn btn-default save_button" data-type = "t3">Save</button>
+                    <button type="submit" class="btn btn-success submit_button">Submit</button>
+                    <form id = "form_marks_E">
+                        <table class = "table table-striped" id = "mark_table_E" style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Students</th>
+                                    <th>Code</th>
+                                </tr>
+                            </thead>
+                            <tbody id = "mark_table_body_E">
+                                <tr id = "subparts_row_E">
+                                    <td colspan = "2"></td>
+                                    <td>Subparts</td>
+                                </tr>
+                                <tr id = "maxMarks_row_E">
+                                    <td colspan = "2"></td>
+                                    <td>Maximum Marks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <button type="submit" class="btn btn-default save_button" data-type = "e">Save</button>
+                    <button type="submit" class="btn btn-success submit_button">Submit</button>
                 </div>
             </div>
         </div>
@@ -152,64 +218,119 @@
                     window.location = '/chpass.html';
                 });
 
-                $("#save_button").click(function(){
-                    var data = $("#form_marks").serializeArray();
+                $(".save_button").click(function(){
+                    var type_question = $(this).attr('data-type');
+                    if(type_question=='t1')
+                        var data = $("#form_marks_T1").serializeArray();
+                    else if(type_question=='t2')
+                        var data = $("#form_marks_T2").serializeArray();
+                    else if(type_question=='t3')
+                        var data = $("#form_marks_T3").serializeArray();
+                    else if(type_question=='e')
+                        var data = $("#foEm_marks_E").serializeArray();
                     var ajaxData = {};
                     var maxMarks = []
-                    var leaderMarks = [];
-                    for(var i in data)
+                    //CAREFUL, hard coded line below
+                    if(type_question=='t1')
+                        var num_subparts = $("#mark_table_body_T1").find("tr:first td").length-2;
+                    else if(type_question=='t2')
+                        var num_subparts = $("#mark_table_body_T2").find("tr:first td").length-2;
+                    else if(type_question=='t3')
+                        var num_subparts = $("#mark_table_body_T3").find("tr:first td").length-2;
+                    else if(type_question=='e')
+                        var num_subparts = $("#mark_table_body_E").find("tr:first td").length-2;
+                    for(var j = 0;j<num_subparts;j++)
                     {
-                        if(data[i].name=='maxMarks')maxMarks.push(parseFloat(data[i].value));
-                        else if(data[i].name=='leaderMarks')
+                        maxMarks.push(parseFloat(data[j].value));
+                    }
+                    for(var i = 1;i<data.length/num_subparts;i++)
+                    {
+                        for(var j = 0;j<num_subparts;j++)
                         {
-                            leaderMarks.push(parseFloat(data[i].value));
-                            if((data[i].value.split('.')[1] || []).length > 1)
+                            var tmp_mark = data[i*num_subparts+j].value;
+                            if((tmp_mark.split('.')[1] || []).length > 1)
                             {
                                 alert("Least count is 0.1");
                                 return;
                             }
-                            ajaxData[i] = parseFloat(data[i].value);
+                            if(parseFloat(tmp_mark)>maxMarks[j])
+                            {
+                                alert("Marks should be less than max marks");
+                                return;
+                            }
+                            ajaxData[(i-1)*num_subparts+j] = parseFloat(tmp_mark);
                         }
                     }
-                    for(var i in leaderMarks)
-                    {
-                        if(maxMarks[i]<leaderMarks[i])
-                        {
-                            alert("Marks should be less than max marks");
-                            return;
-                        }
-                    }
-                    console.log(ajaxData);
+                    if(type_question=='t1')
+                        var destination_url = 'save_mark_T1';
+                    else if(type_question=='t2')
+                        var destination_url = 'save_mark_T2';
+                    else if(type_question=='t3')
+                        var destination_url = 'save_mark_T3';
+                    else if(type_question=='e')
+                        var destination_url = 'save_mark_E';
                     $.ajax({
                             method:"POST",
                             timeout:4000,
-                            url:'save_mark_T1',
+                            url:destination_url,
                             data:ajaxData
                             }).
                     done(function(data){alert("saved!");});
-                    //$.post('/save_mark_T1',ajaxData).success(function(data){
-                    //    alert("saved!");
-                    //    });    
                 });
 
             });
            
-            function send_sheetEditable()
+            function send_sheetEditable(type_question)
             {
+                if(type_question=='t1')
+                    var destination_url = 'sheetEditableT1';
+                else if(type_question=='t2')
+                    var destination_url = 'sheetEditableT2';
+                else if(type_question=='t3')
+                    var destination_url = 'sheetEditableT3';
+                else if(type_question=='e')
+                    var destination_url = 'sheetEditableE';
                 $.ajax
                 ({
-                    url : 'sheetEditableT1'
+                    url : destination_url
                 }).done(function(data)
                 {
                     var table_subparts_body = "";
                     var table_maxMarks_body = "";
                     for(var i in data.subparts)
                     {
-                        table_subparts_body += "<td>" + data.subparts[i] + "</td>";
+                        table_subparts_body += "<td>" + data.subparts[i] + "<input type = 'hidden' name = 'maxMarks' value = " + data.maxMarks[i] + " /></td>";
                         table_maxMarks_body += "<td>" + data.maxMarks[i] + "</td>";
                     }
-                    $("#subparts_row_T1").append(table_subparts_body);
-                    $("#maxMarks_row_T1").append(table_maxMarks_body);
+                    var subparts_row;
+                    var maxMarks_row;
+                    var table_body_elem;
+                    if(type_question=='t1')
+                    {
+                        subparts_row = $("#subparts_row_T1");
+                        maxMarks_row = $("#maxMarks_row_T1");
+                        table_body_elem = $("#mark_table_body_T1");
+                    }
+                    else if(type_question=='t2')
+                    {
+                        subparts_row = $("#subparts_row_T2");
+                        maxMarks_row = $("#maxMarks_row_T2");
+                        table_body_elem = $("#mark_table_body_T2");
+                    }
+                    else if(type_question=='t3')
+                    {                    
+                        subparts_row = $("#subparts_row_T3");
+                        maxMarks_row = $("#maxMarks_row_T3");
+                        table_body_elem = $("#mark_table_body_T3");
+                    }
+                    else if(type_question=='e')
+                    {
+                        subparts_row = $("#subparts_row_E");
+                        maxMarks_row = $("#maxMarks_row_E");
+                        table_body_elem = $("#mark_table_body_E");
+                    }
+                    subparts_row.append(table_subparts_body);
+                    maxMarks_row.append(table_maxMarks_body);
                     var table_body = ""; 
                     for(var i in data.students)
                     {
@@ -220,7 +341,7 @@
                         }
                         table_body += "</tr>";
                     }
-                    $("#mark_table_body_T1").append(table_body);
+                    table_body_elem.append(table_body);
                     var i = 0;
                     if(data.leaderMarks.length!=0)
                     {
@@ -249,7 +370,10 @@
                 var cell = row.insertCell(1);
                 cell.innerHTML = "Message Table"; 
 
-                send_sheetEditable();
+                send_sheetEditable('t1');
+                send_sheetEditable('t2');
+                send_sheetEditable('t3');
+                send_sheetEditable('e');
             });
 
             //MESSAGE BOARD SIGNAL			
