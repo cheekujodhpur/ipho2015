@@ -158,6 +158,10 @@ app.get('/', function (req, res)
                 {
                     res.sendFile(__dirname + '/pr/index.html');
                 }
+                else if(type == 3)
+                {
+                    res.sendFile(__dirname + '/mk/index.html');
+                }
                 else
                 {
                     res.sendFile('/chpass.html');
@@ -172,6 +176,43 @@ app.get('/', function (req, res)
         });
         
 	});
+});
+
+app.post('/submit_mark_T1',function(req,res){
+
+    var jsonString = '';
+    req.on('data',function(data)
+        {
+            jsonString += data;
+        });
+    req.on('end',function(){
+        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+        var dbData = [];
+        for(var i in jsonData)
+            dbData.push(parseFloat(jsonData[i]));
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var marks = db.collection('marks_T1');
+            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+                res.json({"success":true});
+                db.close();});
+        });
+    });
 });
 
 app.post('/save_mark_T1',function(req,res){
@@ -617,211 +658,278 @@ app.post('/request_fb_leader',function(req,res)
     });
 });
 //request present table
-app.get('/sheetEditableT1',function(req,res)
+app.post('/sheetEditableT1',function(req,res)
 {
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
+    var country_name ='';
+    var jsonString = '';
+    req.on('data',function(data)
         {
-            console.log(err);
-            return 0;
+            jsonString += data;
+        });
+    req.on('end',function(){
+        if(jsonString==''){}
+        else{
+            var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+            var country_name = jsonData['country_name'];
         }
-        if(req.ip != null)
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_T1');
-        var users = db.collection('users');
-        
-        var query = {};
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var subparts = db.collection('subparts');
+            var marks = db.collection('marks_T1');
+            var users = db.collection('users');
+            
+            var query = {};
 
-        subparts.find({"type":"t1"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
-                    {
-                        var leaderMarks = items2[0].leaderMarks;
-                    }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
+            subparts.find({"type":"t1"}).toArray(function(err,items){
+                var subparts = items[0].subparts;
+                var maxMarks = items[0].maxMarks;
+                var query_ob = {};
+                if(country_name=='')query_ob["ip"] = ip;
+                else query_ob["country_name"] = country_name;
+                users.find(query_ob).toArray(function(err,data){
+                    var country_code = data[0].country_code;
+                    //var students = data[0].students;
+                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var new_ip = data[0].ip;
+                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                        if(items2.length>=1)
+                        {
+                            var leaderMarks = items2[0].leaderMarks;
+                        }
+                        else
+                            var leaderMarks = [];
+                        query['subparts'] = subparts;
+                        query['leaderMarks'] = leaderMarks;
+                        query['maxMarks'] = maxMarks;
+                        query['students'] = students;
+                        query['country_code'] = country_code;
+                        res.json(query);
+                        db.close();
+                    });
                 });
             });
         });
     });
 });
-app.get('/sheetEditableT2',function(req,res)
+app.post('/sheetEditableT2',function(req,res)
 {
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
+    var country_name ='';
+    var jsonString = '';
+    req.on('data',function(data)
         {
-            console.log(err);
-            return 0;
+            jsonString += data;
+        });
+    req.on('end',function(){
+        if(jsonString==''){}
+        else{
+            var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+            var country_name = jsonData['country_name'];
         }
-        if(req.ip != null)
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_T2');
-        var users = db.collection('users');
-        
-        var query = {};
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var subparts = db.collection('subparts');
+            var marks = db.collection('marks_T2');
+            var users = db.collection('users');
+            
+            var query = {};
 
-        subparts.find({"type":"t2"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
-                    {
-                        var leaderMarks = items2[0].leaderMarks;
-                    }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
+            subparts.find({"type":"t2"}).toArray(function(err,items){
+                var subparts = items[0].subparts;
+                var maxMarks = items[0].maxMarks;
+                var query_ob = {};
+                if(country_name=='')query_ob["ip"] = ip;
+                else query_ob["country_name"] = country_name;
+                users.find(query_ob).toArray(function(err,data){
+                    var country_code = data[0].country_code;
+                    //var students = data[0].students;
+                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var new_ip = data[0].ip;
+                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                        if(items2.length>=1)
+                        {
+                            var leaderMarks = items2[0].leaderMarks;
+                        }
+                        else
+                            var leaderMarks = [];
+                        query['subparts'] = subparts;
+                        query['leaderMarks'] = leaderMarks;
+                        query['maxMarks'] = maxMarks;
+                        query['students'] = students;
+                        query['country_code'] = country_code;
+                        res.json(query);
+                        db.close();
+                    });
                 });
             });
         });
     });
 });
-app.get('/sheetEditableT3',function(req,res)
+app.post('/sheetEditableT3',function(req,res)
 {
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
+    var country_name ='';
+    var jsonString = '';
+    req.on('data',function(data)
         {
-            console.log(err);
-            return 0;
+            jsonString += data;
+        });
+    req.on('end',function(){
+        if(jsonString==''){}
+        else{
+            var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+            var country_name = jsonData['country_name'];
         }
-        if(req.ip != null)
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_T3');
-        var users = db.collection('users');
-        
-        var query = {};
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var subparts = db.collection('subparts');
+            var marks = db.collection('marks_T3');
+            var users = db.collection('users');
+            
+            var query = {};
 
-        subparts.find({"type":"t3"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
-                    {
-                        var leaderMarks = items2[0].leaderMarks;
-                    }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
+            subparts.find({"type":"t3"}).toArray(function(err,items){
+                var subparts = items[0].subparts;
+                var maxMarks = items[0].maxMarks;
+                var query_ob = {};
+                if(country_name=='')query_ob["ip"] = ip;
+                else query_ob["country_name"] = country_name;
+                users.find(query_ob).toArray(function(err,data){
+                    var country_code = data[0].country_code;
+                    //var students = data[0].students;
+                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var new_ip = data[0].ip;
+                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                        if(items2.length>=1)
+                        {
+                            var leaderMarks = items2[0].leaderMarks;
+                        }
+                        else
+                            var leaderMarks = [];
+                        query['subparts'] = subparts;
+                        query['leaderMarks'] = leaderMarks;
+                        query['maxMarks'] = maxMarks;
+                        query['students'] = students;
+                        query['country_code'] = country_code;
+                        res.json(query);
+                        db.close();
+                    });
                 });
             });
         });
     });
 });
-app.get('/sheetEditableE',function(req,res)
+app.post('/sheetEditableE',function(req,res)
 {
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
+    var country_name ='';
+    var jsonString = '';
+    req.on('data',function(data)
         {
-            console.log(err);
-            return 0;
+            jsonString += data;
+        });
+    req.on('end',function(){
+        if(jsonString==''){}
+        else{
+            var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+            var country_name = jsonData['country_name'];
         }
-        if(req.ip != null)
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_E');
-        var users = db.collection('users');
-        
-        var query = {};
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var subparts = db.collection('subparts');
+            var marks = db.collection('marks_E');
+            var users = db.collection('users');
+            
+            var query = {};
 
-        subparts.find({"type":"e"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
-                    {
-                        var leaderMarks = items2[0].leaderMarks;
-                    }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
+            subparts.find({"type":"e"}).toArray(function(err,items){
+                var subparts = items[0].subparts;
+                var maxMarks = items[0].maxMarks;
+                var query_ob = {};
+                if(country_name=='')query_ob["ip"] = ip;
+                else query_ob["country_name"] = country_name;
+                users.find(query_ob).toArray(function(err,data){
+                    var country_code = data[0].country_code;
+                    //var students = data[0].students;
+                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var new_ip = data[0].ip;
+                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                        if(items2.length>=1)
+                        {
+                            var leaderMarks = items2[0].leaderMarks;
+                        }
+                        else
+                            var leaderMarks = [];
+                        query['subparts'] = subparts;
+                        query['leaderMarks'] = leaderMarks;
+                        query['maxMarks'] = maxMarks;
+                        query['students'] = students;
+                        query['country_code'] = country_code;
+                        res.json(query);
+                        db.close();
+                    });
                 });
             });
         });
     });
 });
-
 //copies the uploaded file from /tmp to /downloads for the convener
 app.post('/uploaded',function(req,res)
 {
@@ -1280,7 +1388,18 @@ io.on('connection',function(socket)
             socket.emit('country-data',items[0]);
             console.log("'numberofleaders' signal broadcasted from the server in response to " + ip.toString());
             console.log("'country-data' signal broadcasted from the server in response to " + ip.toString());
-            db.close(); 
+            if(items[0].type==3)    //marks entry
+            {
+                users.find({}).toArray(function(err,items2){
+                    console.log("'countries' signal broadcasted from the server in response to " + ip.toString());
+                    socket.emit('countries',items2);
+                    db.close();
+                });
+            }
+            else
+            {
+                db.close(); 
+            }
         });
     }); 
     

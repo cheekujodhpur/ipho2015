@@ -51,6 +51,8 @@
             
             <div class = "tab-content">
                 <div role="tabpanel" class="tab-pane active" id = "marks">
+                    <select id = "country_list_select">
+                    </select>
                     <form id = "form_marks_T1">
                         <table class = "table table-striped" id = "mark_table_T1" style="table-layout:fixed;">
                             <thead>
@@ -191,10 +193,6 @@
                 socket.io.reconnect();
             });	
            
-            socket.on('numofleaders',function(value)
-            {
-                num_of_leaders = value;
-            });
             //DONT PUT THIS IN DOCUMENT READY SCRIPT
             //function to disableF5
             function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
@@ -348,7 +346,7 @@
 
             });
            
-            function send_sheetEditable(type_question)
+            function send_sheetEditable(country_name,type_question)
             {
                 if(type_question=='t1')
                     var destination_url = 'sheetEditableT1';
@@ -358,10 +356,13 @@
                     var destination_url = 'sheetEditableT3';
                 else if(type_question=='e')
                     var destination_url = 'sheetEditableE';
+                var uData = {};
+                uData['country_name'] = country_name;
                 $.ajax
                 ({
                     method:'POST',
-                    url : destination_url
+                    url : destination_url,
+                    data : uData
                 }).done(function(data)
                 {
                     var table_subparts_body = "";
@@ -422,6 +423,31 @@
                 });
             }
 
+            $("#country_list_select").change(function(){
+            
+                var name = $(this).val();
+                $("#mark_table_body_T1").html('<tr id = "subparts_row_T1"><td colspan = "2"></td><td>Subparts</td></tr><tr id = "maxMarks_row_T1"><td colspan = "2"></td><td>Maximum Marks</td></tr>');
+                $("#mark_table_body_T2").html('<tr id = "subparts_row_T2"><td colspan = "2"></td><td>Subparts</td></tr><tr id = "maxMarks_row_T2"><td colspan = "2"></td><td>Maximum Marks</td></tr>');
+                $("#mark_table_body_T3").html('<tr id = "subparts_row_T3"><td colspan = "2"></td><td>Subparts</td></tr><tr id = "maxMarks_row_T3"><td colspan = "2"></td><td>Maximum Marks</td></tr>');
+                $("#mark_table_body_E").html('<tr id = "subparts_row_E"><td colspan = "2"></td><td>Subparts</td></tr><tr id = "maxMarks_row_E"><td colspan = "2"></td><td>Maximum Marks</td></tr>');
+                
+                send_sheetEditable(name,'t1');
+                send_sheetEditable(name,'t2');
+                send_sheetEditable(name,'t3');
+                send_sheetEditable(name,'e');
+            });
+            
+            socket.on('countries',function(countries){
+                    var select_elem = $("#country_list_select");
+                    var opt = '<option>';
+                    for(var i in countries)
+                    {
+                        opt = '<option>';
+                        opt += countries[i].country_name;
+                        opt += '</option>';
+                        select_elem.append(opt);
+                    }
+            });
             socket.on('country-data',function(country)
             {
                 var mt_head = document.getElementById("message-board-head");
@@ -439,10 +465,10 @@
                 var cell = row.insertCell(1);
                 cell.innerHTML = "Message Table"; 
 
-                send_sheetEditable('t1');
-                send_sheetEditable('t2');
-                send_sheetEditable('t3');
-                send_sheetEditable('e');
+                //send_sheetEditable('t1');
+                //send_sheetEditable('t2');
+                //send_sheetEditable('t3');
+                //send_sheetEditable('e');
             });
 
             //MESSAGE BOARD SIGNAL			
