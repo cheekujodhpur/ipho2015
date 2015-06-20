@@ -42,6 +42,38 @@ inp='db.flags.drop()'
 echo $inp
 mongo test --eval $inp
 
+inp='db.marks_T1.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.marks_T2.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.marks_T3.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.marks_E.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.ourMarks_T1.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.ourMarks_T2.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.ourMarks_T3.drop()'
+echo $inp
+mongo test --eval $inp
+
+inp='db.ourMarks_E.drop()'
+echo $inp
+mongo test --eval $inp
+
 #all the ip
 while read -r LINE;
 do 
