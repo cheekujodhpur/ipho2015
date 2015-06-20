@@ -1173,8 +1173,10 @@ app.post('/uploadedT1',function(req,res)
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T1":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
+                        db.close();
                         res.redirect('/')
                         done = false;
+                        
                     }
                 }
             });
@@ -1251,6 +1253,7 @@ app.post('/uploadedT2',function(req,res)
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T2":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
+                        db.close();
                         res.redirect('/')
                         done = false;
                     }
@@ -1330,6 +1333,7 @@ app.post('/uploadedT3',function(req,res)
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T3":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
+                        db.close();
                         res.redirect('/')
                         done = false;
                     }
@@ -1410,6 +1414,7 @@ app.post('/uploadedE',function(req,res)
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"E":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
+                        db.close();
                         res.redirect('/')
                         done = false;                        
                     }
