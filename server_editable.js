@@ -225,8 +225,13 @@ app.post('/save_mark_T1',function(req,res){
     req.on('end',function(){
         var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
         var dbData = [];
+        var country_name = '';
         for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
@@ -244,8 +249,13 @@ app.post('/save_mark_T1',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_T1');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+            if(country_name=='')
+                var marks = db.collection('marks_T1');
+            else var marks = db.collection('ourMarks_T1');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 res.json({"success":true});
                 db.close();});
         });
@@ -261,8 +271,13 @@ app.post('/save_mark_T2',function(req,res){
     req.on('end',function(){
         var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
         var dbData = [];
+        var country_name = '';
         for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
@@ -280,8 +295,13 @@ app.post('/save_mark_T2',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_T2');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+            if(country_name=='')
+                var marks = db.collection('marks_T2');
+            else var marks = db.collection('ourMarks_T2');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 res.json({"success":true});
                 db.close();});
         });
@@ -297,8 +317,13 @@ app.post('/save_mark_T3',function(req,res){
     req.on('end',function(){
         var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
         var dbData = [];
+        var country_name = '';
         for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
@@ -316,8 +341,13 @@ app.post('/save_mark_T3',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_T3');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+            if(country_name=='')
+                var marks = db.collection('marks_T3');
+            else var marks = db.collection('ourMarks_T3');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 res.json({"success":true});
                 db.close();});
         });
@@ -333,8 +363,13 @@ app.post('/save_mark_E',function(req,res){
     req.on('end',function(){
         var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
         var dbData = [];
+        var country_name = '';
         for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
@@ -352,8 +387,13 @@ app.post('/save_mark_E',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_E');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+            if(country_name=='')
+                var marks = db.collection('marks_E');
+            else var marks = db.collection('ourMarks_E');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 res.json({"success":true});
                 db.close();});
         });
@@ -667,6 +707,7 @@ app.post('/sheetEditableT1',function(req,res)
             jsonString += data;
         });
     req.on('end',function(){
+        country_name='';
         if(jsonString==''){}
         else{
             var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
@@ -690,7 +731,9 @@ app.post('/sheetEditableT1',function(req,res)
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var subparts = db.collection('subparts');
-            var marks = db.collection('marks_T1');
+            if(country_name=='')
+                var marks = db.collection('marks_T1');
+            else var marks = db.collection('ourMarks_T1');
             var users = db.collection('users');
             
             var query = {};
@@ -706,7 +749,7 @@ app.post('/sheetEditableT1',function(req,res)
                     //var students = data[0].students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
-                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                    marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
                         if(items2.length>=1)
                         {
                             var leaderMarks = items2[0].leaderMarks;
@@ -735,6 +778,7 @@ app.post('/sheetEditableT2',function(req,res)
             jsonString += data;
         });
     req.on('end',function(){
+        country_name='';
         if(jsonString==''){}
         else{
             var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
@@ -758,7 +802,9 @@ app.post('/sheetEditableT2',function(req,res)
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var subparts = db.collection('subparts');
-            var marks = db.collection('marks_T2');
+            if(country_name=='')
+                var marks = db.collection('marks_T2');
+            else var marks = db.collection('ourMarks_T2');
             var users = db.collection('users');
             
             var query = {};
@@ -774,7 +820,7 @@ app.post('/sheetEditableT2',function(req,res)
                     //var students = data[0].students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
-                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                    marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
                         if(items2.length>=1)
                         {
                             var leaderMarks = items2[0].leaderMarks;
@@ -803,6 +849,7 @@ app.post('/sheetEditableT3',function(req,res)
             jsonString += data;
         });
     req.on('end',function(){
+        country_name='';
         if(jsonString==''){}
         else{
             var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
@@ -826,7 +873,9 @@ app.post('/sheetEditableT3',function(req,res)
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var subparts = db.collection('subparts');
-            var marks = db.collection('marks_T3');
+            if(country_name=='')
+                var marks = db.collection('marks_T3');
+            else var marks = db.collection('ourMarks_T3');
             var users = db.collection('users');
             
             var query = {};
@@ -842,7 +891,7 @@ app.post('/sheetEditableT3',function(req,res)
                     //var students = data[0].students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
-                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                    marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
                         if(items2.length>=1)
                         {
                             var leaderMarks = items2[0].leaderMarks;
@@ -871,6 +920,7 @@ app.post('/sheetEditableE',function(req,res)
             jsonString += data;
         });
     req.on('end',function(){
+        country_name='';
         if(jsonString==''){}
         else{
             var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
@@ -894,7 +944,9 @@ app.post('/sheetEditableE',function(req,res)
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
             var subparts = db.collection('subparts');
-            var marks = db.collection('marks_E');
+            if(country_name=='')
+                var marks = db.collection('marks_E');
+            else var marks = db.collection('ourMarks_E');
             var users = db.collection('users');
             
             var query = {};
@@ -910,7 +962,7 @@ app.post('/sheetEditableE',function(req,res)
                     //var students = data[0].students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
-                    marks.find({"ip":new_ip}).toArray(function(err,items2){
+                    marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
                         if(items2.length>=1)
                         {
                             var leaderMarks = items2[0].leaderMarks;
