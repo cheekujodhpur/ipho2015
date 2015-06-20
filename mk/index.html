@@ -74,7 +74,6 @@
                         </table>
                     </form>
                     <button type="submit" class="btn btn-default save_button" data-type = "t1">Save</button>
-                    <button type="submit" class="btn btn-success submit_button" data-type = "t1">Submit</button>
                     <form id = "form_marks_T2">
                         <table class = "table table-striped" id = "mark_table_T2" style="table-layout:fixed;">
                             <thead>
@@ -96,7 +95,6 @@
                         </table>
                     </form>
                     <button type="submit" class="btn btn-default save_button" data-type = "t2">Save</button>
-                    <button type="submit" class="btn btn-success submit_button" data-type = "t2">Submit</button>
                     <form id = "form_marks_T3">
                         <table class = "table table-striped" id = "mark_table_T3" style="table-layout:fixed;">
                             <thead>
@@ -118,7 +116,6 @@
                         </table>
                     </form>
                     <button type="submit" class="btn btn-default save_button" data-type = "t3">Save</button>
-                    <button type="submit" class="btn btn-success submit_button" data-type = "t3">Submit</button>
                     <form id = "form_marks_E">
                         <table class = "table table-striped" id = "mark_table_E" style="table-layout:fixed;">
                             <thead>
@@ -140,7 +137,6 @@
                         </table>
                     </form>
                     <button type="submit" class="btn btn-default save_button" data-type = "e">Save</button>
-                    <button type="submit" class="btn btn-success submit_button" data-type = "e">Submit</button>
                 </div>
             </div>
         </div>
@@ -216,73 +212,6 @@
                     window.location = '/chpass.html';
                 });
 
-                $(".submit_button").click(function(){
-                    var type_question = $(this).attr('data-type');
-                    if(type_question=='t1')
-                        var data = $("#form_marks_T1").serializeArray();
-                    else if(type_question=='t2')
-                        var data = $("#form_marks_T2").serializeArray();
-                    else if(type_question=='t3')
-                        var data = $("#form_marks_T3").serializeArray();
-                    else if(type_question=='e')
-                        var data = $("#form_marks_E").serializeArray();
-                    var ajaxData = {};
-                    var maxMarks = []
-                    //CAREFUL, hard coded line below
-                    if(type_question=='t1')
-                        var num_subparts = $("#mark_table_body_T1").find("tr:first td").length-2;
-                    else if(type_question=='t2')
-                        var num_subparts = $("#mark_table_body_T2").find("tr:first td").length-2;
-                    else if(type_question=='t3')
-                        var num_subparts = $("#mark_table_body_T3").find("tr:first td").length-2;
-                    else if(type_question=='e')
-                        var num_subparts = $("#mark_table_body_E").find("tr:first td").length-2;
-                    for(var j = 0;j<num_subparts;j++)
-                    {
-                        maxMarks.push(parseFloat(data[j].value));
-                    }
-                    for(var i = 1;i<data.length/num_subparts;i++)
-                    {
-                        for(var j = 0;j<num_subparts;j++)
-                        {
-                            var tmp_mark = data[i*num_subparts+j].value;
-                            if(tmp_mark=='')
-                            {
-                                alert("No field can be empty!");
-                                return;
-                            }
-                            if((tmp_mark.split('.')[1] || []).length > 1)
-                            {
-                                alert("Least count is 0.1");
-                                return;
-                            }
-                            if(parseFloat(tmp_mark)>maxMarks[j])
-                            {
-                                alert("Marks should be less than max marks");
-                                return;
-                            }
-                            ajaxData[(i-1)*num_subparts+j] = parseFloat(tmp_mark);
-                        }
-                    }
-                    if(type_question=='t1')
-                        var destination_url = 'submit_mark_T1';
-                    else if(type_question=='t2')
-                        var destination_url = 'submit_mark_T2';
-                    else if(type_question=='t3')
-                        var destination_url = 'submit_mark_T3';
-                    else if(type_question=='e')
-                        var destination_url = 'submit_mark_E';
-                    $.ajax({
-                            method:"POST",
-                            timeout:4000,
-                            url:destination_url,
-                            data:ajaxData
-                            }).
-                    done(function(data)
-                    {
-                            alert("saved!");
-                    });
-                });
 
                 $(".save_button").click(function(){
                     var type_question = $(this).attr('data-type');
@@ -335,6 +264,7 @@
                         var destination_url = 'save_mark_T3';
                     else if(type_question=='e')
                         var destination_url = 'save_mark_E';
+                    ajaxData['country'] = $("#country_list_select").val();
                     $.ajax({
                             method:"POST",
                             timeout:4000,
