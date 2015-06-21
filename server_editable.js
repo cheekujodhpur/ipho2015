@@ -99,7 +99,7 @@ app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res
 app.use("/media",express.static(__dirname + "/media"));console.log("File download enabled for /media");
 app.use("/static",express.static(__dirname + "/static"));console.log("File download enabled for /static");
 
-app.get('/:id',function(req,res){
+app.get('/marks/:id',function(req,res){
     res.sendFile(__dirname+'/mk/'+req.params.id);
 });
 
@@ -215,6 +215,7 @@ app.post('/submit_mark_T1',function(req,res){
             var marks = db.collection('marks_T1');
             var users = db.collection('users');
             var ourMarks_db = db.collection('ourMarks_T1');
+            var subparts = db.collection('subparts');
             marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 //TODO: the code to write the marks onto a file
                 users.find({"ip":ip}).toArray(function(err,items){
@@ -224,39 +225,45 @@ app.post('/submit_mark_T1',function(req,res){
                     var country_name = user.country_name;
                     //var students = user.students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                    ourMarks_db.find({"country_name":country_name}).toArray(function(err,items2){
-                        var ourMarks = items2[0].leaderMarks;   //Yes, the field name is still leaderMarks
-                        var fileName = "mk/" + country_code.toString() + "_T1.html";
-                        var com_fileName = country_code.toString() + "_T1.html";
-                        var stream = fs.createWriteStream(fileName);
-                        stream.once('open',function(fd){
-                            var htmlstr = '';
-                            var tdstr = '';
-                            htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body>';
-                            htmlstr += '<table class = "table table-striped">';
-                            for(var i = 0;i<ourMarks.length/students.length;i++)
-                            {
-                                tdstr += '<td colspan = "2"></td>';
-                            } 
-                            htmlstr += '<tr> <th>Students</th> <th>Code</th> </tr> <tr id = "subparts_row_T1"> <td colspan = "2"></td> <td>Subparts</td> '+tdstr+'</tr> <tr id = "maxMarks_row_T1"> <td colspan = "2"></td> <td>Maximum Marks</td> '+tdstr+'</tr>';
-                            for(var i = 0;i<students.length;i++)
-                            {
-                                htmlstr += '<tr><td>'+students[i]+'</td><td>'+country_code+'_'+(i+1).toString()+'</td><td></td>';
-                                for(var j = 0;j<ourMarks.length/students.length;j++)
+                    subparts.find({"type":"t1"}).toArray(function(err,itemss){
+                        var subpart_arr = itemss[0].subparts;
+                        var maxMarks_arr = itemss[0].maxMarks;
+                        ourMarks_db.find({"country_name":country_name}).toArray(function(err,items2){
+                            var ourMarks = items2[0].leaderMarks;   //Yes, the field name is still leaderMarks
+                            var fileName = "mk/" + country_code.toString() + "_T1.html";
+                            var com_fileName = "marks/" + country_code.toString() + "_T1.html";
+                            var stream = fs.createWriteStream(fileName);
+                            stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/students.length;i++)
                                 {
-                                    htmlstr += '<td>'+ourMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
-                                    htmlstr += '<td>'+leaderMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                    tdstr_subparts += '<td colspan="2">'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td colspan="2">'+maxMarks_arr[i]+'</td>';
+                                } 
+                                htmlstr += '<tr> <th>Students</th> <th>Code</th> </tr> <tr id = "subparts_row_T1"> <td colspan = "2"></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr id = "maxMarks_row_T1"> <td colspan = "2"></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<students.length;i++)
+                                {
+                                    htmlstr += '<tr><td>'+students[i]+'</td><td>'+country_code+'_'+(i+1).toString()+'</td><td style = "border-right:solid 1px grey"></td>';
+                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    {
+                                        htmlstr += '<td style="border-right:solid 1px grey;">'+ourMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr>';
                                 }
-                                htmlstr += '</tr>';
-                            }
-                            htmlstr += '</table>';
-                            htmlstr += '</body></html>';
-                            
-                            stream.write(htmlstr);
-                            stream.end();
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                stream.write(htmlstr);
+                                stream.end();
+                            });
+                            res.json({"success":true,"filename":com_fileName});
+                            db.close();
                         });
-                        res.json({"success":true,"filename":com_fileName});
-                        db.close();
                     });
                 });
             });
