@@ -177,10 +177,6 @@
                         <div class="form-group" id = "fb-dropdown">
                            <label for = "fbMenu">Question:</label>
                            <select class = "form-control" id = "fbMenu">
-                               <option>1a</option>
-                               <option>1b</option>
-                               <option>1c</option>
-                               <option>1d</option>
                            </select>    
                         </div>
                         <div class = "form-group" id = "fb-content">
@@ -389,9 +385,14 @@
                         })
                 .done(function(data){
                         var subparts = data['subparts'];
-                        console.log(subparts); 
+                        var elem_fb = $("#fbMenu");
+                        var htmlstr = '';
+                        for(var i in subparts)
+                        {
+                            htmlstr += '<option>'+subparts[i]+'</option>';
+                        }
+                        elem_fb.html(htmlstr);
                         });
-
             }
 
             function send_list_dir(folder)
@@ -632,14 +633,25 @@
             //FEEDBACK ENABLE
             socket.on('fbEnable',function(q){
                 if(q=='tq1')
+                {
                     $("#fbHead").text("Feedback for Theory Question 1");
+                    get_subparts('t1');
+                }
                 if(q=='tq2')
+                {
                     $("#fbHead").text("Feedback for Theory Question 2");
+                    get_subparts('t2');
+                }
                 if(q=='tq3')
+                {
                     $("#fbHead").text("Feedback for Theory Question 3");
+                    get_subparts('t3');
+                }
                 if(q=='ep1')
+                {
                     $("#fbHead").text("Feedback for Practical Question 1");
-                    
+                    get_subparts('e');
+                }   
                 fb_current = q;
                 request_fb(fb_current);
                 $("#fbb").show();

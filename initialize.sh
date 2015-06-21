@@ -14,6 +14,10 @@ inp='db.users.drop()'
 echo $inp
 mongo test --eval $inp
 
+inp='db.subparts.drop()'
+echo $inp
+mongo test --eval $inp
+
 inp='db.uploads.drop()'
 echo $inp
 mongo test --eval $inp

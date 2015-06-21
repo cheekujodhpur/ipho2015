@@ -457,36 +457,37 @@ app.post('/save_mark_E',function(req,res){
 });
 
 //send subparts
-//app.post('/get_subparts',function(req,res)
-//{
-//    var jsonString = '';
-//    var ip = req.ip;
-//    console.log("'/get_subparts' request received from " + ip.toString());  
-//
-//    req.on('data',function(data)
-//    {
-//       jsonString += data;
-//    });
-//    req.on('end',function()
-//    {
-//       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
-//       var type = jsonData['val'];
-//    });
-//    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-//    {
-//        if(err)
-//        {
-//            console.log(err);
-//            return 0;
-//        }
-//        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-//        var collection = db.collection('subparts');
-//        collection.find({'type':type}).toArray(function(err,items){
-//            res.json(items[0].subparts);
-//            db.close();
-//        });
-//    });
-//});
+app.post('/get_subparts',function(req,res)
+{
+    var jsonString = '';
+    var ip = req.ip;
+    console.log("'/get_subparts' request received from " + ip.toString());  
+
+    req.on('data',function(data)
+    {
+       jsonString += data;
+    });
+    req.on('end',function()
+    {
+       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
+       var type = jsonData['val'];
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('subparts');
+            collection.find({'type':type}).toArray(function(err,items){
+                res.json(items[0]);
+                db.close();
+            });
+        });
+    });
+});
+
 //receive list_dir request
 
 app.post('/list_dir',function(req,res)
