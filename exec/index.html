@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset = "utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>IPhO 2015 - Mumbai, India</title>
+
+		<!--Bootstrap-->
+		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
+		<!!--Custom CSS-->
+		<link href = "/static/css/main.css" rel = "stylesheet" />
+
+        <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+        <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/>	
+	</head>
+
+    <body>
+        <div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
+			<div class = "container-fluid">
+                <div class = "navbar-header">
+                    <a class="navbar-brand" href = "http://www.ipho2015.in">
+                        <img alt="ipho-logo" src = "/media/ipho-logo1.png" />
+                    </a>
+                </div>
+			</div>
+			<div id = "tifr-mast">
+				<div id = "tifr-logo"><img class = "right" alt="tifr-logo" src = "/media/tifr-logo-s.png" />
+				<br />
+				<div id = "out-button" class="right">
+				<button id = "chpass-button" type = "button" class = "btn btn-default btn-sm">Change Password</button>
+				<button id = "logout-button" type = "button"  class = "btn btn-default btn-sm">
+					<span class="glyphicon glyphicon-log-out"></span> Log out
+				</button>
+				</div>
+				<br />
+				</div>
+				<div id = "hbc-tifr" style = "position:relative;left:110px;">
+					<div id = "hbc">Homi Bhabha Centre for Science Education</div>
+					<div id = "tifr">Tata Institute of Fundamental Research</div>
+				</div>
+			</div>
+		</div>
+		
+        <div id = "document" style="width:80%">
+            <div role = "tabpanel">
+                    <ul class = "nav nav-pills" id = "nemo">
+                        <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'send_list_dir("uploads");send_list_dir("downloads");'>Home</a></li>
+                        <li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
+                        <li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
+                    </ul>
+            </div>
+            
+            <div class = "tab-content">
+                <!-- Home tab -->
+                <div role="tabpanel" class="tab-pane active" id = "home" >
+
+                    <table id='download_table' class='table table-bordered table-hover'>
+                        <thead>
+                            <tr><th>Downloads</th></tr>
+                        </thead>
+                        <tbody id="download_table_body">
+                        </tbody>
+                    </table>
+
+                </div>
+                
+                <div role="tabpanel" class="tab-pane" id = "cvote">
+                        <p id = "vote-body"></p>
+                        <form>
+                            <div class="form-group" id = "vote-opts">
+                            </div>	
+                        </form>
+                        <br />
+                        <font>Time to vote: <span id = "timer"></span> seconds.</font>
+                </div>
+                
+                <div role="tabpanel" class="tab-pane" id = "rvote"></div>
+                
+            </div>
+        </div>
+        
+        <div id="sidebar-wrapper" style="width:20%">
+            <table class="table table-hover" id = "country_data_table" style="table-layout:fixed;">
+            <col style="width:50%">
+            <col style="width:50%">
+            </table>
+            <table class="table" id = "message-board">
+            <thead id = "message-board-head">
+                <tr><th>Message Board</th></tr>
+            </thead>
+            <tbody id="message-board-body"></tbody> 
+            </table>
+        </div>
+    
+       <footer id="sp-footer-wrapper" style="bottom:0px;">
+                	<div class="container">
+                        <div class="row-fluid" id="footer">
+                             <div id="sp-footer1" class="span6" style="text-align:center">
+                                 <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                                 <br /><span>Mumbai - India </span> 
+                             </div>
+                         </div>
+                	</div>
+        </footer>   	
+        
+        <!-- jQuery -->
+        <script src = "/static/js/jquery.min.js"></script>
+        <script src = "/static/js/Chart.min.js"></script>
+        <script src = "/static/js/bootstrap.min.js"></script>
+        <script src = "/socket.io/socket.io.js"></script>
+        <script>
+
+            //to protect from unload
+            window.onbeforeunload = function() 
+            {
+                //send directory listing signal before refesh
+                if($("#cvoteb").is(":visible"))
+                    return 'You will lose your chance to vote if you continue. Are you sure?';
+            };
+            
+            var socket = io();
+            var fb_current = '';
+            var num_of_leaders = '';
+            socket.on('end-ack',function()
+            {
+                window.location = '/auth.html';
+            });
+            socket.on('disconnect',function()
+            {
+                console.log('Disconnected');
+                socket.io.reconnect();
+            });	
+           
+            socket.on('num_of_leaders',function(value)
+            {
+                num_of_leaders = value;
+            });
+            
+            //DONT PUT THIS IN DOCUMENT READY SCRIPT
+            //function to disableF5
+            function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
+                
+            //document ready script
+            $(document).ready(function()
+            {
+  
+                socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");
+                var uptimer = setInterval(function()
+                {
+                    send_list_dir('uploads');
+                    send_list_dir('downloads');
+                },10000);
+                send_list_dir('uploads');
+                send_list_dir('downloads');
+                $('#nemo a:first').tab('show');
+                //socket.io controls
+                $("#logout-button").click(function()
+                {
+                    socket.emit('end');
+                });
+                $("#chpass-button").click(function()
+                {
+                    window.location = '/chpass.html';
+                });
+
+            });
+
+            function send_list_dir(folder)
+            {
+                var uData = {};
+                uData["folder"] = folder;
+                $.ajax({
+                        method:"POST",
+                        url:'/list_dir',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                            var id = data['id'];
+                            var directory_path = data['directory_path'];
+                            var files = data['files'];
+                            if(id == "download")
+                            {
+                                //var table = "<table id='download_table' class='table table-hover'><thead><tr><th>Downloads</th></tr></thead>";
+                                var table = document.getElementById("download_table");
+                                table.innerHTML = '';
+                                     
+                                for(var i = 0;i < files.length;i++)
+                                {
+                                    var row = table.insertRow(i);
+                                    var cell = row.insertCell(0);
+                                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                                    //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                                }
+                                var row = table.insertRow(0);
+                                var cell = row.insertCell(0);
+                                cell.innerHTML ='<b>Downloads<b>';
+                                //table += "</table>";
+                                //$("#download_table").remove();
+                                //$("#home").append(table);
+                            }
+                            else
+                            {
+                                var table = document.getElementById("upload_table");
+                                table.innerHTML = '';
+                                //var table = "<table id='upload_table' class='table table-hover'><thead><tr><th>Uploads</th></tr></thead>";
+                                for(var i = 0;i < files.length;i++)
+                                {
+                                    var row = table.insertRow(i);
+                                    var cell = row.insertCell(0);
+                                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                                    //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
+                                }
+                                var row = table.insertRow(0);
+                                var cell = row.insertCell(0);
+                                cell.innerHTML ='<b>Uploads<b>';
+                                //table += "</table>";
+                                //$("#upload_table").remove();
+                                //$("#home").append(table); 
+                            }
+                            if(data['T1_printed'] == true)
+                            {
+                                $("#T1_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['T2_printed'] == true)
+                            {
+                                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['T3_printed'] == true)
+                            {
+                                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['E_printed'] == true)
+                            {
+                                $("#E_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                        });
+            }
+            
+            socket.on('country-data',function(country)
+            {
+                var mt_head = document.getElementById("country_data_table");
+                mt_head.innerHTML = '';
+                var row = mt_head.insertRow(0);
+                var cell = row.insertCell(0);
+                cell.innerHTML = '<p style="text-align:right"><img style="width:40px;height:20px;" alt="country image" src= "/media/flags/' + country.country_name + '.png" /></p>'; 
+                //ENTER COUNTRY IMAGE HERE
+                var cell = row.insertCell(1);
+                cell.innerHTML = '<th style="text-align:left">' + country.country_code + '</th>'; 
+
+            });
+
+            //VOTING
+            //on receiving vote request
+            socket.on('govote',function(id,body,options,time)
+            {
+                $(document).on("keydown",disableF5);
+                var option,Option;
+                if(num_of_leaders==2)
+                    var optiontext = '<div id="divider-container"><div id = "left-opts" class = "left"><h5>Leader 1</h5></div><div class = "left" id = "right-opts" style = "position:relative"><h5>Leader 2</h5></div><div class = "clear"></div></div>';
+                else
+                    var optiontext = '<div id="divider-container"><div id = "left-opts" class = "left"><h5>Leader 1</h5></div><div class = "clear"></div></div>';
+                $("#vote-opts").html(optiontext);
+                for(var i = 1;i<=options.length;i++){
+                    if(i!=options.length)
+                        option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+                    else
+                        option = '<div class = "radio"><label><input type="radio" name = "vote-options" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
+                    Option = $(option);
+                    $("#left-opts").append(Option);
+                }
+                if(num_of_leaders==2)
+                {
+                    for(var i = 1;i<=options.length;i++){
+                        if(i!=options.length)
+                            option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" />'+options[i-1]+'</label></div>';
+                        else
+                            option = '<div class = "radio"><label><input type="radio" name = "vote-options2" id = "opt'+i+'" value = "opt'+i+'" checked="checked" />'+options[i-1]+'</label></div>';
+                        Option = $(option);
+                        $("#right-opts").append(Option);
+                    }
+                }
+                var dummy_submit = '<button id = "dummy_submit" class = "btn btn-default">Submit</button>';
+                var Dummy_submit = $(dummy_submit);
+                $("#left-opts").append(Dummy_submit);
+                if(num_of_leaders==2)
+                {
+                    var dummy_submit = '<button id = "dummy_submit2" class = "btn btn-default">Submit</button>';
+                    var Dummy_submit = $(dummy_submit);
+                    $("#right-opts").append(Dummy_submit);
+                }
+                //add click event handler to dummy_submit
+                $("#dummy_submit").click(function(e){
+                    e.preventDefault();
+                    $('input[name=vote-options]').attr('disabled',true);
+                });
+                if(num_of_leaders==2)
+                {
+                    $("#dummy_submit2").click(function(e){
+                        e.preventDefault();
+                        $('input[name=vote-options2]').attr('disabled',true);
+                    });
+                }
+                var Body = $('<font style="font-size:18px;">'+body+'</font>');
+                $("#vote-body").append(Body);
+                $("#cvoteb").show();
+                $("#nemo a:eq(-2)").tab('show');
+            
+                    clearInterval(timer);
+                    var startDate = new Date();
+                    var startTime = startDate.getTime()/1000;
+                    var timer = setInterval(function(){
+                var nowDate = new Date();
+                var nowTime = nowDate.getTime()/1000;
+                var seconds = parseInt(time-nowTime+startTime);
+                        $("#timer").parent().show();
+                        $("#timer").html(seconds);
+                        if(seconds<=0) {
+                        logVote(id);
+                        clearInterval(timer);
+                        }	
+                    },1000);
+            });
+            
+            //results came
+            socket.on('voteresults',function(counts,body,options)
+            {
+                $(document).off("keydown",disableF5); 
+                var Body = $('<font style="font-size:18px;">'+body+'</font>');
+                $("#rvote").append(Body);
+                var graph = '<div id = "graph"></div>';
+                $("#rvote").append(graph);
+                //get total number of counts
+                var totalus = 0;
+                for(var i in counts)
+                    if(i!='_id' && i!='id')
+                    {
+                        totalus += parseInt(counts[i]);
+                    }
+                //add graph elements
+                    $("#graph").append('<table id = "graph_table" class = "table table-bordered table-hover"></table>');
+                var j = 0;
+                var maxcount = 0;
+                for(var i in counts)
+                {
+                    if(i!='_id' && i!='id')
+                    {
+                        if(parseInt(counts[i])>maxcount) 
+                        {
+                            console.log(options[j]);
+                            if(options[j]!='Abstain')
+                                maxcount = parseInt(counts[i]);
+                        }
+                        j++;
+                    }
+                }
+                console.log(maxcount);
+                j = 0;
+                for(var i in counts)
+                    if(i!='_id' && i!='id')
+                    {
+                        var wid = (parseFloat(counts[i])/totalus)*500;
+                        if(options[j]=='Abstain')
+                        {
+                                var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span id = "bar" style = "height:30px;width:'+wid+'px;background:grey"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                        }
+                        else
+                        {
+                            if(parseInt(counts[i])==maxcount)
+                                var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_green" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                            else
+                                var bb = '<tr><td id = "option_name">'+options[j]+'</td><td id = "bar_container"><span class ="bar_red" id = "bar" style = "height:30px;width:'+wid+'px;"></span></td><td id = "vote_count">'+counts[i]+'</td></tr>';
+                        }
+                        $("#graph_table").append(bb);
+                        j++; 
+                    }
+                $("#rvoteb").show();
+                $("#nemo a:eq(-1)").tab('show');
+            });
+
+            //MESSAGE BOARD SIGNAL			
+            //show the message on board
+            socket.on("message-sent",function(message_table)
+            {
+                $("#message-board-body").html('');
+                for(var i in message_table)
+                {
+                    $("#message-board-body").append("<tr><td>" + message_table[i].message + "</td></tr>");
+                }
+            });
+
+            //REFRESH SIGNAL
+            socket.on('refreshAll',function(){
+                    $("#rvote").html('');
+                    $("#vote-body").html('');
+                    $("#vote-opts").html('');
+                    $("#timer").html('');
+                    $("#rvoteb").hide();
+                    $("#cvoteb").hide();
+                    $("#nemo a:eq(0)").tab('show');
+            });
+
+            //FEEDBACK ENABLE
+            socket.on('fbEnable',function(q){
+                if(q=='tq1')
+                {
+                    $("#fbHead").text("Feedback for Theory Question 1");
+                    get_subparts('t1');
+                }
+                if(q=='tq2')
+                {
+                    $("#fbHead").text("Feedback for Theory Question 2");
+                    get_subparts('t2');
+                }
+                if(q=='tq3')
+                {
+                    $("#fbHead").text("Feedback for Theory Question 3");
+                    get_subparts('t3');
+                }
+                if(q=='ep1')
+                {
+                    $("#fbHead").text("Feedback for Practical Question 1");
+                    get_subparts('e');
+                }   
+                fb_current = q;
+                request_fb(fb_current);
+                $("#fbb").show();
+            });
+            //FEEDBACK DISABLE
+            socket.on('fbDisable',function(){
+                $("#nemo a:first").tab('show');
+                $("#fbb").hide();
+            });
+
+            $("#fb_submit").click(function(e){
+                e.preventDefault();
+                var content = $("#comment").val();
+                var id = $("#fbMenu").val();
+                
+                $("#comment").val('');
+                var now = new Date();
+                //alert(now.toString());
+                socket.emit('fbContent',id,fb_current,content,now.toTimeString());
+                request_fb(fb_current);
+            });
+            
+            //FUNCTIONS
+            function logVote(id)
+            {
+                var option = $('input[name=vote-options]:checked').val();
+                var option2 = $('input[name=vote-options2]:checked').val();
+                socket.emit('logvote',id,option,option2);
+                $('input[name=vote-options]').attr('disabled',true);
+                $('input[name=vote-options2]').attr('disabled',true);
+                $("#timer").parent().hide();
+            }
+            function emptyfile_check_T1()
+            {
+                var file = document.getElementById('file_upload_T1');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_T2()
+            {
+                var file = document.getElementById('file_upload_T2');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_T3()
+            {
+                var file = document.getElementById('file_upload_T3');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_E()
+            {
+                var file = document.getElementById('file_upload_E');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+        </script>
+	   
+	</body>
+</html>

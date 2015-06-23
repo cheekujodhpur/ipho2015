@@ -1,0 +1,9 @@
+Different types of users
+
+0: Convener
+1: Regular Leader (1 or 2 leaders)
+2: Printer
+3: Convener Mark Entry
+4: IPhO Exec (vote, download, no upload)
+5: Costa Rica (upload, download, view vote)
+6: Display (only display vote)
