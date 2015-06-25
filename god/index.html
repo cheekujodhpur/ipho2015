@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset = "utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>IPhO 2015 - Mumbai, India</title>
+
+		<!--Bootstrap-->
+		<link href = "/static/css/bootstrap.min.css" rel = "stylesheet" />
+		<!!--Custom CSS-->
+        <link href = "/static/css/main.css" rel = "stylesheet" />
+
+        <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+        <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/>   
+    </head>
+
+    <body>
+		<div id = "sp-header-wrapper" class = "navbar navbar-defaul navbar-fixed-top">
+			<div class = "container-fluid">
+				<div class = "navbar-header">
+					<a class="navbar-brand" href = "http://www.ipho2015.in">
+						<img alt="ipho-logo" src = "media/ipho-logo1.png" />
+					</a>
+				</div>
+			</div>
+			<div id = "tifr-mast">
+				<div id = "tifr-logo"><img class = "right" alt="tifr-logo" src = "/media/tifr-logo-s.png" />
+				<br />
+				<div id = "out-button" class="right">
+				<button id = "chpass-button" type = "button" class = "btn btn-default btn-sm">Change Password</button>
+				<button id = "logout-button" type = "button"  class = "btn btn-default btn-sm">
+					<span class="glyphicon glyphicon-log-out"></span> Log out
+				</button>
+				</div>
+				<br />
+				</div>
+				<div id = "hbc-tifr" style = "position:relative;left:110px">
+					<div id = "hbc">Homi Bhabha Centre for Science Education</div>
+					<div id = "tifr">Tata Institute of Fundamental Research</div>
+				</div>
+			</div>
+		</div>
+        
+        <div id = "document" style="width:80%">
+			<div role = "tabpanel">
+				<ul class = "nav nav-pills" id = "nemo">
+					<li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'send_list_dir"downloads");'>Home</a></li>
+                </ul>
+			</div>
+			
+            <div class = "tab-content">
+				
+                <div role="tabpanel" class="tab-pane active" id = "home">
+                    <input type = "button" id = "super_refresh_button" style = "width:100px;height:50px;background:red;color:white;font-size:30px;" value = "Boom!" />
+                </div>
+			</div>	
+		</div>
+        
+        <div id="sidebar-wrapper" >
+            <button type="button" class="btn btn-danger" id = "refresh-button">Clear All</button>
+            <form id="form-message-submit">
+                <div class="form-group">
+                    <label for="message_input">Message</label>
+                    <input type="message" class="form-control" id="message_input" placeholder="Enter message here">
+                </div>
+                <button type="submit" class="btn btn-primary" >Submit</button>
+            </form>
+            <table class="table" id = "message-board">
+            <thead>
+                <tr><th>Message Board</th></tr>
+            </thead>
+            <tbody id="message-board-body">
+            </tbody>
+            </table>
+        </div>
+        <footer id="sp-footer-wrapper" style="bottom:0px;">
+                	<div class="container">
+                        <div class="row-fluid" id="footer">
+                             <div id="sp-footer1" class="span6" style="text-align:center">
+                                 <span>Copyright &copy; Homi Bhabha Centre for Science Education, TIFR</span>
+                                 <br /><span>Mumbai - India </span> 
+                             </div>
+                         </div>
+                	</div>
+        </footer>   	
+		
+        <!-- jQuery -->
+		<script src = "/static/js/jquery.min.js"></script>
+		<script src = "/static/js/bootstrap.min.js"></script>
+        <script src = "/static/js/knockout-2.2.0.js"></script>
+        <script src = "/static/js/jquery.tablesorter.js"></script>
+		<script src = "/static/js/Chart.min.js"></script>
+		<script src = "/socket.io/socket.io.js"></script>
+		<script>
+
+            //my globals
+            var socket = io();
+            //document ready script
+			$(document).ready(function()
+            {
+				$('#nemo a:first').tab('show');
+				//socket.io controls
+				$("#logout-button").click(function(){
+					socket.emit('end');
+				});
+				$("#chpass-button").click(function(){
+					window.location = '/chpass.html';
+				});
+                $("#super_refresh_button").click(function(){
+                        socket.emit('super_refresh'):
+                    });
+
+		    });
+
+            //SOCKET SIGNALS
+            socket.on('disconnect',function()
+            {
+                console.log('Disconnected');
+                socket.io.reconnect();
+            }); 
+            
+            socket.on('end-ack',function() 
+            { 
+                 window.location = '/auth.html'; 
+            }); 
+            
+            //show the message on board
+            socket.on("message-sent",function(message_table){
+                $("#message-board-body").html('');
+                for(var i in message_table)
+                {
+                    $("#message-board").append('<tr><td>' + message_table[i].message + '</td><td><button type="button" class="btn btn-default btn-sm message-remove" id = "'+message_table[i].id+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>   </td></tr>');
+                }
+                //delete-message
+                $(".message-remove").click(function(e){
+                    e.preventDefault();
+                    socket.emit('message-delete',$(this).attr("id"));
+                });
+            });
+                
+		</script>
+	</body>
+</html>
