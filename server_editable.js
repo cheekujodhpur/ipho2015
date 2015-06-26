@@ -1475,6 +1475,8 @@ app.post('/uploadedT1',function(req,res)
                         var country_code = items[0].country_code
                         file_name = "T1_" + country_code.toString() + "." + file_extension; 
                         new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+    
+                        var common_new_location = __dirname + '/common/T1'+ '/' + file_name;
                         //copy the file to the new_location from the temp_path 
                         fs.copy(temp_path.toString(), new_location.toString(), function(err) 
                         {
@@ -1487,6 +1489,16 @@ app.post('/uploadedT1',function(req,res)
                             console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
                         });
                         
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/T1");
+                        });
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T1":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
@@ -1521,6 +1533,7 @@ app.post('/uploadedT2',function(req,res)
         //the new location to which the file will be copied according to
         //the user's ip
         var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/T2'+ '/' + file_name;
      
 
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -1567,6 +1580,17 @@ app.post('/uploadedT2',function(req,res)
                             console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
                         });
 
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/T2/");
+                        });
+
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T2":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
@@ -1600,6 +1624,7 @@ app.post('/uploadedT3',function(req,res)
         //the new location to which the file will be copied according to
         //the user's ip
         var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/T3'+ '/' + file_name;
      
 
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -1646,7 +1671,16 @@ app.post('/uploadedT3',function(req,res)
                             console.log(req.files.user_file);
                             console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
                         });
-
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/T3/");
+                        });
                         var uploads = db.collection('uploads');
                         uploads.update({"ip":ip},{$set:{"T3":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
@@ -1680,6 +1714,7 @@ app.post('/uploadedE',function(req,res)
         //the new location to which the file will be copied according to
         //the user's ip
         var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/E'+ '/' + file_name;
      
 
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -1726,6 +1761,17 @@ app.post('/uploadedE',function(req,res)
                             //print the uploaded file metadata on the console
                             console.log(req.files.user_file);
                             console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/E/");
                         });
 
                         var uploads = db.collection('uploads');

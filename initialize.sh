@@ -3,8 +3,14 @@
 #create the directories
 rm -r ./uploads
 rm -r ./downloads
+rm -r ./common
 mkdir ./uploads
 mkdir ./downloads
+mkdir ./common
+mkdir ./common/T1
+mkdir ./common/T2
+mkdir ./common/T3
+mkdir ./common/E
 #copy the contents of server_editable.js to server.js
 chmod 777 server.js
 cp server_editable.js server.js
