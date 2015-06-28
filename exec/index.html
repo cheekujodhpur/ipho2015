@@ -48,13 +48,13 @@
                         <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'send_list_dir("uploads");send_list_dir("downloads");'>Home</a></li>
                         <li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
                         <li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
+                        <li id = "fbb" role = "presentation" style = "display:none;"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
                     </ul>
             </div>
             
             <div class = "tab-content">
                 <!-- Home tab -->
                 <div role="tabpanel" class="tab-pane active" id = "home" >
-
                     <table id='download_table' class='table table-bordered table-hover'>
                         <thead>
                             <tr><th>Downloads</th></tr>
@@ -62,7 +62,6 @@
                         <tbody id="download_table_body">
                         </tbody>
                     </table>
-
                 </div>
                 
                 <div role="tabpanel" class="tab-pane" id = "cvote">
@@ -77,6 +76,38 @@
                 
                 <div role="tabpanel" class="tab-pane" id = "rvote"></div>
                 
+                <div role="tabpanel" class="tab-pane" id = "fb">
+                    <h4 id = "fbHead">Feedback for </h4>
+                    <form id = "form-feedback">
+                        <div class="form-group" id = "fb-dropdown">
+                           <label for = "fbMenu">Question:</label>
+                           <select class = "form-control" id = "fbMenu">
+                           </select>    
+                        </div>
+                        <div class = "form-group" id = "fb-content">
+                            <label for = "comment">Comment:</label>
+                            <textarea class = "form-control" rows = "5" id = "comment"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-default" id = "fb_submit" onclick='alert("Your feedback has been submitted successfully.")'>Submit</button>
+                    </form>
+                    
+                    <div id = "fb_data">
+                        <table style = "table-layout:fixed;" class = "table table-bordered table-hover" id = "fb_data_table">
+                            <col style="width:30%"> 
+                            <col style="width:10%"> 
+                            <col style="width:60%"> 
+                            <thead>
+                            <tr>
+                                <th style="text-align:center"><div class="btn btn-info">Time</div></th>
+                                <th style="text-align:center"><div class="btn btn-info">QID</div></th>
+                                <th style="text-align:center"><div class="btn btn-info">Content</div></th>
+                            </tr>
+                            </thead>
+                            <tbody id = "fb_data_table_body">
+                            </tbody>
+                        </table>
+                    </div>    
+                </div>
             </div>
         </div>
         
@@ -110,6 +141,32 @@
         <script src = "/static/js/bootstrap.min.js"></script>
         <script src = "/socket.io/socket.io.js"></script>
         <script>
+            //gets the element by its id
+            var E1_file = document.getElementById('file_upload_E1');
+            //binds to onchange event of the input field
+            E1_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
+                }
+                
+            });
+            var E2_file = document.getElementById('file_upload_E2');
+            //binds to onchange event of the input field
+            E2_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
+                }
+                
+            });
+
 
             //to protect from unload
             window.onbeforeunload = function() 
@@ -148,10 +205,8 @@
                 socket.emit("list-dir","/uploads");socket.emit("list-dir","/downloads");
                 var uptimer = setInterval(function()
                 {
-                    send_list_dir('uploads');
                     send_list_dir('downloads');
                 },10000);
-                send_list_dir('uploads');
                 send_list_dir('downloads');
                 $('#nemo a:first').tab('show');
                 //socket.io controls
@@ -165,6 +220,56 @@
                 });
 
             });
+         
+            
+            function request_fb(current)
+            {
+                var uData = {};
+                uData['current'] = current;
+                $.ajax({
+                        method:"POST",
+                        url:'/request_fb_leader',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                       var feeds = data['feeds'];
+                 
+                        $("#fb_data_table_body").html('');
+                        for(var feed in feeds)
+                        {
+                            var ll = '';
+                            for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td></tr>';
+                            var Field = $(field);
+                            $("#fb_data_table_body").append(Field);
+                        }
+                        });
+            }
+
+            //AJAX requests
+
+            function get_subparts(val) 
+            {
+                var uData = {};
+                uData["val"] = val;
+                $.ajax({
+                        method:"POST",
+                        url:'get_subparts',
+                        data:uData,
+                        dataType:"json"
+                        })
+                .done(function(data){
+                        var subparts = data['subparts'];
+                        var elem_fb = $("#fbMenu");
+                        var htmlstr = '';
+                        for(var i in subparts)
+                        {
+                            htmlstr += '<option>'+subparts[i]+'</option>';
+                        }
+                        elem_fb.html(htmlstr);
+                        });
+            }
 
             function send_list_dir(folder)
             {
@@ -219,21 +324,13 @@
                                 //$("#upload_table").remove();
                                 //$("#home").append(table); 
                             }
-                            if(data['T1_printed'] == true)
+                            if(data['E1_printed'] == true)
                             {
-                                $("#T1_form").html('<p class="btn btn-success">Printed</p>');
+                                $("#E1_form").html('<p class="btn btn-success">Printed</p>');
                             }
-                            if(data['T2_printed'] == true)
+                            if(data['E2_printed'] == true)
                             {
-                                $("#T2_form").html('<p class="btn btn-success">Printed</p>');
-                            }
-                            if(data['T3_printed'] == true)
-                            {
-                                $("#T3_form").html('<p class="btn btn-success">Printed</p>');
-                            }
-                            if(data['E_printed'] == true)
-                            {
-                                $("#E_form").html('<p class="btn btn-success">Printed</p>');
+                                $("#E2_form").html('<p class="btn btn-success">Printed</p>');
                             }
                         });
             }
@@ -305,7 +402,7 @@
                 var Body = $('<font style="font-size:18px;">'+body+'</font>');
                 $("#vote-body").append(Body);
                 $("#cvoteb").show();
-                $("#nemo a:eq(-2)").tab('show');
+                $("#nemo a:eq(-3)").tab('show');
             
                     clearInterval(timer);
                     var startDate = new Date();
@@ -376,7 +473,7 @@
                         j++; 
                     }
                 $("#rvoteb").show();
-                $("#nemo a:eq(-1)").tab('show');
+                $("#nemo a:eq(-2)").tab('show');
             });
 
             //MESSAGE BOARD SIGNAL			
@@ -403,25 +500,30 @@
 
             //FEEDBACK ENABLE
             socket.on('fbEnable',function(q){
-                if(q=='tq1')
+                if(q=='t1')
                 {
-                    $("#fbHead").text("Feedback for Theory Question 1");
+                    $("#fbHead").text("Feedback for T-1");
                     get_subparts('t1');
                 }
-                if(q=='tq2')
+                if(q=='t2')
                 {
-                    $("#fbHead").text("Feedback for Theory Question 2");
+                    $("#fbHead").text("Feedback for T-2");
                     get_subparts('t2');
                 }
-                if(q=='tq3')
+                if(q=='t3')
                 {
-                    $("#fbHead").text("Feedback for Theory Question 3");
+                    $("#fbHead").text("Feedback for T-3");
                     get_subparts('t3');
                 }
-                if(q=='ep1')
+                if(q=='e1')
                 {
-                    $("#fbHead").text("Feedback for Practical Question 1");
-                    get_subparts('e');
+                    $("#fbHead").text("Feedback for E-1");
+                    get_subparts('e1');
+                }   
+                if(q=='e2')
+                {
+                    $("#fbHead").text("Feedback for E-2");
+                    get_subparts('e2');
                 }   
                 fb_current = q;
                 request_fb(fb_current);
@@ -454,62 +556,6 @@
                 $('input[name=vote-options]').attr('disabled',true);
                 $('input[name=vote-options2]').attr('disabled',true);
                 $("#timer").parent().hide();
-            }
-            function emptyfile_check_T1()
-            {
-                var file = document.getElementById('file_upload_T1');
-                if(file.value === null || file.value === "")
-                {
-                    alert("It is not possible to upload an empty file.");
-                    return false;
-                }
-                else
-                {
-                    alert("File uploaded successfully.");
-                    return true;
-                }
-            }
-            function emptyfile_check_T2()
-            {
-                var file = document.getElementById('file_upload_T2');
-                if(file.value === null || file.value === "")
-                {
-                    alert("It is not possible to upload an empty file.");
-                    return false;
-                }
-                else
-                {
-                    alert("File uploaded successfully.");
-                    return true;
-                }
-            }
-            function emptyfile_check_T3()
-            {
-                var file = document.getElementById('file_upload_T3');
-                if(file.value === null || file.value === "")
-                {
-                    alert("It is not possible to upload an empty file.");
-                    return false;
-                }
-                else
-                {
-                    alert("File uploaded successfully.");
-                    return true;
-                }
-            }
-            function emptyfile_check_E()
-            {
-                var file = document.getElementById('file_upload_E');
-                if(file.value === null || file.value === "")
-                {
-                    alert("It is not possible to upload an empty file.");
-                    return false;
-                }
-                else
-                {
-                    alert("File uploaded successfully.");
-                    return true;
-                }
             }
         </script>
 	   

@@ -116,24 +116,14 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Theory 1</td>
-                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" /></td> 
-                                        <td><input checked = "checked" name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq1';reset_fb_timer();" value="tq1" /></td>
+                                        <td>E-1</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','e1')" value="e1" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e1';reset_fb_timer();" value="e1" /></td>
                                     </tr> 
                                     <tr>
-                                        <td>Theory 2</td>
-                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq2')" value="tq2" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq2';reset_fb_timer();" value="tq2" /></td>
-                                    </tr> 
-                                    <tr>
-                                        <td>Theory 3</td>
-                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq3')" value="tq3" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq3';reset_fb_timer();" value="tq3" /></td>
-                                    </tr> 
-                                    <tr>
-                                        <td>Experimemt</td>
-                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','ep1')" value="ep1" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'ep1';reset_fb_timer();" value="ep1" /></td>
+                                        <td>E-2</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','e2')" value="e2" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e2';reset_fb_timer();" value="e2" /></td>
                                     </tr> 
                                     <tr>
                                         <td>None</td>
@@ -194,10 +184,8 @@
                         <thead>
                         <tr>
                             <th>Country Code</th>
-                            <th>T1</th>
-                            <th>T2</th>
-                            <th>T3</th>
-                            <th>E</th>
+                            <th>E1</th>
+                            <th>E2</th>
                         </tr>
                         </thead>    
                         <tbody id="all_uploads_table_body">
@@ -327,7 +315,7 @@
                 fbtimer = setInterval(function(){
                     request_fb(fb_current);    
                 },10000);
-                fb_current = 'tq1';
+                fb_current = 'e1';
                 request_fb(fb_current);
 		    });
 
@@ -602,18 +590,12 @@
                 var table = '';
                 var users_logged = 0;
                 var num_votes = 0;
-                var T1_u = 0;
-                var T1_pr = 0;
-                var T1_pck = 0;
-                var T2_u = 0;
-                var T2_pr = 0;
-                var T2_pck = 0;
-                var T3_u = 0;
-                var T3_pr = 0;
-                var T3_pck = 0;
-                var E_u = 0;
-                var E_pr = 0;
-                var E_pck = 0;
+                var E1_u = 0;
+                var E1_pr = 0;
+                var E1_pck = 0;
+                var E2_u = 0;
+                var E2_pr = 0;
+                var E2_pck = 0;
                 for(var i in all_uploads)
                 {
                     if(all_uploads[i].country_code != "NULL")
@@ -628,103 +610,50 @@
                         {
                             table += '<tr><td><button type="button" class = "btn btn-info">' + all_uploads[i].country_code + '</button></td>';
                         }
-                        
-                        if(all_uploads[i].T1)
+                        if(all_uploads[i].E1)
                         {
-                            if(all_uploads[i].T1_printed && all_uploads[i].T1_packed)
-                            {
-                                table += '<td><button type="button" class="btn btn-success">Theory 1</button></td>';
-                                T1_u += 1;
-                                T1_pr += 1;
-                                T1_pck += 1;
-
-                            }
-                            else if(all_uploads[i].T1_printed) 
-                            { 
-                                T1_u += 1;
-                                T1_pr += 1;
-                                table += '<td><button type="button" class="btn btn-primary">Theory 1</button></td>';
-                            }
-                            else
-                            {
-                                T1_u += 1;
-                                table += '<td><button type="button" class="btn btn-warning">Theory 1</button></td>';
-                            }
-                        }
-                        else
-                        {   
-                            table += '<td><button type="button" class="btn btn-danger">Theory 1</button></td>';
-                        }
-                    
-                        if(all_uploads[i].T2)
-                        {
-                            if(all_uploads[i].T2_printed && all_uploads[i].T2_packed)
-                            {
-                                T2_u += 1;
-                                T2_pr += 1;
-                                T2_pck += 1;
-                                table += '<td><button type="button" class="btn btn-success">Theory 2</button></td>';
-                            }
-                            else if(all_uploads[i].T2_printed) 
-                            { 
-                                T2_u += 1;
-                                T2_pr += 1;
-                                table += '<td><button type="button" class="btn btn-primary">Theory 2</button></td>';
-                            }
-                            else
-                            {
-                                table += '<td><button type="button" class="btn btn-warning">Theory 2</button></td>';
-                                T2_u += 1;
-                            }
-                        }
-                        else
-                        {   
-                            table += '<td><button type="button" class="btn btn-danger">Theory 2</button></td>';
-                        }
-                        if(all_uploads[i].T3)
-                        {
-                            if(all_uploads[i].T3_printed && all_uploads[i].T3_packed)
-                            {
-                                table += '<td><button type="button" class="btn btn-success">Theory 3</button></td>';
-                                T3_u += 1;
-                                T3_pr += 1;
-                                T3_pck += 1;
-                            }
-                            else if(all_uploads[i].T3_printed) 
-                            { 
-                                table += '<td><button type="button" class="btn btn-primary">Theory 3</button></td>';
-                                T3_u += 1;
-                                T3_pr += 1;
-                            }
-                            else
-                            {
-                                table += '<td><button type="button" class="btn btn-warning">Theory 3</button></td>';
-                                T3_u += 1;
-                            }
-                        }
-                        else
-                        {   
-                            table += '<td><button type="button" class="btn btn-danger">Theory 3</button></td>';
-                        }
-                        if(all_uploads[i].E)
-                        {
-                            if(all_uploads[i].E_printed && all_uploads[i].E_packed)
+                            if(all_uploads[i].E1_printed && all_uploads[i].E1_packed)
                             {
                                 table += '<td><button type="button" class="btn btn-success">Experiment</button></td>';
-                                E_u += 1;
-                                E_pr += 1;
-                                E_pck += 1;
+                                E1_u += 1;
+                                E1_pr += 1;
+                                E1_pck += 1;
                             }
-                            else if(all_uploads[i].E_printed) 
+                            else if(all_uploads[i].E1_printed) 
                             { 
                                 table += '<td><button type="button" class="btn btn-primary">Experiment</button></td>';
-                                E_u += 1;
-                                E_pr += 1;
+                                E1_u += 1;
+                                E1_pr += 1;
                             }
                             else
                             {
                                 table += '<td><button type="button" class="btn btn-warning">Experiment</button></td>';
-                                E_u += 1;
+                                E1_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Experiment</button></td>';
+                        }
+                        if(all_uploads[i].E2)
+                        {
+                            if(all_uploads[i].E2_printed && all_uploads[i].E2_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">Experiment</button></td>';
+                                E2_u += 1;
+                                E2_pr += 1;
+                                E2_pck += 1;
+                            }
+                            else if(all_uploads[i].E2_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">Experiment</button></td>';
+                                E2_u += 1;
+                                E2_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">Experiment</button></td>';
+                                E2_u += 1;
                             }
                         }
                         else
@@ -736,10 +665,8 @@
                 }
                 var table_stat = '';
                 table_stat += '<tr><td>Users Logged: ' + users_logged + '<br /> Total Votes: ' + num_votes +' </td>';
-                table_stat += '<td>Uploaded: ' + T1_u + '<br />Printed: ' + T1_pr + '<br />Packed: ' + T1_pck + '</td>';
-                table_stat += '<td>Uploaded: ' + T2_u + '<br />Printed: ' + T2_pr + '<br />Packed: ' + T2_pck + '</td>';
-                table_stat += '<td>Uploaded: ' + T3_u + '<br />Printed: ' + T3_pr + '<br />Packed: ' + T3_pck + '</td>';
-                table_stat += '<td>Uploaded: ' + E_u + '<br />Printed: ' + E_pr + '<br />Packed: ' + E_pck + '</td></tr>';
+                table_stat += '<td>Uploaded: ' + E1_u + '<br />Printed: ' + E1_pr + '<br />Packed: ' + E1_pck + '</td></tr>';
+                table_stat += '<td>Uploaded: ' + E2_u + '<br />Printed: ' + E2_pr + '<br />Packed: ' + E2_pck + '</td></tr>';
                 table = table_stat + table;
                 $("#all_uploads_table_body").html(table);
             }); 
@@ -755,14 +682,10 @@
             });
 
             socket.on('fbEnable',function(q){
-                if(q=='tq1')
+                if(q=='e1')
                     $("input:radio[name='fb-toggle']:eq(0)").attr('checked','checked');       
-                if(q=='tq2')
+                if(q=='e2')
                     $("input:radio[name='fb-toggle']:eq(1)").attr('checked','checked');       
-                if(q=='tq3')
-                    $("input:radio[name='fb-toggle']:eq(2)").attr('checked','checked');       
-                if(q=='ep1')
-                    $("input:radio[name='fb-toggle']:eq(3)").attr('checked','checked');       
             });
             
             socket.on('fbDisplay',function(feeds){

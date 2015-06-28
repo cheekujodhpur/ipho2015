@@ -45,100 +45,56 @@
         <div id = "document">
             <div role = "tabpanel">
                     <ul class = "nav nav-pills" id = "nemo">
-                        <li role = "presentation" class = "active"><a href = "#theory" aria-controls="marks" role="tab" data-toggle="tab">Theory</a></li>
-                        <li role = "presentation"><a href = "#experiment" aria-controls="marks" role="tab" data-toggle="tab">Experimental</a></li>
+                        <li role = "presentation" class="active"><a href = "#experiment" aria-controls="marks" role="tab" data-toggle="tab">Experimental</a></li>
                     </ul>
             </div>
             
             <div class = "tab-content">
-                <div role="tabpanel" class="tab-pane active" id = "theory">
-                    <form id = "form_marks_T1">
-                        <table class = "table table-striped" id = "mark_table_T1" style="table-layout:fixed;">
+                <div role="tabpanel" class="tab-pane active" id = "experiment">
+                    <form id = "form_marks_E1">
+			<h3>E-1 Marks Entry</h3>
+                        <table class = "table table-striped" id = "mark_table_E1" style="table-layout:fixed;">
                             <thead>
                                 <tr>
                                     <th>Students</th>
                                     <th>Code</th>
                                 </tr>
                             </thead>
-                            <tbody id = "mark_table_body_T1">
-                                <tr id = "subparts_row_T1">
+                            <tbody id = "mark_table_body_E1">
+                                <tr id = "subparts_row_E1">
                                     <td colspan = "2"></td>
                                     <td>Subparts</td>
                                 </tr>
-                                <tr id = "maxMarks_row_T1">
+                                <tr id = "maxMarks_row_E1">
                                     <td colspan = "2"></td>
                                     <td>Maximum Marks</td>
                                 </tr>
                             </tbody>
                         </table>
                     </form>
-                    <button type="submit" class="btn btn-default save_button" data-type = "t1">Save</button>
-                    <form id = "form_marks_T2">
-                        <table class = "table table-striped" id = "mark_table_T2" style="table-layout:fixed;">
+                    <button type="submit" class="btn btn-default save_button" data-type = "e1">Save</button>
+                    <form id = "form_marks_E2">
+			<h3>E-2 Marks Entry</h3>
+                        <table class = "table table-striped" id = "mark_table_E2" style="table-layout:fixed;">
                             <thead>
                                 <tr>
                                     <th>Students</th>
                                     <th>Code</th>
                                 </tr>
                             </thead>
-                            <tbody id = "mark_table_body_T2">
-                                <tr id = "subparts_row_T2">
+                            <tbody id = "mark_table_body_E2">
+                                <tr id = "subparts_row_E2">
                                     <td colspan = "2"></td>
                                     <td>Subparts</td>
                                 </tr>
-                                <tr id = "maxMarks_row_T2">
+                                <tr id = "maxMarks_row_E2">
                                     <td colspan = "2"></td>
                                     <td>Maximum Marks</td>
                                 </tr>
                             </tbody>
                         </table>
                     </form>
-                    <button type="submit" class="btn btn-default save_button" data-type = "t2">Save</button>
-                    <form id = "form_marks_T3">
-                        <table class = "table table-striped" id = "mark_table_T3" style="table-layout:fixed;">
-                            <thead>
-                                <tr>
-                                    <th>Students</th>
-                                    <th>Code</th>
-                                </tr>
-                            </thead>
-                            <tbody id = "mark_table_body_T3">
-                                <tr id = "subparts_row_T3">
-                                    <td colspan = "2"></td>
-                                    <td>Subparts</td>
-                                </tr>
-                                <tr id = "maxMarks_row_T3">
-                                    <td colspan = "2"></td>
-                                    <td>Maximum Marks</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </form>
-                    <button type="submit" class="btn btn-default save_button" data-type = "t3">Save</button>
-                    <button type="submit" class="btn btn-success submit_button" data-type = "t">Submit</button>
-                </div>
-                <div role="tabpanel" class="tab-pane" id = "experiment">
-                    <form id = "form_marks_E">
-                        <table class = "table table-striped" id = "mark_table_E" style="table-layout:fixed;">
-                            <thead>
-                                <tr>
-                                    <th>Students</th>
-                                    <th>Code</th>
-                                </tr>
-                            </thead>
-                            <tbody id = "mark_table_body_E">
-                                <tr id = "subparts_row_E">
-                                    <td colspan = "2"></td>
-                                    <td>Subparts</td>
-                                </tr>
-                                <tr id = "maxMarks_row_E">
-                                    <td colspan = "2"></td>
-                                    <td>Maximum Marks</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </form>
-                    <button type="submit" class="btn btn-default save_button" data-type = "e">Save</button>
+                    <button type="submit" class="btn btn-default save_button" data-type = "e2">Save</button>
                     <button type="submit" class="btn btn-success submit_button" data-type = "e">Submit</button>
                 </div>
             </div>
@@ -229,7 +185,8 @@
                     }
                     else if(type_question=='e')
                     {
-                        submit_marks('e');
+                        submit_marks('e1');
+                        submit_marks('e2');
                     }
                 });
                 
@@ -241,8 +198,10 @@
                         var data = $("#form_marks_T2").serializeArray();
                     else if(type_question=='t3')
                         var data = $("#form_marks_T3").serializeArray();
-                    else if(type_question=='e')
-                        var data = $("#form_marks_E").serializeArray();
+                    else if(type_question=='e1')
+                        var data = $("#form_marks_E1").serializeArray();
+                    else if(type_question=='e2')
+                        var data = $("#form_marks_E2").serializeArray();
                     var ajaxData = {};
                     var maxMarks = []
                     //CAREFUL, hard coded line below
@@ -252,8 +211,10 @@
                         var num_subparts = $("#mark_table_body_T2").find("tr:first td").length-2;
                     else if(type_question=='t3')
                         var num_subparts = $("#mark_table_body_T3").find("tr:first td").length-2;
-                    else if(type_question=='e')
-                        var num_subparts = $("#mark_table_body_E").find("tr:first td").length-2;
+                    else if(type_question=='e1')
+                        var num_subparts = $("#mark_table_body_E1").find("tr:first td").length-2;
+                    else if(type_question=='e2')
+                        var num_subparts = $("#mark_table_body_E2").find("tr:first td").length-2;
                     for(var j = 0;j<num_subparts;j++)
                     {
                         maxMarks.push(parseFloat(data[j].value));
@@ -287,8 +248,10 @@
                         var destination_url = 'submit_mark_T2';
                     else if(type_question=='t3')
                         var destination_url = 'submit_mark_T3';
-                    else if(type_question=='e')
-                        var destination_url = 'submit_mark_E';
+                    else if(type_question=='e1')
+                        var destination_url = 'submit_mark_E1';
+                    else if(type_question=='e2')
+                        var destination_url = 'submit_mark_E2';
                     $.ajax({
                             method:"POST",
                             timeout:4000,
@@ -309,8 +272,10 @@
                         var data = $("#form_marks_T2").serializeArray();
                     else if(type_question=='t3')
                         var data = $("#form_marks_T3").serializeArray();
-                    else if(type_question=='e')
-                        var data = $("#form_marks_E").serializeArray();
+                    else if(type_question=='e1')
+                        var data = $("#form_marks_E1").serializeArray();
+                    else if(type_question=='e2')
+                        var data = $("#form_marks_E2").serializeArray();
                     var ajaxData = {};
                     var maxMarks = []
                     //CAREFUL, hard coded line below
@@ -320,8 +285,10 @@
                         var num_subparts = $("#mark_table_body_T2").find("tr:first td").length-2;
                     else if(type_question=='t3')
                         var num_subparts = $("#mark_table_body_T3").find("tr:first td").length-2;
-                    else if(type_question=='e')
-                        var num_subparts = $("#mark_table_body_E").find("tr:first td").length-2;
+                    else if(type_question=='e1')
+                        var num_subparts = $("#mark_table_body_E1").find("tr:first td").length-2;
+                    else if(type_question=='e2')
+                        var num_subparts = $("#mark_table_body_E2").find("tr:first td").length-2;
                     for(var j = 0;j<num_subparts;j++)
                     {
                         maxMarks.push(parseFloat(data[j].value));
@@ -350,8 +317,10 @@
                         var destination_url = 'save_mark_T2';
                     else if(type_question=='t3')
                         var destination_url = 'save_mark_T3';
-                    else if(type_question=='e')
-                        var destination_url = 'save_mark_E';
+                    else if(type_question=='e1')
+                        var destination_url = 'save_mark_E1';
+                    else if(type_question=='e2')
+                        var destination_url = 'save_mark_E2';
                     $.ajax({
                             method:"POST",
                             timeout:4000,
@@ -371,8 +340,10 @@
                     var destination_url = 'sheetEditableT2';
                 else if(type_question=='t3')
                     var destination_url = 'sheetEditableT3';
-                else if(type_question=='e')
-                    var destination_url = 'sheetEditableE';
+                else if(type_question=='e1')
+                    var destination_url = 'sheetEditableE1';
+                else if(type_question=='e2')
+                    var destination_url = 'sheetEditableE2';
                 $.ajax
                 ({
                     method:'POST',
@@ -407,11 +378,17 @@
                         maxMarks_row = $("#maxMarks_row_T3");
                         table_body_elem = $("#mark_table_body_T3");
                     }
-                    else if(type_question=='e')
+                    else if(type_question=='e1')
                     {
-                        subparts_row = $("#subparts_row_E");
-                        maxMarks_row = $("#maxMarks_row_E");
-                        table_body_elem = $("#mark_table_body_E");
+                        subparts_row = $("#subparts_row_E1");
+                        maxMarks_row = $("#maxMarks_row_E1");
+                        table_body_elem = $("#mark_table_body_E1");
+                    }
+                    else if(type_question=='e2')
+                    {
+                        subparts_row = $("#subparts_row_E2");
+                        maxMarks_row = $("#maxMarks_row_E2");
+                        table_body_elem = $("#mark_table_body_E2");
                     }
                     subparts_row.append(table_subparts_body);
                     maxMarks_row.append(table_maxMarks_body);
@@ -457,7 +434,8 @@
                 send_sheetEditable('t1');
                 send_sheetEditable('t2');
                 send_sheetEditable('t3');
-                send_sheetEditable('e');
+                send_sheetEditable('e1');
+                send_sheetEditable('e2');
             });
 
             //MESSAGE BOARD SIGNAL			
@@ -473,14 +451,16 @@
 
             //FEEDBACK ENABLE
             socket.on('fbEnable',function(q){
-                if(q=='tq1')
-                    $("#fbHead").text("Feedback for Theory Question 1");
-                if(q=='tq2')
-                    $("#fbHead").text("Feedback for Theory Question 2");
-                if(q=='tq3')
-                    $("#fbHead").text("Feedback for Theory Question 3");
-                if(q=='ep1')
-                    $("#fbHead").text("Feedback for Practical Question 1");
+                if(q=='t1')
+                    $("#fbHead").text("Feedback for T-1");
+                if(q=='t2')
+                    $("#fbHead").text("Feedback for T-2");
+                if(q=='t3')
+                    $("#fbHead").text("Feedback for T-3");
+                if(q=='e1')
+                    $("#fbHead").text("Feedback for E-1");
+                if(q=='e2')
+                    $("#fbHead").text("Feedback for E-2");
             });            
         </script>
 	   
