@@ -1,0 +1,47 @@
+
+app.post('/save_mark_T1',function(req,res){
+
+    var jsonString = '';
+    req.on('data',function(data)
+        {
+            jsonString += data;
+        })
+    req.on('end',function(){
+        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+        var dbData = [];
+        var country_name = '';
+        for(var i in jsonData)
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            if(country_name=='')
+                var marks = db.collection('marks_T1');
+            else var marks = db.collection('ourMarks_T1');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+                res.json({"success":true});
+                db.close();});
+        });
+    });
+});

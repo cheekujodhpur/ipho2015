@@ -1,0 +1,15 @@
+
+            function emptyfile_check_T1()
+            {
+                var file = document.getElementById('file_upload_T1');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }

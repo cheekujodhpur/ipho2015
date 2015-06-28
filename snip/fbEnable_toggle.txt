@@ -1,0 +1,4 @@
+
+                                        <td>Theory 1</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','tq1')" value="tq1" /></td> 
+                                        <td><input checked = "checked" name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'tq1';reset_fb_timer();" value="tq1" /></td>

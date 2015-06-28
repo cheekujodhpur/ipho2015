@@ -1,0 +1,15 @@
+
+                                <td id = "T1_form">
+                                    <form id        =  "upload_form"
+                                        enctype   =  "multipart/form-data"
+                                        action    =  "/uploadedT1"
+                                        method    =  "post" > <div style="position:relative;"> <a class='btn btn-default' href='javascript:;'>
+                                                    Choose File...
+                                                    <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_T1" name="user_file" size="40"  onchange='$("#upload-file-info").html($(this).val().replace("C:\\fakepath\\","")) ;'>
+                                                </a>
+                                                &nbsp;
+                                                <span class='label label-info' id="upload-file-info"></span>
+                                    </div>
+                                    <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_T1();'/>
+                                    </form>
+                                 </td>

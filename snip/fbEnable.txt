@@ -1,0 +1,26 @@
+
+            socket.on('fbEnable',function(q){
+                if(q=='tq1')
+                {
+                    $("#fbHead").text("Feedback for Theory Question 1");
+                    get_subparts('t1');
+                }
+                if(q=='tq2')
+                {
+                    $("#fbHead").text("Feedback for Theory Question 2");
+                    get_subparts('t2');
+                }
+                if(q=='tq3')
+                {
+                    $("#fbHead").text("Feedback for Theory Question 3");
+                    get_subparts('t3');
+                }
+                if(q=='ep1')
+                {
+                    $("#fbHead").text("Feedback for Practical Question 1");
+                    get_subparts('e');
+                }   
+                fb_current = q;
+                request_fb(fb_current);
+                $("#fbb").show();
+            });

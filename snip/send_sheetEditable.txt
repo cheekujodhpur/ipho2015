@@ -1,0 +1,74 @@
+
+            function send_sheetEditable(type_question)
+            {
+                if(type_question=='t1')
+                    var destination_url = 'sheetEditableT1';
+                else if(type_question=='t2')
+                    var destination_url = 'sheetEditableT2';
+                else if(type_question=='t3')
+                    var destination_url = 'sheetEditableT3';
+                else if(type_question=='e')
+                    var destination_url = 'sheetEditableE';
+                $.ajax
+                ({
+                    method:'POST',
+                    url : destination_url
+                }).done(function(data)
+                {
+                    var table_subparts_body = "";
+                    var table_maxMarks_body = "";
+                    for(var i in data.subparts)
+                    {
+                        table_subparts_body += "<td>" + data.subparts[i] + "<input type = 'hidden' name = 'maxMarks' value = " + data.maxMarks[i] + " /></td>";
+                        table_maxMarks_body += "<td>" + data.maxMarks[i] + "</td>";
+                    }
+                    var subparts_row;
+                    var maxMarks_row;
+                    var table_body_elem;
+                    if(type_question=='t1')
+                    {
+                        subparts_row = $("#subparts_row_T1");
+                        maxMarks_row = $("#maxMarks_row_T1");
+                        table_body_elem = $("#mark_table_body_T1");
+                    }
+                    else if(type_question=='t2')
+                    {
+                        subparts_row = $("#subparts_row_T2");
+                        maxMarks_row = $("#maxMarks_row_T2");
+                        table_body_elem = $("#mark_table_body_T2");
+                    }
+                    else if(type_question=='t3')
+                    {                    
+                        subparts_row = $("#subparts_row_T3");
+                        maxMarks_row = $("#maxMarks_row_T3");
+                        table_body_elem = $("#mark_table_body_T3");
+                    }
+                    else if(type_question=='e')
+                    {
+                        subparts_row = $("#subparts_row_E");
+                        maxMarks_row = $("#maxMarks_row_E");
+                        table_body_elem = $("#mark_table_body_E");
+                    }
+                    subparts_row.append(table_subparts_body);
+                    maxMarks_row.append(table_maxMarks_body);
+                    var table_body = ""; 
+                    for(var i in data.students)
+                    {
+                        table_body += "<tr><td>" + data.students[i] + "</td><td>"+country_code_global+"_"+i.toString()+"</td><td></td>";
+                        for(var j in data.subparts)
+                        {
+                            table_body += '<td><input type = "text" class = "form-control" name = "leaderMarks" /></td>';
+                        }
+                        table_body += "</tr>";
+                    }
+                    table_body_elem.append(table_body);
+                    var i = 0;
+                    if(data.leaderMarks.length!=0)
+                    {
+                        table_body_elem.find("input[name=leaderMarks]").each(function(){
+                                     $(this).val(data.leaderMarks[i]);
+                                     i++;
+                                });
+                    }
+                });
+            }
