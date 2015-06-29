@@ -254,6 +254,7 @@ app.post('/submit_mark_E1',function(req,res){
                                 var tdstr_subparts = '';
                                 var tdstr_maxMarks = '';
                                 htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+				htmlstr += '<h3>E-1 Marks</h3>';
                                 htmlstr += '<table class = "table table-striped">';
                                 for(var i = 0;i<ourMarks.length/students.length;i++)
                                 {
@@ -350,6 +351,7 @@ app.post('/submit_mark_E2',function(req,res){
                                 var tdstr_subparts = '';
                                 var tdstr_maxMarks = '';
                                 htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+				htmlstr += '<h3>E-2 Marks</h3>';
                                 htmlstr += '<table class = "table table-striped">';
                                 for(var i = 0;i<ourMarks.length/students.length;i++)
                                 {
