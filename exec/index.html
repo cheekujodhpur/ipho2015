@@ -476,9 +476,12 @@
                 {
                     $("#fbHead").text("Feedback for E-2");
                     get_subparts('e2');
-                }   
-                fb_current = q;
-                request_fb(fb_current);
+                }
+                if(fb_current!=q)   
+                {
+                    fb_current = q;
+                    request_fb(fb_current);
+                }
                 $("#fbb").show();
             });
             //FEEDBACK DISABLE
