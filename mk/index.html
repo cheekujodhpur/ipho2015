@@ -339,7 +339,8 @@
             
             socket.on('countries',function(countries){
                     var select_elem = $("#country_list_select");
-                    var opt = '<option>';
+                    var opt = '<option></option>';
+                    select_elem.append(opt);
                     for(var i in countries)
                     {
                         if(countries[i].country_name!="NULL")
