@@ -48,7 +48,6 @@
                         <li role = "presentation" class = "active"><a href = "#home" aria-controls="home" role="tab" data-toggle="tab" onclick = 'send_list_dir("uploads");send_list_dir("downloads");'>Home</a></li>
                         <li id = "cvoteb" role = "presentation" style = "display:none;"><a href = "#cvote" aria-controls="cvote" role="tab" data-toggle="tab">Cast Vote</a></li>
                         <li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
-                        <li id = "fbb" role = "presentation" style = "display:none;"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
                     </ul>
             </div>
             
@@ -128,38 +127,6 @@
                 
                 <div role="tabpanel" class="tab-pane" id = "rvote"></div>
                 
-                <div role="tabpanel" class="tab-pane" id = "fb">
-                    <h4 id = "fbHead">Feedback for </h4>
-                    <form id = "form-feedback">
-                        <div class="form-group" id = "fb-dropdown">
-                           <label for = "fbMenu">Question:</label>
-                           <select class = "form-control" id = "fbMenu">
-                           </select>    
-                        </div>
-                        <div class = "form-group" id = "fb-content">
-                            <label for = "comment">Comment:</label>
-                            <textarea class = "form-control" rows = "5" id = "comment"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-default" id = "fb_submit" onclick='alert("Your feedback has been submitted successfully.")'>Submit</button>
-                    </form>
-                    
-                    <div id = "fb_data">
-                        <table style = "table-layout:fixed;" class = "table table-bordered table-hover" id = "fb_data_table">
-                            <col style="width:30%"> 
-                            <col style="width:10%"> 
-                            <col style="width:60%"> 
-                            <thead>
-                            <tr>
-                                <th style="text-align:center"><div class="btn btn-info">Time</div></th>
-                                <th style="text-align:center"><div class="btn btn-info">QID</div></th>
-                                <th style="text-align:center"><div class="btn btn-info">Content</div></th>
-                            </tr>
-                            </thead>
-                            <tbody id = "fb_data_table_body">
-                            </tbody>
-                        </table>
-                    </div>    
-                </div>
             </div>
         </div>
         
@@ -355,7 +322,7 @@
                                 {
                                     var row = table.insertRow(i);
                                     var cell = row.insertCell(0);
-                                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                                    cell.innerHTML =' <a target = "_blank" href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
                                     //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                                 }
                                 var row = table.insertRow(0);
@@ -374,7 +341,7 @@
                                 {
                                     var row = table.insertRow(i);
                                     var cell = row.insertCell(0);
-                                    cell.innerHTML =' <a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
+                                    cell.innerHTML =' <a target = "_blank" href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a>';
                                     //table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td></tr>';
                                 }
                                 var row = table.insertRow(0);
@@ -414,7 +381,7 @@
             {
                 $(document).on("keydown",disableF5);
                 var option,Option;
-                $("#cast-vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left"><ul id = "left-opts-list" style = "padding:0px;"></ul></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
+                $("#vote-opts").html('<div id="divider-container"><div id = "left-opts" class = "left"><ul id = "left-opts-list" style = "padding:0px;"></ul></div><div class = "left" id = "right-opts" style = "position:relative;width:48%"><h5></h5></div><div class = "clear"></div></div>');
                 for(var i = 1;i<=options.length;i++)
                 {
                     option = '<li>'+options[i-1]+'</li>';
@@ -433,9 +400,9 @@
                 //});
                 //
                 var Body = $('<font style="font-size:18px;">'+body+'</font>');
-                $("#cast-vote-body").append(Body);
+                $("#vote-body").append(Body);
                 //$("#cvoteb").show();
-                $("#nemo a:eq(-4)").tab('show');
+                $("#nemo a:eq(-2)").tab('show');
                 clearInterval(timer);
 		var startDate = new Date();
 		var startTime = startDate.getTime()/1000;
@@ -505,7 +472,7 @@
                         j++; 
                     }
                 $("#rvoteb").show();
-                $("#nemo a:eq(-2)").tab('show');
+                $("#nemo a:eq(-1)").tab('show');
             });
 
             //MESSAGE BOARD SIGNAL			

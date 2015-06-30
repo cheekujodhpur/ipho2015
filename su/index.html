@@ -349,7 +349,7 @@
                             var table = '<table id="download_table" class="table table-hover"><col style="width:90%"><col style="width:90%"><thead><tr><th>Uploads</th></tr></thead>';
                                 for(var i = 0;i < files.length;i++)
                                 {
-                                    table += '<tr><td><a href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td><td><button type="button" class="btn btn-default btn-sm file-remove" id = "'+directory_path+files[i].toString()+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>'
+                                    table += '<tr><td><a target = "_blank" href="' + directory_path + files[i].toString() + '">' + files[i].toString() + '</a></td><td><button type="button" class="btn btn-default btn-sm file-remove" id = "'+directory_path+files[i].toString()+'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td></tr>'
                                 }
                                 table += "</table>";
 
