@@ -100,7 +100,36 @@ app.use("/media",express.static(__dirname + "/media"));console.log("File downloa
 app.use("/static",express.static(__dirname + "/static"));console.log("File download enabled for /static");
 
 app.get('/marks/:id',function(req,res){
-    res.sendFile(__dirname+'/mk/'+req.params.id);
+    var file_name = req.params.id;
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var collection = db.collection('users');
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items.length == 0)
+            {
+                return;
+            }
+            if(file_name.split('_')[0]==items[0].country_code)
+                res.sendFile(__dirname+'/mk/'+req.params.id);
+            db.close();
+        });
+        
+	});
 });
 
 //authentication page
@@ -827,7 +856,7 @@ app.post('/sheetEditableE1',function(req,res)
             var users = db.collection('users');
             
             var query = {};
-
+            query['valid'] = 1;
             subparts.find({"type":"e1"}).toArray(function(err,items){
                 var subparts = items[0].subparts;
                 var maxMarks = items[0].maxMarks;
@@ -836,6 +865,15 @@ app.post('/sheetEditableE1',function(req,res)
                 else query_ob["country_name"] = country_name;
                 users.find(query_ob).toArray(function(err,data){
                     var country_code = data[0].country_code;
+                    var file_name = country_code + "_E1.html";
+                    var file_path = "mk/" + file_name;
+                    if (fs.existsSync(file_path))
+                    {
+                        query['valid'] = 0;
+                        res.json(query);
+                        db.close();
+                        return;
+                    }
                     //var students = data[0].students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
@@ -898,7 +936,7 @@ app.post('/sheetEditableE2',function(req,res)
             var users = db.collection('users');
             
             var query = {};
-
+            query['valid'] = 1;
             subparts.find({"type":"e2"}).toArray(function(err,items){
                 var subparts = items[0].subparts;
                 var maxMarks = items[0].maxMarks;
@@ -907,6 +945,15 @@ app.post('/sheetEditableE2',function(req,res)
                 else query_ob["country_name"] = country_name;
                 users.find(query_ob).toArray(function(err,data){
                     var country_code = data[0].country_code;
+                    var file_name = country_code + "_E2.html";
+                    var file_path = "mk/" + file_name;
+                    if (fs.existsSync(file_path))
+                    {
+                        query['valid'] = 0;
+                        res.json(query);
+                        db.close();
+                        return;
+                    }
                     //var students = data[0].students;
                     var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
