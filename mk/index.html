@@ -336,6 +336,12 @@
             $("#country_list_select").change(function(){
             
                 var name = $(this).val();
+                if(name=='')
+                {
+                    $("#mark_table_body_E1").html('');
+                    $("#mark_table_body_E2").html('');
+                    return; //blank country, do nothing
+                }
                 $("#mark_table_body_E1").html('<tr id = "subparts_row_E1"><td colspan = "2"></td><td>Subparts</td></tr><tr id = "maxMarks_row_E1"><td colspan = "2"></td><td>Maximum Marks</td></tr>');
                 $("#mark_table_body_E2").html('<tr id = "subparts_row_E2"><td colspan = "2"></td><td>Subparts</td></tr><tr id = "maxMarks_row_E2"><td colspan = "2"></td><td>Maximum Marks</td></tr>');
                 
