@@ -7,3 +7,4 @@ Different types of users
 4: IPhO Exec (vote, download, no upload)
 5: Costa Rica (upload, download, view vote)
 6: Display (only display vote)
+7: GOD
