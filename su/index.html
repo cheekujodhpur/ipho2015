@@ -118,7 +118,7 @@
                                     <tr>
                                         <td>E-1</td>
                                         <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','e1')" value="e1" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e1';reset_fb_timer();" value="e1" checked="checked" /></td>
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e1';reset_fb_timer();" value="e1" /></td>
                                     </tr> 
                                     <tr>
                                         <td>E-2</td>
@@ -315,7 +315,7 @@
                 fbtimer = setInterval(function(){
                     request_fb(fb_current);    
                 },10000);
-                fb_current = 'e1';
+                fb_current = '';
                 request_fb(fb_current);
 		    });
 
