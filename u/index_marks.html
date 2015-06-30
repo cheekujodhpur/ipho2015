@@ -267,6 +267,7 @@
                     done(function(data)
                     {
                             window.open(data.filename,"_blank");
+                            send_sheetEditable(type_question);
                     });
                 }
 
@@ -356,6 +357,22 @@
                     url : destination_url
                 }).done(function(data)
                 {
+                    if(!data.valid)
+                    {
+                        $(".save_button").each(function(){$(this).remove();});
+                        $(".submit_button").each(function(){$(this).remove();});
+                        if(type_question=='e1')
+                        {    
+                            var nelem = '<a target = "_blank" href = "marks/' + country_code_global + '_E1.html">E-1 Marksheet</a>';
+                            $("#form_marks_E1").html(nelem);
+                        }
+                        else if(type_question=='e2')
+                        {
+                            var nelem = '<a target = "_blank" href = "marks/' + country_code_global + '_E2.html">E-2 Marksheet</a>';
+                            $("#form_marks_E2").html(nelem);
+                        }
+                        return;
+                    }
                     var table_subparts_body = "";
                     var table_maxMarks_body = "";
                     for(var i in data.subparts)
