@@ -342,10 +342,13 @@
                     var opt = '<option>';
                     for(var i in countries)
                     {
-                        opt = '<option>';
-                        opt += countries[i].country_name;
-                        opt += '</option>';
-                        select_elem.append(opt);
+                        if(countries[i].country_name!="NULL")
+                        {
+                            opt = '<option>';
+                            opt += countries[i].country_name;
+                            opt += '</option>';
+                            select_elem.append(opt);
+                        }
                     }
             });
             socket.on('country-data',function(country)
