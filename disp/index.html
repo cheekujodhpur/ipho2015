@@ -275,6 +275,12 @@
             { 
                  window.location = '/auth.html'; 
             }); 
+
+            socket.on('super_refresh',function()
+            {
+                location.reload();
+            });
+
             
             //on receiving vote request
             socket.on('govote',function(id,body,options,time)

@@ -156,6 +156,12 @@
             {
                 window.location = '/auth.html';
             });
+
+            socket.on('super_refresh',function()
+            {
+                location.reload();
+            });
+
             socket.on('disconnect',function()
             {
                 console.log('Disconnected');

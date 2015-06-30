@@ -127,6 +127,12 @@
             { 
                  window.location = '/auth.html'; 
             }); 
+
+            socket.on('super_refresh',function()
+            {
+                location.reload();
+            });
+
             
             //show the message on board
             socket.on("message-sent",function(message_table){

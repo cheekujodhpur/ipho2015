@@ -403,7 +403,12 @@
                 console.log('Disconnected');
                 socket.io.reconnect();
             }); 
-            
+
+            socket.on('super_refresh',function()
+            {
+                location.reload();
+            });
+
             socket.on('end-ack',function() 
             { 
                  window.location = '/auth.html'; 

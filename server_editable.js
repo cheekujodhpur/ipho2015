@@ -1528,6 +1528,13 @@ io.on('connection',function(socket)
         io.sockets.emit("message-sent",message_table);
         console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
     });
+
+    //super reresh
+    socket.on('super_refresh',function()
+    {
+        io.sockets.emit("super_refresh");
+    });
+
     //directory listing for the convener
     socket.on('list-all-uploads',function()
     {
