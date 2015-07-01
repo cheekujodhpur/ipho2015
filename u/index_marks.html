@@ -56,17 +56,16 @@
                         <table class = "table table-striped" id = "mark_table_E1" style="table-layout:fixed;">
                             <thead>
                                 <tr>
-                                    <th>Students</th>
                                     <th>Code</th>
                                 </tr>
                             </thead>
                             <tbody id = "mark_table_body_E1">
                                 <tr id = "subparts_row_E1">
-                                    <td colspan = "2"></td>
+                                    <td></td>
                                     <td>Subparts</td>
                                 </tr>
                                 <tr id = "maxMarks_row_E1">
-                                    <td colspan = "2"></td>
+                                    <td></td>
                                     <td>Maximum Marks</td>
                                 </tr>
                             </tbody>
@@ -84,11 +83,11 @@
                             </thead>
                             <tbody id = "mark_table_body_E2">
                                 <tr id = "subparts_row_E2">
-                                    <td colspan = "2"></td>
+                                    <td></td>
                                     <td>Subparts</td>
                                 </tr>
                                 <tr id = "maxMarks_row_E2">
-                                    <td colspan = "2"></td>
+                                    <td></td>
                                     <td>Maximum Marks</td>
                                 </tr>
                             </tbody>
@@ -489,9 +488,9 @@
                     subparts_row.append(table_subparts_body);
                     maxMarks_row.append(table_maxMarks_body);
                     var table_body = ""; 
-                    for(var i in data.students)
+                    for(var i=0;i<data.number_of_students;i++)
                     {
-                        table_body += "<tr><td>" + data.students[i] + "</td><td>"+country_code_global+"_"+i.toString()+"</td><td></td>";
+                        table_body += "<tr><td>"+country_code_global+("0"+(i+1).toString()).slice(-2)+"</td><td></td>";
                         for(var j in data.subparts)
                         {
                             table_body += '<td><input type = "text" class = "form-control" name = "leaderMarks" /></td>';

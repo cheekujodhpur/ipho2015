@@ -101,6 +101,8 @@ app.use("/static",express.static(__dirname + "/static"));console.log("File downl
 
 app.get('/marks/:id',function(req,res){
     var file_name = req.params.id;
+    if(file_name.split('_').length>2)
+        return;
     MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
     {
         if(err)
@@ -268,14 +270,14 @@ app.post('/submit_mark_E1',function(req,res){
                     var leaderMarks = dbData;
                     var country_code = user.country_code;
                     var country_name = user.country_name;
-                    //var students = user.students;
-                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var number_of_students = user.number_of_students;
                     subparts.find({"type":"e1"}).toArray(function(err,itemss){
                         var subpart_arr = itemss[0].subparts;
                         var maxMarks_arr = itemss[0].maxMarks;
                         ourMarks_db.find({"country_name":country_name}).toArray(function(err,items2){
                             var ourMarks = items2[0].leaderMarks;   //Yes, the field name is still leaderMarks
                             var fileName = "mk/" + country_code.toString() + "_E1.html";
+                            var our_fileName = "mk/" + country_code.toString() + "_E1_our.html";
                             var com_fileName = "marks/" + country_code.toString() + "_E1.html";
                             var stream = fs.createWriteStream(fileName);
                             stream.once('open',function(fd){
@@ -285,28 +287,28 @@ app.post('/submit_mark_E1',function(req,res){
                                 htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
 				htmlstr += '<h3>E-1 Marks</h3>';
                                 htmlstr += '<table class = "table table-striped">';
-                                for(var i = 0;i<ourMarks.length/students.length;i++)
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
                                 {
                                     tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
                                     tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
                                 } 
-                                htmlstr += '<tr> <th>Students</th> <th>Code</th> </tr> <tr> <td colspan = "2"></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td colspan = "2"></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
-                                for(var i = 0;i<students.length;i++)
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
                                 {
-                                    htmlstr += '<tr><td>'+students[i]+'</td><td>'+country_code+'_'+(i+1).toString()+'</td><td></td>';
-                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
                                     {
-                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
                                     }
-                                    htmlstr += '</tr><tr><td colspan="3"></td>';
-                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
                                     {
-                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
                                     }
-                                    htmlstr += '</tr><tr><td colspan="3"></td>';
-                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
                                     {
-                                        htmlstr += '<td>'+(ourMarks[i*ourMarks.length/students.length+j]-leaderMarks[i*ourMarks.length/students.length+j]).toFixed(1) + '</td>';
+                                        htmlstr += '<td>'+(ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1) + '</td>';
                                     }
                                     htmlstr += '</tr><tr style="height:30px;"></tr>';
                                 }
@@ -315,6 +317,51 @@ app.post('/submit_mark_E1',function(req,res){
                                 
                                 stream.write(htmlstr);
                                 stream.end();
+                            });
+                            var our_stream = fs.createWriteStream(our_fileName);
+                            our_stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+				htmlstr += '<h3>E-2 Marks</h3>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
+                                {
+                                    tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
+                                } 
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
+                                {
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        var difference = (ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1);
+                                        if(difference==0) 
+                                            htmlstr += '<td><b>'+ difference + '</b></td>';
+                                        else if(difference>0)
+                                            htmlstr += '<td><font style = "color:green"><b>'+ difference + '</b></font></td>';
+                                        else
+                                            htmlstr += '<td><font style = "color:red"><b>'+ difference + '</b></font></td>';
+                                    }
+                                    htmlstr += '</tr><tr style="height:30px;"></tr>';
+                                }
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                our_stream.write(htmlstr);
+                                our_stream.end();
                             });
                             res.json({"success":true,"filename":com_fileName});
                             db.close();
@@ -365,14 +412,14 @@ app.post('/submit_mark_E2',function(req,res){
                     var leaderMarks = dbData;
                     var country_code = user.country_code;
                     var country_name = user.country_name;
-                    //var students = user.students;
-                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var number_of_students = user.number_of_students;
                     subparts.find({"type":"e2"}).toArray(function(err,itemss){
                         var subpart_arr = itemss[0].subparts;
                         var maxMarks_arr = itemss[0].maxMarks;
                         ourMarks_db.find({"country_name":country_name}).toArray(function(err,items2){
                             var ourMarks = items2[0].leaderMarks;   //Yes, the field name is still leaderMarks
                             var fileName = "mk/" + country_code.toString() + "_E2.html";
+                            var our_fileName = "mk/" + country_code.toString() + "_E2_our.html";
                             var com_fileName = "marks/" + country_code.toString() + "_E2.html";
                             var stream = fs.createWriteStream(fileName);
                             stream.once('open',function(fd){
@@ -382,28 +429,28 @@ app.post('/submit_mark_E2',function(req,res){
                                 htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
 				htmlstr += '<h3>E-2 Marks</h3>';
                                 htmlstr += '<table class = "table table-striped">';
-                                for(var i = 0;i<ourMarks.length/students.length;i++)
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
                                 {
                                     tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
                                     tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
                                 } 
-                                htmlstr += '<tr> <th>Students</th> <th>Code</th> </tr> <tr> <td colspan = "2"></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td colspan = "2"></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
-                                for(var i = 0;i<students.length;i++)
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
                                 {
-                                    htmlstr += '<tr><td>'+students[i]+'</td><td>'+country_code+'_'+(i+1).toString()+'</td><td></td>';
-                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
                                     {
-                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
                                     }
-                                    htmlstr += '</tr><tr><td colspan="3"></td>';
-                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
                                     {
-                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/students.length+j].toString() + '</td>';
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
                                     }
-                                    htmlstr += '</tr><tr><td colspan="3"></td>';
-                                    for(var j = 0;j<ourMarks.length/students.length;j++)
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
                                     {
-                                        htmlstr += '<td>'+(ourMarks[i*ourMarks.length/students.length+j]-leaderMarks[i*ourMarks.length/students.length+j]).toFixed(1) + '</td>';
+                                        htmlstr += '<td>'+(ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1) + '</td>';
                                     }
                                     htmlstr += '</tr><tr style="height:30px;"></tr>';
                                 }
@@ -412,6 +459,51 @@ app.post('/submit_mark_E2',function(req,res){
                                 
                                 stream.write(htmlstr);
                                 stream.end();
+                            });
+                            var our_stream = fs.createWriteStream(our_fileName);
+                            our_stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+				htmlstr += '<h3>E-2 Marks</h3>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
+                                {
+                                    tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
+                                } 
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
+                                {
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        var difference = (ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1);
+                                        if(difference==0) 
+                                            htmlstr += '<td><b>'+ difference + '</b></td>';
+                                        else if(difference>0)
+                                            htmlstr += '<td><font style = "color:green"><b>'+ difference + '</b></font></td>';
+                                        else
+                                            htmlstr += '<td><font style = "color:red"><b>'+ difference + '</b></font></td>';
+                                    }
+                                    htmlstr += '</tr><tr style="height:30px;"></tr>';
+                                }
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                our_stream.write(htmlstr);
+                                our_stream.end();
                             });
                             res.json({"success":true,"filename":com_fileName});
                             db.close();
@@ -865,6 +957,7 @@ app.post('/sheetEditableE1',function(req,res)
                 else query_ob["country_name"] = country_name;
                 users.find(query_ob).toArray(function(err,data){
                     var country_code = data[0].country_code;
+                    var number_of_students = data[0].number_of_students;
                     var file_name = country_code + "_E1.html";
                     var file_path = "mk/" + file_name;
                     if (fs.existsSync(file_path))
@@ -874,8 +967,6 @@ app.post('/sheetEditableE1',function(req,res)
                         db.close();
                         return;
                     }
-                    //var students = data[0].students;
-                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
                     var new_ip = data[0].ip;
                     marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
                         if(items2.length>=1)
@@ -887,7 +978,7 @@ app.post('/sheetEditableE1',function(req,res)
                         query['subparts'] = subparts;
                         query['leaderMarks'] = leaderMarks;
                         query['maxMarks'] = maxMarks;
-                        query['students'] = students;
+                        query['number_of_students'] = number_of_students;
                         query['country_code'] = country_code;
                         res.json(query);
                         db.close();
@@ -945,6 +1036,7 @@ app.post('/sheetEditableE2',function(req,res)
                 else query_ob["country_name"] = country_name;
                 users.find(query_ob).toArray(function(err,data){
                     var country_code = data[0].country_code;
+                    var number_of_students = data[0].number_of_students;
                     var file_name = country_code + "_E2.html";
                     var file_path = "mk/" + file_name;
                     if (fs.existsSync(file_path))
@@ -967,7 +1059,7 @@ app.post('/sheetEditableE2',function(req,res)
                         query['subparts'] = subparts;
                         query['leaderMarks'] = leaderMarks;
                         query['maxMarks'] = maxMarks;
-                        query['students'] = students;
+                        query['number_of_students'] = number_of_students;
                         query['country_code'] = country_code;
                         res.json(query);
                         db.close();
