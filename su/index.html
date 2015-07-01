@@ -51,6 +51,7 @@
 					<li id = "rvoteb" role = "presentation" style = "display:none;"><a href = "#rvote" aria-controls="rvote" role="tab" data-toggle="tab">Results</a></li>
 					<li id = "fbb" role = "presentation"><a href = "#fb" aria-controls="fb" role="tab" data-toggle="tab">Feedback</a></li>
                     <li id = "all_uploads_b" role = "presentation"><a href = "#all_uploads" aria-controls="all_uploads" data-toggle="tab" onclick = 'socket.emit("list-all-uploads");'>Uploads</a></li>
+                    <li id = "marksheet_b" role = "presentation"><a href = "#marksheet" aria-controls="marksheet" data-toggle="tab">Marksheets</a></li>
                 </ul>
 			</div>
 			
@@ -192,6 +193,9 @@
                         </tbody>
                     </table>
                 </div>
+                <div role="tabpanel" class="tab-pane" id = "marksheet">
+                    
+                </div> 
 			</div>	
 		</div>
         
@@ -317,6 +321,27 @@
                 },10000);
                 fb_current = '';
                 request_fb(fb_current);
+
+
+                $.ajax({
+                        url:'/marksheet_list',
+                        dataType:"json"
+                        })
+                .done(function(data){
+                       var htmlstr = '';
+                       for(var i in data)
+                       {
+                            htmlstr += '<div><b>'+i+'</b><br /><br />';
+                            for(var j in data[i])
+                            {
+                                htmlstr += '<a target = "_blank" href = "marksheet/' + data[i][j] + '">'+data[i][j]+'</a>';
+                                htmlstr += '<br />';
+                            } 
+                            htmlstr += '</div>';
+                       }
+                       $("#marksheet").html(htmlstr);
+                        
+                        });
 		    });
 
             function reset_fb_timer()
@@ -440,7 +465,7 @@
                 var Body = $('<font style="font-size:18px;">'+body+'</font>');
                 $("#cast-vote-body").append(Body);
                 //$("#cvoteb").show();
-                $("#nemo a:eq(-4)").tab('show');
+                $("#nemo a:eq(-5)").tab('show');
                 clearInterval(timer);
 		var startDate = new Date();
 		var startTime = startDate.getTime()/1000;
@@ -529,7 +554,7 @@
                         j++; 
                     }
                 $("#rvoteb").show();
-                $("#nemo a:eq(-3)").tab('show');
+                $("#nemo a:eq(-4)").tab('show');
             });
             
             function logVote(id)

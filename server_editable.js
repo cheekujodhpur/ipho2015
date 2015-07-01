@@ -99,6 +99,91 @@ app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res
 app.use("/media",express.static(__dirname + "/media"));console.log("File download enabled for /media");
 app.use("/static",express.static(__dirname + "/static"));console.log("File download enabled for /static");
 
+//convener version of marksheet
+app.get('/marksheet/:id',function(req,res){
+    var file_name = req.params.id;
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var collection = db.collection('users');
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items.length == 0)
+            {
+                return;
+            }
+            if(items[0].type==0)
+                res.sendFile(__dirname+'/mk/'+req.params.id);
+            db.close();
+        });
+        
+	});
+});
+
+app.get('/marksheet_list',function(req,res){
+
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var collection = db.collection('users');
+        var ajaxData = {};
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items.length == 0)
+            {
+                return;
+            }
+            if(items[0].type==0)
+            {
+                collection.find({}).toArray(function(err,items2){
+                    for(var i in items2)
+                    {
+                        var file_name = items2[i].country_code + '_E1_our.html';
+                        var file_name2 = items2[i].country_code + '_E2_our.html';
+                        var paths = [];
+                        if(fs.existsSync('mk/'+file_name))
+                            paths.push(file_name);
+                        if(fs.existsSync('mk/'+file_name2))
+                            paths.push(file_name2);
+                        ajaxData[items2[i].country_code] = paths;
+                    } 
+                    res.json(ajaxData);
+                    db.close();
+                });
+            }
+            else
+                db.close();
+        });
+        
+	});
+});
+
 app.get('/marks/:id',function(req,res){
     var file_name = req.params.id;
     if(file_name.split('_').length>2)
@@ -323,7 +408,7 @@ app.post('/submit_mark_E1',function(req,res){
                                 var htmlstr = '';
                                 var tdstr_subparts = '';
                                 var tdstr_maxMarks = '';
-                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body>';
 				htmlstr += '<h3>E-2 Marks</h3>';
                                 htmlstr += '<table class = "table table-striped">';
                                 for(var i = 0;i<ourMarks.length/number_of_students;i++)
@@ -465,7 +550,7 @@ app.post('/submit_mark_E2',function(req,res){
                                 var htmlstr = '';
                                 var tdstr_subparts = '';
                                 var tdstr_maxMarks = '';
-                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body>';
 				htmlstr += '<h3>E-2 Marks</h3>';
                                 htmlstr += '<table class = "table table-striped">';
                                 for(var i = 0;i<ourMarks.length/number_of_students;i++)
