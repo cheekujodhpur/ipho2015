@@ -4,6 +4,8 @@
 rm -r ./uploads
 rm -r ./downloads
 rm -r ./common
+rm mk/*1.html
+rm mk/*2.html
 mkdir ./uploads
 mkdir ./downloads
 mkdir ./common

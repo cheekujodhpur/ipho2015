@@ -8,3 +8,5 @@ uploads/*
 downloads/*
 tmp/*
 *.log
+mk/*1.html
+mk/*2.html
