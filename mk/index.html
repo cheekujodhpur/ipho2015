@@ -213,6 +213,11 @@
                         for(var j = 0;j<num_subparts;j++)
                         {
                             var tmp_mark = data[i*num_subparts+j].value;
+                            if(isNaN(parseFloat(tmp_mark)))
+                            {
+                                alert("Not a number");
+                                return;
+                            }
                             if((tmp_mark.split('.')[1] || []).length > 1)
                             {
                                 alert("Least count is 0.1");
@@ -317,7 +322,7 @@
                         table_body += "<tr><td>" + data.students[i] + "</td><td>"+country_code_global+"_"+i.toString()+"</td><td></td>";
                         for(var j in data.subparts)
                         {
-                            table_body += '<td><input type = "text" class = "form-control" name = "leaderMarks" placeholder = "Enter marks" /></td>';
+                            table_body += '<td><input type = "text" class = "form-control" name = "leaderMarks" /></td>';
                         }
                         table_body += "</tr>";
                     }

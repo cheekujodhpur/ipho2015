@@ -190,10 +190,74 @@
                     }
                     else if(type_question=='e')
                     {
-                        submit_marks('e1');
-                        submit_marks('e2');
+                        if(validateMarks('e1') && validateMarks('e2'))
+                        {
+                            submit_marks('e1');
+                            submit_marks('e2');
+                        }
                     }
                 });
+
+                function validateMarks(type_question)
+                {
+                    if(type_question=='t1')
+                        var data = $("#form_marks_T1").serializeArray();
+                    else if(type_question=='t2')
+                        var data = $("#form_marks_T2").serializeArray();
+                    else if(type_question=='t3')
+                        var data = $("#form_marks_T3").serializeArray();
+                    else if(type_question=='e1')
+                        var data = $("#form_marks_E1").serializeArray();
+                    else if(type_question=='e2')
+                        var data = $("#form_marks_E2").serializeArray();
+                    var ajaxData = {};
+                    var maxMarks = []
+                    //CAREFUL, hard coded line below
+                    if(type_question=='t1')
+                        var num_subparts = $("#mark_table_body_T1").find("tr:first td").length-2;
+                    else if(type_question=='t2')
+                        var num_subparts = $("#mark_table_body_T2").find("tr:first td").length-2;
+                    else if(type_question=='t3')
+                        var num_subparts = $("#mark_table_body_T3").find("tr:first td").length-2;
+                    else if(type_question=='e1')
+                        var num_subparts = $("#mark_table_body_E1").find("tr:first td").length-2;
+                    else if(type_question=='e2')
+                        var num_subparts = $("#mark_table_body_E2").find("tr:first td").length-2;
+                    for(var j = 0;j<num_subparts;j++)
+                    {
+                        maxMarks.push(parseFloat(data[j].value));
+                    }
+                    for(var i = 1;i<data.length/num_subparts;i++)
+                    {
+                        for(var j = 0;j<num_subparts;j++)
+                        {
+                            var tmp_mark = data[i*num_subparts+j].value;
+                            if(tmp_mark=='')
+                            {
+                                alert("No field can be empty!");
+                                return 0;
+                            }
+                            if(isNaN(parseFloat(tmp_mark)))
+                            {
+                                alert("Not a number");
+                                return 0;
+                            }
+                            if((tmp_mark.split('.')[1] || []).length > 1)
+                            {
+                                alert("Least count is 0.1");
+                                return 0;
+                            }
+                            if(parseFloat(tmp_mark)>maxMarks[j])
+                            {
+                                alert("Marks should be less than max marks");
+                                return 0;
+                            }
+                            ajaxData[(i-1)*num_subparts+j] = parseFloat(tmp_mark);
+                        }
+                    }
+                    return 1;
+                }
+
                 
                 function submit_marks(type_question)
                 {
@@ -232,6 +296,11 @@
                             if(tmp_mark=='')
                             {
                                 alert("No field can be empty!");
+                                return;
+                            }
+                            if(isNaN(parseFloat(tmp_mark)))
+                            {
+                                alert("Not a number");
                                 return;
                             }
                             if((tmp_mark.split('.')[1] || []).length > 1)
@@ -304,6 +373,11 @@
                         for(var j = 0;j<num_subparts;j++)
                         {
                             var tmp_mark = data[i*num_subparts+j].value;
+                            if(isNaN(parseFloat(tmp_mark)))
+                            {
+                                alert("Not a number");
+                                return;
+                            }
                             if((tmp_mark.split('.')[1] || []).length > 1)
                             {
                                 alert("Least count is 0.1");
