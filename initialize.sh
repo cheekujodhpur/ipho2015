@@ -14,6 +14,10 @@ mkdir ./common/T2
 mkdir ./common/T3
 mkdir ./common/E1
 mkdir ./common/E2
+mkdir ./common/E1a
+mkdir ./common/E2a
+mkdir ./common/C1
+mkdir ./common/C2
 #copy the contents of server_editable.js to server.js
 chmod 777 server.js
 cp server_editable.js server.js

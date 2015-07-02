@@ -117,14 +117,9 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>E-1</td>
-                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','e1')" value="e1" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e1';reset_fb_timer();" value="e1" /></td>
-                                    </tr> 
-                                    <tr>
-                                        <td>E-2</td>
-                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','e2')" value="e2" /></td> 
-                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e2';reset_fb_timer();" value="e2" /></td>
+                                        <td>E</td>
+                                        <td><input name = "fb-toggle" type = "radio" onclick = "socket.emit('fbStart','e')" value="e" /></td> 
+                                        <td><input name = "fb-display-toggle" type = "radio" onclick = "fb_current = 'e';reset_fb_timer();" value="e" /></td>
                                     </tr> 
                                     <tr>
                                         <td>None</td>
@@ -176,17 +171,23 @@
                     </tbody> 
 
 
-                    <table id = "all_uploads_table" class="table table-stripped table-hover" style="table-layout:fixed;width:700px" >
-                        <col style="width:30%">
+                    <table id = "all_uploads_table" class="table table-stripped table-hover" style="table-layout:fixed;width:900px" >
+                        <col style="width:20%">
                         <col style="width:15%">
                         <col style="width:15%">
                         <col style="width:15%">
-                        <col style="width:25%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:15%">
                         <thead>
                         <tr>
                             <th>Country Code</th>
                             <th>E1</th>
                             <th>E2</th>
+                            <th>E1-Ans</th>
+                            <th>E2-Ans</th>
+                            <th>Cover Pg1</th>
+                            <th>Cover Pg2</th>
                         </tr>
                         </thead>    
                         <tbody id="all_uploads_table_body">
@@ -626,6 +627,18 @@
                 var E2_u = 0;
                 var E2_pr = 0;
                 var E2_pck = 0;
+                var E1a_u = 0;
+                var E1a_pr = 0;
+                var E1a_pck = 0;
+                var E2a_u = 0;
+                var E2a_pr = 0;
+                var E2a_pck = 0;
+                var C1_u = 0;
+                var C1_pr = 0;
+                var C1_pck = 0;
+                var C2_u = 0;
+                var C2_pr = 0;
+                var C2_pck = 0;
                 for(var i in all_uploads)
                 {
                     if(all_uploads[i].country_code != "NULL")
@@ -644,51 +657,151 @@
                         {
                             if(all_uploads[i].E1_printed && all_uploads[i].E1_packed)
                             {
-                                table += '<td><button type="button" class="btn btn-success">Experiment</button></td>';
+                                table += '<td><button type="button" class="btn btn-success">E-1</button></td>';
                                 E1_u += 1;
                                 E1_pr += 1;
                                 E1_pck += 1;
                             }
                             else if(all_uploads[i].E1_printed) 
                             { 
-                                table += '<td><button type="button" class="btn btn-primary">Experiment</button></td>';
+                                table += '<td><button type="button" class="btn btn-primary">E-1</button></td>';
                                 E1_u += 1;
                                 E1_pr += 1;
                             }
                             else
                             {
-                                table += '<td><button type="button" class="btn btn-warning">Experiment</button></td>';
+                                table += '<td><button type="button" class="btn btn-warning">E-1</button></td>';
                                 E1_u += 1;
                             }
                         }
                         else
                         {   
-                            table += '<td><button type="button" class="btn btn-danger">Experiment</button></td>';
+                            table += '<td><button type="button" class="btn btn-danger">E-1</button></td>';
                         }
                         if(all_uploads[i].E2)
                         {
                             if(all_uploads[i].E2_printed && all_uploads[i].E2_packed)
                             {
-                                table += '<td><button type="button" class="btn btn-success">Experiment</button></td>';
+                                table += '<td><button type="button" class="btn btn-success">E-2</button></td>';
                                 E2_u += 1;
                                 E2_pr += 1;
                                 E2_pck += 1;
                             }
                             else if(all_uploads[i].E2_printed) 
                             { 
-                                table += '<td><button type="button" class="btn btn-primary">Experiment</button></td>';
+                                table += '<td><button type="button" class="btn btn-primary">E-2</button></td>';
                                 E2_u += 1;
                                 E2_pr += 1;
                             }
                             else
                             {
-                                table += '<td><button type="button" class="btn btn-warning">Experiment</button></td>';
+                                table += '<td><button type="button" class="btn btn-warning">E-2</button></td>';
                                 E2_u += 1;
                             }
                         }
                         else
                         {   
-                            table += '<td><button type="button" class="btn btn-danger">Experiment</button></td>';
+                            table += '<td><button type="button" class="btn btn-danger">E-2</button></td>';
+                        }
+                        if(all_uploads[i].E1a)
+                        {
+                            if(all_uploads[i].E1a_printed && all_uploads[i].E1a_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">E-1 Ans</button></td>';
+                                E1a_u += 1;
+                                E1a_pr += 1;
+                                E1a_pck += 1;
+                            }
+                            else if(all_uploads[i].E1a_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">E-1 Ans</button></td>';
+                                E1a_u += 1;
+                                E1a_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">E-1 Ans</button></td>';
+                                E1a_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">E-1 Ans</button></td>';
+                        }
+                        if(all_uploads[i].E2a)
+                        {
+                            if(all_uploads[i].E2a_printed && all_uploads[i].E2a_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">E-2 Ans</button></td>';
+                                E2a_u += 1;
+                                E2a_pr += 1;
+                                E2a_pck += 1;
+                            }
+                            else if(all_uploads[i].E2a_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">E-2 Ans</button></td>';
+                                E2a_u += 1;
+                                E2a_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">E-2 Ans</button></td>';
+                                E2a_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">E-2 Ans</button></td>';
+                        }
+                        if(all_uploads[i].C1)
+                        {
+                            if(all_uploads[i].C1_printed && all_uploads[i].C1_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">Cover Page 1</button></td>';
+                                C1_u += 1;
+                                C1_pr += 1;
+                                C1_pck += 1;
+                            }
+                            else if(all_uploads[i].C1_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">Cover Page 1</button></td>';
+                                C1_u += 1;
+                                C1_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">Cover Page 1</button></td>';
+                                C1_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Cover Page 1</button></td>';
+                        }
+                        if(all_uploads[i].C2)
+                        {
+                            if(all_uploads[i].C2_printed && all_uploads[i].C2_packed)
+                            {
+                                table += '<td><button type="button" class="btn btn-success">Cover Page 2</button></td>';
+                                C2_u += 1;
+                                C2_pr += 1;
+                                C2_pck += 1;
+                            }
+                            else if(all_uploads[i].C2_printed) 
+                            { 
+                                table += '<td><button type="button" class="btn btn-primary">Cover Page 2</button></td>';
+                                C2_u += 1;
+                                C2_pr += 1;
+                            }
+                            else
+                            {
+                                table += '<td><button type="button" class="btn btn-warning">Cover Page 2</button></td>';
+                                C2_u += 1;
+                            }
+                        }
+                        else
+                        {   
+                            table += '<td><button type="button" class="btn btn-danger">Cover Page 2</button></td>';
                         }
                         table += '</tr>';
                     } 
@@ -696,7 +809,11 @@
                 var table_stat = '';
                 table_stat += '<tr><td>Users Logged: ' + users_logged + '<br /> Total Votes: ' + num_votes +' </td>';
                 table_stat += '<td>Uploaded: ' + E1_u + '<br />Printed: ' + E1_pr + '<br />Packed: ' + E1_pck + '</td>';
-                table_stat += '<td>Uploaded: ' + E2_u + '<br />Printed: ' + E2_pr + '<br />Packed: ' + E2_pck + '</td></tr>';
+                table_stat += '<td>Uploaded: ' + E2_u + '<br />Printed: ' + E2_pr + '<br />Packed: ' + E2_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + E1a_u + '<br />Printed: ' + E1a_pr + '<br />Packed: ' + E1a_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + E2a_u + '<br />Printed: ' + E2a_pr + '<br />Packed: ' + E2a_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + C1_u + '<br />Printed: ' + C1_pr + '<br />Packed: ' + C1_pck + '</td>';
+                table_stat += '<td>Uploaded: ' + C2_u + '<br />Printed: ' + C2_pr + '<br />Packed: ' + C2_pck + '</td></tr>';
                 table = table_stat + table;
                 $("#all_uploads_table_body").html(table);
             }); 
@@ -712,10 +829,8 @@
             });
 
             socket.on('fbEnable',function(q){
-                if(q=='e1')
+                if(q=='e')
                     $("input:radio[name='fb-toggle']:eq(0)").attr('checked','checked');       
-                if(q=='e2')
-                    $("input:radio[name='fb-toggle']:eq(1)").attr('checked','checked');       
             });
             
             socket.on('fbDisplay',function(feeds){

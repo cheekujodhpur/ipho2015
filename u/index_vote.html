@@ -58,11 +58,11 @@
                     <table class ="table table-stripped" style="table-layout:fixed;">
                         <col style="width:50%"> 
                         <col style="width:50%"> 
-			<thead>
-				<th>E-1 Upload</th>
-				<th>E-2 Upload</th>
-			</thead>
                         <tbody>
+                            <tr>
+                                <th>E-1 Upload</th>
+                                <th>E-2 Upload</th>
+                            </tr>
                             <tr>
                                 <td id = "E1_form">
                                     <form id        =  "upload_form"
@@ -93,6 +93,80 @@
                                                 <span class='label label-info' id="upload-file-info_E2"></span>
                                     </div>
                                     <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_E2();'/>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>E-1 Answer Upload</th>
+                                <th>E-2 Answer Upload</th>
+                            </tr>
+                            <tr>
+                                <td id = "E1a_form">
+                                    <form id        =  "upload_form"
+                                        enctype   =  "multipart/form-data"
+                                        action    =  "/uploadedE1a"
+                                        method    =  "post"
+                                    >
+                                    <div style="position:relative;">
+                                                <a class='btn btn-default' href='javascript:;'>
+                                                    Choose File...
+                                                    <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_E1a" name="user_file" size="40"  onchange='$("#upload-file-info_E1a").html($(this).val().replace("C:\\fakepath\\","")) ;'>
+                                                </a>
+                                                &nbsp;
+                                               <span class='label label-info' id="upload-file-info_E1a"></span>
+                                     </div>
+                                    <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_E1a();'/>
+                                    </form>
+                                 </td>
+                                <td id = "E2a_form">
+                                    <form id        =  "upload_form"
+                                        enctype   =  "multipart/form-data"
+                                        action    =  "/uploadedE2a"
+                                        method    =  "post"
+                                    >
+                                    <div style="position:relative;">
+                                                <a class='btn btn-default' href='javascript:;'> Choose File...  <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_E2a" name="user_file" size="40"  onchange='$("#upload-file-info_E2a").html($(this).val().replace("C:\\fakepath\\",""));'> </a>
+                                                &nbsp;
+                                                <span class='label label-info' id="upload-file-info_E2a"></span>
+                                    </div>
+                                    <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_E2a();'/>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Cover Page 1 Upload</th>
+                                <th>Cover Page 2 Upload</th>
+                            </tr>
+                            <tr>
+                                <td id = "C1_form">
+                                    <form id        =  "upload_form"
+                                        enctype   =  "multipart/form-data"
+                                        action    =  "/uploadedC1"
+                                        method    =  "post"
+                                    >
+                                    <div style="position:relative;">
+                                                <a class='btn btn-default' href='javascript:;'>
+                                                    Choose File...
+                                                    <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_C1" name="user_file" size="40"  onchange='$("#upload-file-info_C1").html($(this).val().replace("C:\\fakepath\\","")) ;'>
+                                                </a>
+                                                &nbsp;
+                                               <span class='label label-info' id="upload-file-info_C1"></span>
+                                     </div>
+                                    <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_C1();'/>
+                                    </form>
+                                 </td>
+                                <td id = "C2_form">
+                                    <form id        =  "upload_form"
+                                        enctype   =  "multipart/form-data"
+                                        action    =  "/uploadedC2"
+                                        method    =  "post"
+                                    >
+                                    <div style="position:relative;">
+                                                <a class='btn btn-default' href='javascript:;'> Choose File...  <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' id = "file_upload_C2" name="user_file" size="40"  onchange='$("#upload-file-info_C2").html($(this).val().replace("C:\\fakepath\\",""));'> </a>
+                                                &nbsp;
+                                                <span class='label label-info' id="upload-file-info_C2"></span>
+                                    </div>
+                                    <input class = "btn btn-default" type="submit" value="Upload File" name="submit" onclick = 'return emptyfile_check_C2();'/>
                                     </form>
                                 </td>
                             </tr>
@@ -134,6 +208,19 @@
                         <div class="form-group" id = "fb-dropdown">
                            <label for = "fbMenu">Question:</label>
                            <select class = "form-control" id = "fbMenu">
+                               <option>E-1 Page 1</option>
+                               <option>E-1 Page 2</option>
+                               <option>E-1 Page 3</option>
+                               <option>E-1 Page 4</option>
+                               <option>E-1 Page 5</option>
+                               <option>E-1 Page 6</option>
+                               <option>E-2 Page 1</option>
+                               <option>E-2 Page 2</option>
+                               <option>E-2 Page 3</option>
+                               <option>E-2 Page 4</option>
+                               <option>E-2 Page 5</option>
+                               <option>E-2 Page 6</option>
+
                            </select>    
                         </div>
                         <div class = "form-group" id = "fb-content">
@@ -209,6 +296,54 @@
             var E2_file = document.getElementById('file_upload_E2');
             //binds to onchange event of the input field
             E2_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
+                }
+                
+            });
+            var E1a_file = document.getElementById('file_upload_E1a');
+            //binds to onchange event of the input field
+            E1a_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
+                }
+                
+            });
+            var E2a_file = document.getElementById('file_upload_E2a');
+            //binds to onchange event of the input field
+            E2a_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
+                }
+                
+            });
+            var C1_file = document.getElementById('file_upload_C1');
+            //binds to onchange event of the input field
+            C1_file.addEventListener('change', function() 
+            {
+                //this.files[0].size gets the size of your file.
+                if(this.files[0].size > 104857600)
+                {
+                    alert("File limit (100 MB) exceeded.");
+                    window.location = '/';
+                }
+                
+            });
+            var C2_file = document.getElementById('file_upload_C2');
+            //binds to onchange event of the input field
+            C2_file.addEventListener('change', function() 
             {
                 //this.files[0].size gets the size of your file.
                 if(this.files[0].size > 104857600)
@@ -391,6 +526,22 @@
                             if(data['E2_printed'] == true)
                             {
                                 $("#E2_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['E1a_printed'] == true)
+                            {
+                                $("#E1a_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['E2a_printed'] == true)
+                            {
+                                $("#E2a_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['C1_printed'] == true)
+                            {
+                                $("#C1_form").html('<p class="btn btn-success">Printed</p>');
+                            }
+                            if(data['C2_printed'] == true)
+                            {
+                                $("#C2_form").html('<p class="btn btn-success">Printed</p>');
                             }
                         });
             }
@@ -575,15 +726,9 @@
                     $("#fbHead").text("Feedback for T-3");
                     get_subparts('t3');
                 }
-                if(q=='e1')
+                if(q=='e')
                 {
-                    $("#fbHead").text("Feedback for E-1");
-                    get_subparts('e1');
-                }   
-                if(q=='e2')
-                {
-                    $("#fbHead").text("Feedback for E-2");
-                    get_subparts('e2');
+                    $("#fbHead").text("Feedback for E");
                 }   
                 if(fb_current!=q)
                 {
@@ -637,6 +782,62 @@
             function emptyfile_check_E2()
             {
                 var file = document.getElementById('file_upload_E2');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_E1a()
+            {
+                var file = document.getElementById('file_upload_E1a');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_E2a()
+            {
+                var file = document.getElementById('file_upload_E2a');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_C1()
+            {
+                var file = document.getElementById('file_upload_C1');
+                if(file.value === null || file.value === "")
+                {
+                    alert("It is not possible to upload an empty file.");
+                    return false;
+                }
+                else
+                {
+                    alert("File uploaded successfully.");
+                    return true;
+                }
+            }
+            function emptyfile_check_C2()
+            {
+                var file = document.getElementById('file_upload_C2');
                 if(file.value === null || file.value === "")
                 {
                     alert("It is not possible to upload an empty file.");
