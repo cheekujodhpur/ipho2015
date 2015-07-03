@@ -5,6 +5,11 @@
     padding:6px;
 }
 
+.tab-pane
+{
+    overflow-x:auto;
+}
+
 .navbar-brand > img
 {
     width:350px;
@@ -13,6 +18,8 @@
 .table
 {
 	word-break:break-all;
+    table-layout:fixed;
+    width:100%;
 }
 
 #document

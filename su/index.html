@@ -134,18 +134,13 @@
                     
                     <div id = "fb_data">
                         <table style = "table-layout:fixed;" class = "table table-bordered table-hover tablesorter" id = "fb_data_table">
-                            <col style="width:20%"> 
-                            <col style="width:10%"> 
-                            <col style="width:10%"> 
-                            <col style="width:56%"> 
-                            <col style="width:4%"> 
                             <thead>
                             <tr>
-                                <th style="text-align:center"><div class="btn btn-info">Time <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th style="text-align:center"><div class="btn btn-info">Country Code <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th style="text-align:center"><div class="btn btn-info">QID <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th style="text-align:center"><div class="btn btn-info">Content <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
-                                <th><div class="btn btn-info">S</div></th>
+                                <th width = "200px" style="text-align:center"><div class="btn btn-info">Time <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th width = "110px" style="text-align:center"><div class="btn btn-info">Country <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th width = "100px" style="text-align:center"><div class="btn btn-info">QID <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th width = "400px"style="text-align:center"><div class="btn btn-info">Content <div class="glyphicon glyphicon-sort-by-attributes"</div></div></th>
+                                <th width = "40px" style="text-align:center"><div class="btn btn-info">S</div></th>
                             </tr>
                             </thead>
                             <tbody id = "fb_data_table_body">
@@ -171,23 +166,16 @@
                     </tbody> 
 
 
-                    <table id = "all_uploads_table" class="table table-stripped table-hover" style="table-layout:fixed;width:900px" >
-                        <col style="width:20%">
-                        <col style="width:15%">
-                        <col style="width:15%">
-                        <col style="width:15%">
-                        <col style="width:15%">
-                        <col style="width:15%">
-                        <col style="width:15%">
+                    <table id = "all_uploads_table" class="table table-stripped table-hover" style="table-layout:fixed;" >
                         <thead>
                         <tr>
-                            <th>Country Code</th>
-                            <th>E1</th>
-                            <th>E2</th>
-                            <th>E1-Ans</th>
-                            <th>E2-Ans</th>
-                            <th>Cover Pg1</th>
-                            <th>Cover Pg2</th>
+                            <th width = "100px">Country Code</th>
+                            <th width = "100px">E1</th>
+                            <th width = "100px">E2</th>
+                            <th width = "100px">E1-Ans</th>
+                            <th width = "100px">E2-Ans</th>
+                            <th width = "200px">Cover Pg1</th>
+                            <th width = "200px">Cover Pg2</th>
                         </tr>
                         </thead>    
                         <tbody id="all_uploads_table_body">
@@ -329,7 +317,7 @@
                         dataType:"json"
                         })
                 .done(function(data){
-                        var htmlstr = '<table id = "marksheet_table"><tr>';
+                        var htmlstr = '<table id = "marksheet_table" class="table"><tr>';
                         var k = 0;
                        for(var i in data)
                        {
@@ -420,11 +408,11 @@
                             for(var ff in feeds[feed].content) ll = ll + feeds[feed].content[ff] + '<br />';
                             if(feeds[feed].done == false)
                             {
-                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center;" class="btn btn-danger glyphicon glyphicon-remove" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"></td></tr>';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="margin-left:10px;" class="btn btn-danger glyphicon glyphicon-remove" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);$(this).removeClass('glyphicon-remove');$(this).removeClass('btn-danger');$(this).addClass('btn-success');$(this).addClass('glyphicon-ok');" + '"></td></tr>';
                             } 
                             else 
                             {
-                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="text-align:center" class="btn btn-success glyphicon glyphicon-ok" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);" + '"><span style = "font-size:0">1</span></td></tr>';
+                            var field = '<tr id = "fb_row"><td>'+feeds[feed].time + '</td><td>' + feeds[feed].country_code+'</td><td>'+feeds[feed].qid+'</td><td>'+ll+'</td><td style="margin-left:10px;" class="btn btn-success glyphicon glyphicon-ok" onclick="socket.emit(' + "'fb_stat_toggle'," + "'" + feeds[feed]._id + "');request_fb(fb_current);$(this).removeClass('glyphicon-ok');$(this).removeClass('btn-success');$(this).addClass('btn-danger');$(this).addClass('glyphicon-remove');" + '"><span style = "font-size:0">1</span></td></tr>';
                             } 
                             var Field = $(field);
                             $("#fb_data_table_body").append(Field);
@@ -651,7 +639,7 @@
                 var C2_pck = 0;
                 for(var i in all_uploads)
                 {
-                    if(all_uploads[i].country_code != "NULL")
+                    if(all_uploads[i].country_code != "NULL" && all_uploads[i].country_code!='')
                     { 
                         if(all_uploads[i].logged)
                         {
