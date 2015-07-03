@@ -19,7 +19,6 @@
 192.168.200.121 Slovakia SVK 2 5
 192.168.200.122 Serbia SRB 2 5
 192.168.200.123 Saudi_Arabia SAU 2 5
-192.168.200.123 The_Hashemite_Kingdom_of_Jordan JOR 2 5
 192.168.200.124 Russia RUS 2 5
 192.168.200.125 Romania ROU 2 5
 192.168.200.126 Republic_of_Singapore SGP 2 5

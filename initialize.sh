@@ -117,3 +117,8 @@ done < country_code_ip.txt
 echo 'app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");' >> server.js
 #make server.js read and executable
 chmod 555 server.js
+
+#Flag validation
+echo "----FLAG VALIDATION----"
+./validate_flags.sh
+echo "-----------------------"
