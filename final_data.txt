@@ -40,7 +40,7 @@ Japan 2 5
 Jordan 2 5
 Kyrgyzstan 2 5
 Latvia 2 5
-Liechtenstein 0 0
+Liechtenstein 2 0
 Lithuania 2 5
 Macao_China 2 3
 Macedonia 2 5

@@ -16,10 +16,10 @@ npm install mongodb
 
 
 ===Issues===
-1. User must not log in via two tabs or windows
-2. Make no. of options 1 after setvote
-3. Do superusers have uplaod privilieges?
-
+DONE-1. User must not log in via two tabs or windows
+DONE-2. Make no. of options 1 after setvote
+DONE-3. Do superusers have uplaod privilieges?
+4.Liechtenstein data on students
 
 
 
