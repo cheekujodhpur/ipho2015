@@ -1,3 +1,10 @@
+#marksheet_table td
+{
+    width:150px;
+    border:solid 1px lightgrey;
+    padding:6px;
+}
+
 .navbar-brand > img
 {
     width:350px;

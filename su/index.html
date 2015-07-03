@@ -329,17 +329,27 @@
                         dataType:"json"
                         })
                 .done(function(data){
-                       var htmlstr = '';
+                        var htmlstr = '<table id = "marksheet_table"><tr>';
+                        var k = 0;
                        for(var i in data)
                        {
-                            htmlstr += '<div><b>'+i+'</b><br /><br />';
-                            for(var j in data[i])
+                            if(i!="NULL" && i!='')
                             {
-                                htmlstr += '<a target = "_blank" href = "marksheet/' + data[i][j] + '">'+data[i][j]+'</a>';
-                                htmlstr += '<br />';
-                            } 
-                            htmlstr += '</div>';
+                                htmlstr += '<td><div><b>'+i+'</b><br /><br />';
+                                for(var j in data[i])
+                                {
+                                    htmlstr += '<a target = "_blank" href = "marksheet/' + data[i][j] + '">'+data[i][j]+'</a>';
+                                    htmlstr += '<br />';
+                                } 
+                                htmlstr += '</div></td>';
+                                if(parseInt(k)>0 && parseInt(k)%6==5)
+                                {
+                                    htmlstr += '</tr><tr>';
+                                }
+                                k++;
+                            }
                        }
+                       htmlstr += '</tr></table>';
                        $("#marksheet").html(htmlstr);
                         
                         });
