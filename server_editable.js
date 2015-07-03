@@ -1189,6 +1189,7 @@ app.post('/uploaded',function(req,res)
             {
                 if(items.length == 0)
                 {
+                    db.close();
                     return;
                 }
                 if(items[0].logged)
@@ -1215,9 +1216,10 @@ app.post('/uploaded',function(req,res)
                         });
 
                         //redirect the client to his homepage
-                        res.redirect('/')
+                        res.redirect('/');
                         done = false;
                     }
+                    db.close();
                 }
             });
         });
