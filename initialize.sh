@@ -122,3 +122,7 @@ chmod 555 server.js
 echo "----FLAG VALIDATION----"
 ./validate_flags.sh
 echo "-----------------------"
+#data validation
+echo "----DATA VALIDATION----"
+./validate_data.sh
+echo "-----------------------"
