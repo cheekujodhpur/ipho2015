@@ -20,7 +20,8 @@ DONE-1. User must not log in via two tabs or windows
 DONE-2. Make no. of options 1 after setvote
 DONE-3. Do superusers have uplaod privilieges?
 4.Liechtenstein data on students
-
+5.Costa Rica's upload tabs have not been updated
+6.Ghana is not present in ip allocation.Is it actually present?
 
 
 
