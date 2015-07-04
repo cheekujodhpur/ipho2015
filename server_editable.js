@@ -903,11 +903,19 @@ app.post('/list_dir',function(req,res)
                         if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
                         if(items[0].E1_printed)result['E1_printed']=true;else result['E1_printed']=false;
                         if(items[0].E2_printed)result['E2_printed']=true;else result['E2_printed']=false;
+                        if(items[0].E1a_printed)result['E1a_printed']=true;else result['E1a_printed']=false;
+                        if(items[0].E2a_printed)result['E2a_printed']=true;else result['E2a_printed']=false;
+                        if(items[0].C1_printed)result['C1_printed']=true;else result['C1_printed']=false;
+                        if(items[0].C2_printed)result['C2_printed']=true;else result['C2_printed']=false;
                         if(items[0].T1_packed)result['T1_packed']=true;else result['T1_packed']=false;
                         if(items[0].T2_packed)result['T2_packed']=true;else result['T2_packed']=false;
                         if(items[0].T3_packed)result['T3_packed']=true;else result['T3_packed']=false;
                         if(items[0].E1_packed)result['E1_packed']=true;else result['E1_packed']=false;
                         if(items[0].E2_packed)result['E2_packed']=true;else result['E2_packed']=false;
+                        if(items[0].E1a_packed)result['E1a_packed']=true;else result['E1a_packed']=false;
+                        if(items[0].E2a_packed)result['E2a_packed']=true;else result['E2a_packed']=false;
+                        if(items[0].C1_packed)result['C1_packed']=true;else result['C1_packed']=false;
+                        if(items[0].C2_packed)result['C2_packed']=true;else result['C2_packed']=false;
 
                         id = "upload";
                         directory_path = "/uploads/" + ip.toString() + "/";
