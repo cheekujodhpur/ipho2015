@@ -1,4 +1,4 @@
-#!/usr/bin/env nodejs
+#!/usr/bin/env node
 /*
 server.js file of the Server system for IPhO-2015 India
 
@@ -98,6 +98,127 @@ app.get('/static/fonts/glyphicons-halflings-regular.woff', function(req,res){res
 
 app.use("/media",express.static(__dirname + "/media"));console.log("File download enabled for /media");
 app.use("/static",express.static(__dirname + "/static"));console.log("File download enabled for /static");
+
+//convener version of marksheet
+app.get('/marksheet/:id',function(req,res){
+    var file_name = req.params.id;
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var collection = db.collection('users');
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items.length == 0)
+            {
+                return;
+            }
+            if(items[0].type==0)
+                res.sendFile(__dirname+'/mk/'+req.params.id);
+            db.close();
+        });
+        
+	});
+});
+
+app.get('/marksheet_list',function(req,res){
+
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var collection = db.collection('users');
+        var ajaxData = {};
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items.length == 0)
+            {
+                return;
+            }
+            if(items[0].type==0)
+            {
+                collection.find({}).toArray(function(err,items2){
+                    for(var i in items2)
+                    {
+                        var file_name = items2[i].country_code + '_E1_our.html';
+                        var file_name2 = items2[i].country_code + '_E2_our.html';
+                        var paths = [];
+                        if(fs.existsSync('mk/'+file_name))
+                            paths.push(file_name);
+                        if(fs.existsSync('mk/'+file_name2))
+                            paths.push(file_name2);
+                        ajaxData[items2[i].country_code] = paths;
+                    } 
+                    res.json(ajaxData);
+                    db.close();
+                });
+            }
+            else
+                db.close();
+        });
+        
+	});
+});
+
+app.get('/marks/:id',function(req,res){
+    var file_name = req.params.id;
+    if(file_name.split('_').length>2)
+        return;
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return;
+        }
+        if(req.ip != null)
+        {
+            var ip = req.ip.toString();
+        }
+        else
+        {
+            console.log("Null IP Error.Carry on");
+        }
+        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip);
+        var collection = db.collection('users');
+        collection.find({"ip":ip}).toArray(function(err,items)
+        {
+            if(items.length == 0)
+            {
+                return;
+            }
+            if(file_name.split('_')[0]==items[0].country_code)
+                res.sendFile(__dirname+'/mk/'+req.params.id);
+            db.close();
+        });
+        
+	});
+});
+
 //authentication page
 app.get('/auth.html',function(req,res)
 {
@@ -158,6 +279,26 @@ app.get('/', function (req, res)
                 {
                     res.sendFile(__dirname + '/pr/index.html');
                 }
+                else if(type == 3)
+                {
+                    res.sendFile(__dirname + '/mk/index.html');
+                }
+                else if(type == 4)
+                {
+                    res.sendFile(__dirname + '/exec/index.html');
+                }
+                else if(type == 5)
+                {
+                    res.sendFile(__dirname + '/cr/index.html');
+                }
+                else if(type == 6)
+                {
+                    res.sendFile(__dirname + '/disp/index.html');
+                }
+                else if(type == 7)
+                {
+                    res.sendFile(__dirname + '/god/index.html');
+                }
                 else
                 {
                     res.sendFile('/chpass.html');
@@ -174,7 +315,7 @@ app.get('/', function (req, res)
 	});
 });
 
-app.post('/save_mark_T1',function(req,res){
+app.post('/submit_mark_E1',function(req,res){
 
     var jsonString = '';
     req.on('data',function(data)
@@ -203,14 +344,309 @@ app.post('/save_mark_T1',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_T1');
+            var marks = db.collection('marks_E1');
+            var users = db.collection('users');
+            var ourMarks_db = db.collection('ourMarks_E1');
+            var subparts = db.collection('subparts');
             marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+                //TODO: the code to write the marks onto a file
+                users.find({"ip":ip}).toArray(function(err,items){
+                    var user = items[0];
+                    var leaderMarks = dbData;
+                    var country_code = user.country_code;
+                    var country_name = user.country_name;
+                    var number_of_students = user.number_of_students;
+                    subparts.find({"type":"e1"}).toArray(function(err,itemss){
+                        var subpart_arr = itemss[0].subparts;
+                        var maxMarks_arr = itemss[0].maxMarks;
+                        ourMarks_db.find({"country_name":country_name}).toArray(function(err,items2){
+                            var ourMarks = items2[0].leaderMarks;   //Yes, the field name is still leaderMarks
+                            var fileName = "mk/" + country_code.toString() + "_E1.html";
+                            var our_fileName = "mk/" + country_code.toString() + "_E1_our.html";
+                            var com_fileName = "marks/" + country_code.toString() + "_E1.html";
+                            var stream = fs.createWriteStream(fileName);
+                            stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+				htmlstr += '<h3>E-1 Marks</h3>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
+                                {
+                                    tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
+                                } 
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
+                                {
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+(ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1) + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr style="height:30px;"></tr>';
+                                }
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                stream.write(htmlstr);
+                                stream.end();
+                            });
+                            var our_stream = fs.createWriteStream(our_fileName);
+                            our_stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body>';
+				htmlstr += '<h3>E-2 Marks</h3>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
+                                {
+                                    tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
+                                } 
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
+                                {
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        var difference = (ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1);
+                                        if(difference==0) 
+                                            htmlstr += '<td><b>'+ difference + '</b></td>';
+                                        else if(difference>0)
+                                            htmlstr += '<td><font style = "color:green"><b>'+ difference + '</b></font></td>';
+                                        else
+                                            htmlstr += '<td><font style = "color:red"><b>'+ difference + '</b></font></td>';
+                                    }
+                                    htmlstr += '</tr><tr style="height:30px;"></tr>';
+                                }
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                our_stream.write(htmlstr);
+                                our_stream.end();
+                            });
+                            res.json({"success":true,"filename":com_fileName});
+                            db.close();
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+app.post('/submit_mark_E2',function(req,res){
+
+    var jsonString = '';
+    req.on('data',function(data)
+        {
+            jsonString += data;
+        });
+    req.on('end',function(){
+        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+        var dbData = [];
+        for(var i in jsonData)
+            dbData.push(parseFloat(jsonData[i]));
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var marks = db.collection('marks_E2');
+            var users = db.collection('users');
+            var ourMarks_db = db.collection('ourMarks_E2');
+            var subparts = db.collection('subparts');
+            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+                //TODO: the code to write the marks onto a file
+                users.find({"ip":ip}).toArray(function(err,items){
+                    var user = items[0];
+                    var leaderMarks = dbData;
+                    var country_code = user.country_code;
+                    var country_name = user.country_name;
+                    var number_of_students = user.number_of_students;
+                    subparts.find({"type":"e2"}).toArray(function(err,itemss){
+                        var subpart_arr = itemss[0].subparts;
+                        var maxMarks_arr = itemss[0].maxMarks;
+                        ourMarks_db.find({"country_name":country_name}).toArray(function(err,items2){
+                            var ourMarks = items2[0].leaderMarks;   //Yes, the field name is still leaderMarks
+                            var fileName = "mk/" + country_code.toString() + "_E2.html";
+                            var our_fileName = "mk/" + country_code.toString() + "_E2_our.html";
+                            var com_fileName = "marks/" + country_code.toString() + "_E2.html";
+                            var stream = fs.createWriteStream(fileName);
+                            stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body onload = "window.print()" onload = "window.print()">';
+				htmlstr += '<h3>E-2 Marks</h3>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
+                                {
+                                    tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
+                                } 
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
+                                {
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+(ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1) + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr style="height:30px;"></tr>';
+                                }
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                stream.write(htmlstr);
+                                stream.end();
+                            });
+                            var our_stream = fs.createWriteStream(our_fileName);
+                            our_stream.once('open',function(fd){
+                                var htmlstr = '';
+                                var tdstr_subparts = '';
+                                var tdstr_maxMarks = '';
+                                htmlstr += '<!DOCTYPE html> <html lang="en"> <head> <meta charset = "utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>IPhO 2015 - Mumbai, India</title> <!--Bootstrap--> <link href = "/static/css/bootstrap.min.css" rel = "stylesheet" /> <!!--Custom CSS--> <link href = "/static/css/main.css" rel = "stylesheet" /> <link href = "media/favicon.ico" rel="shortcut icon" type="image/x-icon"/> <link href = "media/favicon.ico" rel="icon" type="image/x-icon"/> </head><body>';
+				htmlstr += '<h3>E-2 Marks</h3>';
+                                htmlstr += '<table class = "table table-striped">';
+                                for(var i = 0;i<ourMarks.length/number_of_students;i++)
+                                {
+                                    tdstr_subparts += '<td>'+subpart_arr[i]+'</td>';
+                                    tdstr_maxMarks += '<td><b>'+maxMarks_arr[i]+'</b></td>';
+                                } 
+                                htmlstr += '<tr> <th>Code</th> </tr> <tr> <td></td> <td>Subparts</td> '+tdstr_subparts+'</tr> <tr > <td></td> <td>Maximum Marks</td> '+tdstr_maxMarks+'</tr>';
+                                for(var i = 0;i<number_of_students;i++)
+                                {
+                                    htmlstr += '<tr><td>'+country_code+("0"+(i+1).toString()).slice(-2)+'</td><td></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+ourMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        htmlstr += '<td>'+leaderMarks[i*ourMarks.length/number_of_students+j].toString() + '</td>';
+                                    }
+                                    htmlstr += '</tr><tr><td colspan="2"></td>';
+                                    for(var j = 0;j<ourMarks.length/number_of_students;j++)
+                                    {
+                                        var difference = (ourMarks[i*ourMarks.length/number_of_students+j]-leaderMarks[i*ourMarks.length/number_of_students+j]).toFixed(1);
+                                        if(difference==0) 
+                                            htmlstr += '<td><b>'+ difference + '</b></td>';
+                                        else if(difference>0)
+                                            htmlstr += '<td><font style = "color:green"><b>'+ difference + '</b></font></td>';
+                                        else
+                                            htmlstr += '<td><font style = "color:red"><b>'+ difference + '</b></font></td>';
+                                    }
+                                    htmlstr += '</tr><tr style="height:30px;"></tr>';
+                                }
+                                htmlstr += '</table>';
+                                htmlstr += '</body></html>';
+                                
+                                our_stream.write(htmlstr);
+                                our_stream.end();
+                            });
+                            res.json({"success":true,"filename":com_fileName});
+                            db.close();
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+
+app.post('/save_mark_E1',function(req,res){
+
+    var jsonString = '';
+    req.on('data',function(data)
+        {
+            jsonString += data;
+        });
+    req.on('end',function(){
+        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+        var dbData = [];
+        var country_name = '';
+        for(var i in jsonData)
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            if(country_name=='')
+                var marks = db.collection('marks_E1');
+            else var marks = db.collection('ourMarks_E1');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 res.json({"success":true});
                 db.close();});
         });
     });
 });
-app.post('/save_mark_T2',function(req,res){
+app.post('/save_mark_E2',function(req,res){
 
     var jsonString = '';
     req.on('data',function(data)
@@ -220,8 +656,13 @@ app.post('/save_mark_T2',function(req,res){
     req.on('end',function(){
         var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
         var dbData = [];
+        var country_name = '';
         for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
+        {
+            if(i!='country')
+                dbData.push(parseFloat(jsonData[i]));
+            else country_name = jsonData[i];
+        }
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
             if(err)
@@ -239,80 +680,13 @@ app.post('/save_mark_T2',function(req,res){
                 return;
             }
             console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_T2');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
-                res.json({"success":true});
-                db.close();});
-        });
-    });
-});
-app.post('/save_mark_T3',function(req,res){
-
-    var jsonString = '';
-    req.on('data',function(data)
-        {
-            jsonString += data;
-        });
-    req.on('end',function(){
-        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
-        var dbData = [];
-        for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
-        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-        {
-            if(err)
-            {
-                console.log(err);
-                return 0;
-            }
-            if(req.ip != null)
-            {
-                var ip = req.ip.toString();
-            }
-            else
-            {
-                console.log("Null IP Error.Carry on");
-                return;
-            }
-            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_T3');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
-                res.json({"success":true});
-                db.close();});
-        });
-    });
-});
-app.post('/save_mark_E',function(req,res){
-
-    var jsonString = '';
-    req.on('data',function(data)
-        {
-            jsonString += data;
-        });
-    req.on('end',function(){
-        var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
-        var dbData = [];
-        for(var i in jsonData)
-            dbData.push(parseFloat(jsonData[i]));
-        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-        {
-            if(err)
-            {
-                console.log(err);
-                return 0;
-            }
-            if(req.ip != null)
-            {
-                var ip = req.ip.toString();
-            }
-            else
-            {
-                console.log("Null IP Error.Carry on");
-                return;
-            }
-            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var marks = db.collection('marks_E');
-            marks.update({"ip":ip},{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
+            if(country_name=='')
+                var marks = db.collection('marks_E2');
+            else var marks = db.collection('ourMarks_E2');
+            var query_ob = {};
+            if(country_name=='')query_ob["ip"] = ip;
+            else query_ob["country_name"] = country_name;
+            marks.update(query_ob,{$set:{"leaderMarks":dbData}},{upsert:true},function(err,result){
                 res.json({"success":true});
                 db.close();});
         });
@@ -320,36 +694,37 @@ app.post('/save_mark_E',function(req,res){
 });
 
 //send subparts
-//app.post('/get_subparts',function(req,res)
-//{
-//    var jsonString = '';
-//    var ip = req.ip;
-//    console.log("'/get_subparts' request received from " + ip.toString());  
-//
-//    req.on('data',function(data)
-//    {
-//       jsonString += data;
-//    });
-//    req.on('end',function()
-//    {
-//       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
-//       var type = jsonData['val'];
-//    });
-//    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-//    {
-//        if(err)
-//        {
-//            console.log(err);
-//            return 0;
-//        }
-//        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-//        var collection = db.collection('subparts');
-//        collection.find({'type':type}).toArray(function(err,items){
-//            res.json(items[0].subparts);
-//            db.close();
-//        });
-//    });
-//});
+app.post('/get_subparts',function(req,res)
+{
+    var jsonString = '';
+    var ip = req.ip;
+    console.log("'/get_subparts' request received from " + ip.toString());  
+
+    req.on('data',function(data)
+    {
+       jsonString += data;
+    });
+    req.on('end',function()
+    {
+       var jsonData = JSON.parse('{"'+decodeURI(jsonString).replace(/"/g,'\\"').replace(/&/g,'","').replace(/=/g,'":"')+'"}');
+       var type = jsonData['val'];
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('subparts');
+            collection.find({'type':type}).toArray(function(err,items){
+                res.json(items[0]);
+                db.close();
+            });
+        });
+    });
+});
+
 //receive list_dir request
 
 app.post('/list_dir',function(req,res)
@@ -526,11 +901,13 @@ app.post('/list_dir',function(req,res)
                         if(items[0].T1_printed)result['T1_printed']=true;else result['T1_printed']=false;
                         if(items[0].T2_printed)result['T2_printed']=true;else result['T2_printed']=false;
                         if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
-                        if(items[0].E_printed)result['E_printed']=true;else result['E_printed']=false;
+                        if(items[0].E1_printed)result['E1_printed']=true;else result['E1_printed']=false;
+                        if(items[0].E2_printed)result['E2_printed']=true;else result['E2_printed']=false;
                         if(items[0].T1_packed)result['T1_packed']=true;else result['T1_packed']=false;
                         if(items[0].T2_packed)result['T2_packed']=true;else result['T2_packed']=false;
                         if(items[0].T3_packed)result['T3_packed']=true;else result['T3_packed']=false;
-                        if(items[0].E_packed)result['E_packed']=true;else result['E_packed']=false;
+                        if(items[0].E1_packed)result['E1_packed']=true;else result['E1_packed']=false;
+                        if(items[0].E2_packed)result['E2_packed']=true;else result['E2_packed']=false;
 
                         id = "upload";
                         directory_path = "/uploads/" + ip.toString() + "/";
@@ -617,211 +994,166 @@ app.post('/request_fb_leader',function(req,res)
     });
 });
 //request present table
-app.get('/sheetEditableT1',function(req,res)
+app.post('/sheetEditableE1',function(req,res)
 {
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
+    var country_name ='';
+    var jsonString = '';
+    req.on('data',function(data)
         {
-            console.log(err);
-            return 0;
+            jsonString += data;
+        });
+    req.on('end',function(){
+        country_name='';
+        if(jsonString==''){}
+        else{
+            var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+            var country_name = jsonData['country_name'];
         }
-        if(req.ip != null)
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_T1');
-        var users = db.collection('users');
-        
-        var query = {};
-
-        subparts.find({"type":"t1"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var subparts = db.collection('subparts');
+            if(country_name=='')
+                var marks = db.collection('marks_E1');
+            else var marks = db.collection('ourMarks_E1');
+            var users = db.collection('users');
+            
+            var query = {};
+            query['valid'] = 1;
+            subparts.find({"type":"e1"}).toArray(function(err,items){
+                var subparts = items[0].subparts;
+                var maxMarks = items[0].maxMarks;
+                var query_ob = {};
+                if(country_name=='')query_ob["ip"] = ip;
+                else query_ob["country_name"] = country_name;
+                users.find(query_ob).toArray(function(err,data){
+                    var country_code = data[0].country_code;
+                    var number_of_students = data[0].number_of_students;
+                    var file_name = country_code + "_E1.html";
+                    var file_path = "mk/" + file_name;
+                    if (fs.existsSync(file_path))
                     {
-                        var leaderMarks = items2[0].leaderMarks;
+                        query['valid'] = 0;
+                        res.json(query);
+                        db.close();
+                        return;
                     }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
+                    var new_ip = data[0].ip;
+                    marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
+                        if(items2.length>=1)
+                        {
+                            var leaderMarks = items2[0].leaderMarks;
+                        }
+                        else
+                            var leaderMarks = [];
+                        query['subparts'] = subparts;
+                        query['leaderMarks'] = leaderMarks;
+                        query['maxMarks'] = maxMarks;
+                        query['number_of_students'] = number_of_students;
+                        query['country_code'] = country_code;
+                        res.json(query);
+                        db.close();
+                    });
                 });
             });
         });
     });
 });
-app.get('/sheetEditableT2',function(req,res)
+app.post('/sheetEditableE2',function(req,res)
 {
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
+    var country_name ='';
+    var jsonString = '';
+    req.on('data',function(data)
         {
-            console.log(err);
-            return 0;
+            jsonString += data;
+        });
+    req.on('end',function(){
+        country_name='';
+        if(jsonString==''){}
+        else{
+            var jsonData = JSON.parse('{"' + decodeURI(jsonString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+            var country_name = jsonData['country_name'];
         }
-        if(req.ip != null)
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
         {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_T2');
-        var users = db.collection('users');
-        
-        var query = {};
-
-        subparts.find({"type":"t2"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var subparts = db.collection('subparts');
+            if(country_name=='')
+                var marks = db.collection('marks_E2');
+            else var marks = db.collection('ourMarks_E2');
+            var users = db.collection('users');
+            
+            var query = {};
+            query['valid'] = 1;
+            subparts.find({"type":"e2"}).toArray(function(err,items){
+                var subparts = items[0].subparts;
+                var maxMarks = items[0].maxMarks;
+                var query_ob = {};
+                if(country_name=='')query_ob["ip"] = ip;
+                else query_ob["country_name"] = country_name;
+                users.find(query_ob).toArray(function(err,data){
+                    var country_code = data[0].country_code;
+                    var number_of_students = data[0].number_of_students;
+                    var file_name = country_code + "_E2.html";
+                    var file_path = "mk/" + file_name;
+                    if (fs.existsSync(file_path))
                     {
-                        var leaderMarks = items2[0].leaderMarks;
+                        query['valid'] = 0;
+                        res.json(query);
+                        db.close();
+                        return;
                     }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
+                    //var students = data[0].students;
+                    var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
+                    var new_ip = data[0].ip;
+                    marks.find({$or:[{"ip":new_ip},{"country_name":country_name}]}).toArray(function(err,items2){
+                        if(items2.length>=1)
+                        {
+                            var leaderMarks = items2[0].leaderMarks;
+                        }
+                        else
+                            var leaderMarks = [];
+                        query['subparts'] = subparts;
+                        query['leaderMarks'] = leaderMarks;
+                        query['maxMarks'] = maxMarks;
+                        query['number_of_students'] = number_of_students;
+                        query['country_code'] = country_code;
+                        res.json(query);
+                        db.close();
+                    });
                 });
             });
         });
     });
 });
-app.get('/sheetEditableT3',function(req,res)
-{
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
-        {
-            console.log(err);
-            return 0;
-        }
-        if(req.ip != null)
-        {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_T3');
-        var users = db.collection('users');
-        
-        var query = {};
-
-        subparts.find({"type":"t3"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
-                    {
-                        var leaderMarks = items2[0].leaderMarks;
-                    }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
-                });
-            });
-        });
-    });
-});
-app.get('/sheetEditableE',function(req,res)
-{
-    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-    {
-        if(err)
-        {
-            console.log(err);
-            return 0;
-        }
-        if(req.ip != null)
-        {
-            var ip = req.ip.toString();
-        }
-        else
-        {
-            console.log("Null IP Error.Carry on");
-            return;
-        }
-        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-        var subparts = db.collection('subparts');
-        var marks = db.collection('marks_E');
-        var users = db.collection('users');
-        
-        var query = {};
-
-        subparts.find({"type":"e"}).toArray(function(err,items){
-            var subparts = items[0].subparts;
-            var maxMarks = items[0].maxMarks;
-            users.find({"ip":ip}).toArray(function(err,data){
-                var country_code = data[0].country_code;
-                //var students = data[0].students;
-                var students = ['Sirius Sharma','Rigel Armstrong','Saiph Ali Khan'];
-                marks.find({"ip":ip}).toArray(function(err,items2){
-                    if(items2.length>=1)
-                    {
-                        var leaderMarks = items2[0].leaderMarks;
-                    }
-                    else
-                        var leaderMarks = [];
-                    query['subparts'] = subparts;
-                    query['leaderMarks'] = leaderMarks;
-                    query['maxMarks'] = maxMarks;
-                    query['students'] = students;
-                    query['country_code'] = country_code;
-                    res.json(query);
-                    db.close();
-                });
-            });
-        });
-    });
-});
-
 //copies the uploaded file from /tmp to /downloads for the convener
 app.post('/uploaded',function(req,res)
 {
@@ -857,6 +1189,7 @@ app.post('/uploaded',function(req,res)
             {
                 if(items.length == 0)
                 {
+                    db.close();
                     return;
                 }
                 if(items[0].logged)
@@ -883,9 +1216,10 @@ app.post('/uploaded',function(req,res)
                         });
 
                         //redirect the client to his homepage
-                        res.redirect('/')
+                        res.redirect('/');
                         done = false;
                     }
+                    db.close();
                 }
             });
         });
@@ -893,249 +1227,8 @@ app.post('/uploaded',function(req,res)
     }
 });
 
-//copies the uploaded file from /tmp to the user's home folder for T1
-app.post('/uploadedT1',function(req,res)
-{
-    if(file_size_ex == true)
-    {
-        file_size_ex = false;
-        done = false;
-        res.redirect('/');
-        return;
-    }
-    if(done==true)
-    {
-        //the /tmp path of the file
-        var temp_path = req.files.user_file.path;
-        //file extension
-        var file_extension = req.files.user_file.extension; 
-        //the name of the uploaded file
-        var file_name = req.files.user_file.name
-        //the new location to which the file will be copied according to
-        //the user's ip
-        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
-     
-
-        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-        {
-            if(err)
-            {
-                console.log(err);
-                return 0;
-            }
-            if(req.ip != null)
-            {
-                var ip = req.ip.toString();
-            }
-            else
-            {
-                console.log("Null IP Error.Carry on");
-                return;
-            }
-            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var collection = db.collection('users');
-            collection.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items == null | items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].logged)
-                {
-                    var type = items[0].type;
-                    if(type == 1)
-                    {
-                        //LEADERS
-                        var country_code = items[0].country_code
-                        file_name = "T1_" + country_code.toString() + "." + file_extension; 
-                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
-                        //copy the file to the new_location from the temp_path 
-                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
-                        {
-                            if (err) 
-                            {
-                            return console.error(err);
-                            }
-                            //print the uploaded file metadata on the console
-                            console.log(req.files.user_file);
-                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
-                        });
-                        
-                        var uploads = db.collection('uploads');
-                        uploads.update({"ip":ip},{$set:{"T1":true}},function(err,result){db.close();});
-                        //redirect the client to his homepage
-                        db.close();
-                        res.redirect('/')
-                        done = false;
-                        
-                    }
-                }
-            });
-        });
-    }
-});
-
-//copies the uploaded file from /tmp to the user's home folder fot T2
-app.post('/uploadedT2',function(req,res)
-{
-    if(file_size_ex == true)
-    {
-        file_size_ex = false;
-        done = false;
-        res.redirect('/');
-        return;
-    }
-    if(done==true)
-    {
-        //the /tmp path of the file
-        var temp_path = req.files.user_file.path;
-        var file_extension = req.files.user_file.extension; 
-        //the name of the uploaded file
-        var file_name = req.files.user_file.name
-        //the new location to which the file will be copied according to
-        //the user's ip
-        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
-     
-
-        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-        {
-            if(err)
-            {
-                console.log(err);
-                return 0;
-            }
-            if(req.ip != null)
-            {
-                var ip = req.ip.toString();
-            }
-            else
-            {
-                console.log("Null IP Error.Carry on");
-            }
-            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var collection = db.collection('users');
-            collection.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].logged)
-                {
-                    var type = items[0].type;
-                    if(type)
-                    {
-                        //LEADERS
-                        var country_code = items[0].country_code
-                        file_name = "T2_" + country_code.toString() + "." + file_extension; 
-                        new_location = __dirname + '/uploads/'+ ip + '/' + file_name;
-                        //copy the file to the new_location from the temp_path 
-                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
-                        {
-                            if (err) 
-                            {
-                            return console.error(err);
-                            }
-                            //print the uploaded file metadata on the console
-                            console.log(req.files.user_file);
-                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
-                        });
-
-                        var uploads = db.collection('uploads');
-                        uploads.update({"ip":ip},{$set:{"T2":true}},function(err,result){db.close();});
-                        //redirect the client to his homepage
-                        db.close();
-                        res.redirect('/')
-                        done = false;
-                    }
-                }
-            });
-        });
-    }
-});
-
-//copies the uploaded file from /tmp to the user's home folder for T3
-app.post('/uploadedT3',function(req,res)
-{
-    if(file_size_ex == true)
-    {
-        file_size_ex = false;
-        done = false;
-        res.redirect('/');
-        return;
-    }
-    if(done==true)
-    {
-        //the /tmp path of the file
-        var temp_path = req.files.user_file.path;
-        var file_extension = req.files.user_file.extension; 
-        //the name of the uploaded file
-        var file_name = req.files.user_file.name
-        //the new location to which the file will be copied according to
-        //the user's ip
-        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
-     
-
-        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-        {
-            if(err)
-            {
-                console.log(err);
-                return 0;
-            }
-            if(req.ip != null)
-            {
-                var ip = req.ip.toString();
-            }
-            else
-            {
-                console.log("Null IP Error.Carry on");
-                return;
-            }
-            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-            var collection = db.collection('users');
-            collection.find({"ip":ip}).toArray(function(err,items)
-            {
-                if(items.length == 0)
-                {
-                    return;
-                }
-                if(items[0].logged)
-                {
-                    var type = items[0].type;
-                    if(type)
-                    {
-                        //LEADERS
-                        var country_code = items[0].country_code
-                        file_name = "T3_" + country_code.toString() + "." + file_extension; 
-                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
-                        //copy the file to the new_location from the temp_path 
-                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
-                        {
-                            if (err) 
-                            {
-                            return console.error(err);
-                            }
-                            //print the uploaded file metadata on the console
-                            console.log(req.files.user_file);
-                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
-                        });
-
-                        var uploads = db.collection('uploads');
-                        uploads.update({"ip":ip},{$set:{"T3":true}},function(err,result){db.close();});
-                        //redirect the client to his homepage
-                        db.close();
-                        res.redirect('/')
-                        done = false;
-                    }
-                }
-            });
-        });
-    }
-});
-
 //copies the uploaded file from /tmp to the user's home folder for E
-app.post('/uploadedE',function(req,res)
+app.post('/uploadedE1',function(req,res)
 {
     if(file_size_ex == true)
     {
@@ -1154,6 +1247,7 @@ app.post('/uploadedE',function(req,res)
         //the new location to which the file will be copied according to
         //the user's ip
         var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/E1'+ '/' + file_name;
      
 
         MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -1188,7 +1282,7 @@ app.post('/uploadedE',function(req,res)
                     {
                         //LEADERS
                         var country_code = items[0].country_code
-                        file_name = "E_" + country_code.toString() + "." + file_extension; 
+                        file_name = "E1_" + country_code.toString() + "." + file_extension; 
                         new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
                         //copy the file to the new_location from the temp_path 
                         fs.copy(temp_path.toString(), new_location.toString(), function(err) 
@@ -1202,8 +1296,474 @@ app.post('/uploadedE',function(req,res)
                             console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
                         });
 
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/E1/");
+                        });
+
                         var uploads = db.collection('uploads');
-                        uploads.update({"ip":ip},{$set:{"E":true}},function(err,result){db.close();});
+                        uploads.update({"ip":ip},{$set:{"E1":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        db.close();
+                        res.redirect('/')
+                        done = false;                        
+                    }
+                }
+            });
+        });
+    }
+});
+app.post('/uploadedE2',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/E2'+ '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "E2_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/E2/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"E2":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        db.close();
+                        res.redirect('/')
+                        done = false;                        
+                    }
+                }
+            });
+        });
+    }
+});
+app.post('/uploadedE1a',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/E1a'+ '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "E1_Answer_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/E1a/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"E1a":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        db.close();
+                        res.redirect('/')
+                        done = false;                        
+                    }
+                }
+            });
+        });
+    }
+});
+app.post('/uploadedE2a',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/E2a'+ '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "E2_Answer_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/E2a/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"E2a":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        db.close();
+                        res.redirect('/')
+                        done = false;                        
+                    }
+                }
+            });
+        });
+    }
+});
+app.post('/uploadedC1',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/C1'+ '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "Cover_Pg1_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/C1/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"C1":true}},function(err,result){db.close();});
+                        //redirect the client to his homepage
+                        db.close();
+                        res.redirect('/')
+                        done = false;                        
+                    }
+                }
+            });
+        });
+    }
+});
+app.post('/uploadedC2',function(req,res)
+{
+    if(file_size_ex == true)
+    {
+        file_size_ex = false;
+        done = false;
+        res.redirect('/');
+        return;
+    }
+    if(done==true)
+    {
+        //the /tmp path of the file
+        var temp_path = req.files.user_file.path;
+        var file_extension = req.files.user_file.extension; 
+        //the name of the uploaded file
+        var file_name = req.files.user_file.name
+        //the new location to which the file will be copied according to
+        //the user's ip
+        var new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+        var common_new_location = __dirname + '/common/C2'+ '/' + file_name;
+     
+
+        MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+            if(err)
+            {
+                console.log(err);
+                return 0;
+            }
+            var ip = req.ip;
+            if(req.ip != null)
+            {
+                var ip = req.ip.toString();
+            }
+            else
+            {
+                console.log("Null IP Error.Carry on");
+                return;
+            }
+            console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+            var collection = db.collection('users');
+            collection.find({"ip":ip}).toArray(function(err,items)
+            {
+                if(items.length == 0)
+                {
+                    return;
+                }
+                if(items[0].logged)
+                {
+                    var type = items[0].type;
+                    if(type)
+                    {
+                        //LEADERS
+                        var country_code = items[0].country_code
+                        file_name = "Cover_Pg2_" + country_code.toString() + "." + file_extension; 
+                        new_location = __dirname + '/uploads/'+ req.ip + '/' + file_name;
+                        //copy the file to the new_location from the temp_path 
+                        fs.copy(temp_path.toString(), new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /uploads/" + req.ip.toString() + "/");
+                        });
+
+                        fs.copy(temp_path.toString(), common_new_location.toString(), function(err) 
+                        {
+                            if (err) 
+                            {
+                            return console.error(err);
+                            }
+                            //print the uploaded file metadata on the console
+                            console.log(req.files.user_file);
+                            console.log(file_name + " successfully copied to /common/C2/");
+                        });
+
+                        var uploads = db.collection('uploads');
+                        uploads.update({"ip":ip},{$set:{"C2":true}},function(err,result){db.close();});
                         //redirect the client to his homepage
                         db.close();
                         res.redirect('/')
@@ -1256,7 +1816,8 @@ io.on('connection',function(socket)
             if(items[0].T1_printed)socket.emit('T1_printed');
             if(items[0].T2_printed)socket.emit('T2_printed');
             if(items[0].T3_printed)socket.emit('T3_printed');
-            if(items[0].E_printed)socket.emit('E_printed');
+            if(items[0].E1_printed)socket.emit('E1_printed');
+            if(items[0].E2_printed)socket.emit('E2_printed');
             db.close();
         });
     }); 
@@ -1285,7 +1846,18 @@ io.on('connection',function(socket)
             socket.emit('country-data',items[0]);
             console.log("'numberofleaders' signal broadcasted from the server in response to " + ip.toString());
             console.log("'country-data' signal broadcasted from the server in response to " + ip.toString());
-            db.close(); 
+            if(items[0].type==3)    //marks entry
+            {
+                users.find({}).toArray(function(err,items2){
+                    console.log("'countries' signal broadcasted from the server in response to " + ip.toString());
+                    socket.emit('countries',items2);
+                    db.close();
+                });
+            }
+            else
+            {
+                db.close(); 
+            }
         });
     }); 
     
@@ -1423,9 +1995,13 @@ io.on('connection',function(socket)
             {
                 uploads.update({"ip":client_ip},{$set:{"T3_alert":true}},function(err,result){db.close();});
             }
-            else if(id == "E")
+            else if(id == "E1")
             {
-                uploads.update({"ip":client_ip},{$set:{"E_alert":true}},function(err,result){db.close();});
+                uploads.update({"ip":client_ip},{$set:{"E1_alert":true}},function(err,result){db.close();});
+            }
+            else if(id == "E2")
+            {
+                uploads.update({"ip":client_ip},{$set:{"E2_alert":true}},function(err,result){db.close();});
             }
         });
     });
@@ -1542,6 +2118,13 @@ io.on('connection',function(socket)
         io.sockets.emit("message-sent",message_table);
         console.log("'message-sent' signal broadcasted from the server in response to " + ip.toString());
     });
+
+    //super reresh
+    socket.on('super_refresh',function()
+    {
+        io.sockets.emit("super_refresh");
+    });
+
     //directory listing for the convener
     socket.on('list-all-uploads',function()
     {
@@ -1701,7 +2284,8 @@ io.on('connection',function(socket)
                     if(items[0].T1_printed)socket.emit('T1_printed');
                     if(items[0].T2_printed)socket.emit('T2_printed');
                     if(items[0].T3_printed)socket.emit('T3_printed');
-                    if(items[0].E_printed)socket.emit('E_printed');
+                    if(items[0].E1_printed)socket.emit('E1_printed');
+                    if(items[0].E2_printed)socket.emit('E2_printed');
 
                     if(items[0].T1_alert)
                     {
@@ -1718,10 +2302,15 @@ io.on('connection',function(socket)
                         uploads.update({"ip":ip},{$set:{"T3_alert":false}},function(err,result){});
                         socket.emit('T3-alert');
                     }
-                    if(items[0].E_alert)
+                    if(items[0].E1_alert)
                     {
                         uploads.update({"ip":ip},{$set:{"E_alert":false}},function(err,result){});
-                        socket.emit('E-alert');
+                        socket.emit('E1-alert');
+                    }
+                    if(items[0].E2_alert)
+                    {
+                        uploads.update({"ip":ip},{$set:{"E_alert":false}},function(err,result){});
+                        socket.emit('E2-alert');
                     }
                     db.close();
                 });
@@ -2201,91 +2790,100 @@ io.on('connection',function(socket)
 app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
 app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
 app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");
-app.use("/uploads/192.168.200.71/",express.static(__dirname + "/uploads/192.168.200.71/"));console.log("File download enabled for /uploads/192.168.200.71/");
-app.use("/uploads/192.168.200.200/",express.static(__dirname + "/uploads/192.168.200.200/"));console.log("File download enabled for /uploads/192.168.200.200/");
-app.use("/uploads/192.168.200.201/",express.static(__dirname + "/uploads/192.168.200.201/"));console.log("File download enabled for /uploads/192.168.200.201/");
-app.use("/uploads/192.168.200.202/",express.static(__dirname + "/uploads/192.168.200.202/"));console.log("File download enabled for /uploads/192.168.200.202/");
-app.use("/uploads/192.168.200.203/",express.static(__dirname + "/uploads/192.168.200.203/"));console.log("File download enabled for /uploads/192.168.200.203/");
-app.use("/uploads/192.168.200.204/",express.static(__dirname + "/uploads/192.168.200.204/"));console.log("File download enabled for /uploads/192.168.200.204/");
-app.use("/uploads/192.168.200.205/",express.static(__dirname + "/uploads/192.168.200.205/"));console.log("File download enabled for /uploads/192.168.200.205/");
-app.use("/uploads/192.168.200.206/",express.static(__dirname + "/uploads/192.168.200.206/"));console.log("File download enabled for /uploads/192.168.200.206/");
-app.use("/uploads/192.168.200.207/",express.static(__dirname + "/uploads/192.168.200.207/"));console.log("File download enabled for /uploads/192.168.200.207/");
-app.use("/uploads/192.168.200.208/",express.static(__dirname + "/uploads/192.168.200.208/"));console.log("File download enabled for /uploads/192.168.200.208/");
-app.use("/uploads/192.168.200.209/",express.static(__dirname + "/uploads/192.168.200.209/"));console.log("File download enabled for /uploads/192.168.200.209/");
-app.use("/uploads/192.168.200.210/",express.static(__dirname + "/uploads/192.168.200.210/"));console.log("File download enabled for /uploads/192.168.200.210/");
-app.use("/uploads/192.168.200.211/",express.static(__dirname + "/uploads/192.168.200.211/"));console.log("File download enabled for /uploads/192.168.200.211/");
-app.use("/uploads/192.168.200.212/",express.static(__dirname + "/uploads/192.168.200.212/"));console.log("File download enabled for /uploads/192.168.200.212/");
-app.use("/uploads/192.168.200.213/",express.static(__dirname + "/uploads/192.168.200.213/"));console.log("File download enabled for /uploads/192.168.200.213/");
-app.use("/uploads/192.168.200.214/",express.static(__dirname + "/uploads/192.168.200.214/"));console.log("File download enabled for /uploads/192.168.200.214/");
-app.use("/uploads/192.168.200.215/",express.static(__dirname + "/uploads/192.168.200.215/"));console.log("File download enabled for /uploads/192.168.200.215/");
-app.use("/uploads/192.168.200.216/",express.static(__dirname + "/uploads/192.168.200.216/"));console.log("File download enabled for /uploads/192.168.200.216/");
-app.use("/uploads/192.168.200.217/",express.static(__dirname + "/uploads/192.168.200.217/"));console.log("File download enabled for /uploads/192.168.200.217/");
-app.use("/uploads/192.168.200.218/",express.static(__dirname + "/uploads/192.168.200.218/"));console.log("File download enabled for /uploads/192.168.200.218/");
-app.use("/uploads/192.168.200.219/",express.static(__dirname + "/uploads/192.168.200.219/"));console.log("File download enabled for /uploads/192.168.200.219/");
-app.use("/uploads/192.168.200.220/",express.static(__dirname + "/uploads/192.168.200.220/"));console.log("File download enabled for /uploads/192.168.200.220/");
-app.use("/uploads/192.168.200.221/",express.static(__dirname + "/uploads/192.168.200.221/"));console.log("File download enabled for /uploads/192.168.200.221/");
-app.use("/uploads/192.168.200.222/",express.static(__dirname + "/uploads/192.168.200.222/"));console.log("File download enabled for /uploads/192.168.200.222/");
-app.use("/uploads/192.168.200.223/",express.static(__dirname + "/uploads/192.168.200.223/"));console.log("File download enabled for /uploads/192.168.200.223/");
-app.use("/uploads/192.168.200.224/",express.static(__dirname + "/uploads/192.168.200.224/"));console.log("File download enabled for /uploads/192.168.200.224/");
-app.use("/uploads/192.168.200.225/",express.static(__dirname + "/uploads/192.168.200.225/"));console.log("File download enabled for /uploads/192.168.200.225/");
-app.use("/uploads/192.168.200.226/",express.static(__dirname + "/uploads/192.168.200.226/"));console.log("File download enabled for /uploads/192.168.200.226/");
-app.use("/uploads/192.168.200.227/",express.static(__dirname + "/uploads/192.168.200.227/"));console.log("File download enabled for /uploads/192.168.200.227/");
-app.use("/uploads/192.168.200.228/",express.static(__dirname + "/uploads/192.168.200.228/"));console.log("File download enabled for /uploads/192.168.200.228/");
-app.use("/uploads/192.168.200.229/",express.static(__dirname + "/uploads/192.168.200.229/"));console.log("File download enabled for /uploads/192.168.200.229/");
-app.use("/uploads/192.168.200.230/",express.static(__dirname + "/uploads/192.168.200.230/"));console.log("File download enabled for /uploads/192.168.200.230/");
-app.use("/uploads/192.168.200.231/",express.static(__dirname + "/uploads/192.168.200.231/"));console.log("File download enabled for /uploads/192.168.200.231/");
-app.use("/uploads/192.168.200.232/",express.static(__dirname + "/uploads/192.168.200.232/"));console.log("File download enabled for /uploads/192.168.200.232/");
-app.use("/uploads/192.168.200.233/",express.static(__dirname + "/uploads/192.168.200.233/"));console.log("File download enabled for /uploads/192.168.200.233/");
-app.use("/uploads/192.168.200.234/",express.static(__dirname + "/uploads/192.168.200.234/"));console.log("File download enabled for /uploads/192.168.200.234/");
-app.use("/uploads/192.168.200.235/",express.static(__dirname + "/uploads/192.168.200.235/"));console.log("File download enabled for /uploads/192.168.200.235/");
-app.use("/uploads/192.168.200.236/",express.static(__dirname + "/uploads/192.168.200.236/"));console.log("File download enabled for /uploads/192.168.200.236/");
-app.use("/uploads/192.168.200.237/",express.static(__dirname + "/uploads/192.168.200.237/"));console.log("File download enabled for /uploads/192.168.200.237/");
-app.use("/uploads/192.168.200.238/",express.static(__dirname + "/uploads/192.168.200.238/"));console.log("File download enabled for /uploads/192.168.200.238/");
-app.use("/uploads/192.168.200.239/",express.static(__dirname + "/uploads/192.168.200.239/"));console.log("File download enabled for /uploads/192.168.200.239/");
-app.use("/uploads/192.168.200.240/",express.static(__dirname + "/uploads/192.168.200.240/"));console.log("File download enabled for /uploads/192.168.200.240/");
-app.use("/uploads/192.168.200.241/",express.static(__dirname + "/uploads/192.168.200.241/"));console.log("File download enabled for /uploads/192.168.200.241/");
-app.use("/uploads/192.168.200.242/",express.static(__dirname + "/uploads/192.168.200.242/"));console.log("File download enabled for /uploads/192.168.200.242/");
-app.use("/uploads/192.168.200.243/",express.static(__dirname + "/uploads/192.168.200.243/"));console.log("File download enabled for /uploads/192.168.200.243/");
-app.use("/uploads/192.168.200.244/",express.static(__dirname + "/uploads/192.168.200.244/"));console.log("File download enabled for /uploads/192.168.200.244/");
-app.use("/uploads/192.168.200.245/",express.static(__dirname + "/uploads/192.168.200.245/"));console.log("File download enabled for /uploads/192.168.200.245/");
-app.use("/uploads/192.168.200.246/",express.static(__dirname + "/uploads/192.168.200.246/"));console.log("File download enabled for /uploads/192.168.200.246/");
-app.use("/uploads/192.168.200.247/",express.static(__dirname + "/uploads/192.168.200.247/"));console.log("File download enabled for /uploads/192.168.200.247/");
-app.use("/uploads/192.168.200.248/",express.static(__dirname + "/uploads/192.168.200.248/"));console.log("File download enabled for /uploads/192.168.200.248/");
-app.use("/uploads/192.168.200.249/",express.static(__dirname + "/uploads/192.168.200.249/"));console.log("File download enabled for /uploads/192.168.200.249/");
-app.use("/uploads/192.168.200.250/",express.static(__dirname + "/uploads/192.168.200.250/"));console.log("File download enabled for /uploads/192.168.200.250/");
-app.use("/uploads/192.168.200.251/",express.static(__dirname + "/uploads/192.168.200.251/"));console.log("File download enabled for /uploads/192.168.200.251/");
-app.use("/uploads/192.168.200.252/",express.static(__dirname + "/uploads/192.168.200.252/"));console.log("File download enabled for /uploads/192.168.200.252/");
-app.use("/uploads/192.168.200.253/",express.static(__dirname + "/uploads/192.168.200.253/"));console.log("File download enabled for /uploads/192.168.200.253/");
-app.use("/uploads/192.168.200.254/",express.static(__dirname + "/uploads/192.168.200.254/"));console.log("File download enabled for /uploads/192.168.200.254/");
-app.use("/uploads/192.168.200.255/",express.static(__dirname + "/uploads/192.168.200.255/"));console.log("File download enabled for /uploads/192.168.200.255/");
-app.use("/uploads/192.168.200.100/",express.static(__dirname + "/uploads/192.168.200.100/"));console.log("File download enabled for /uploads/192.168.200.100/");
-app.use("/uploads/192.168.200.101/",express.static(__dirname + "/uploads/192.168.200.101/"));console.log("File download enabled for /uploads/192.168.200.101/");
-app.use("/uploads/192.168.200.102/",express.static(__dirname + "/uploads/192.168.200.102/"));console.log("File download enabled for /uploads/192.168.200.102/");
-app.use("/uploads/192.168.200.103/",express.static(__dirname + "/uploads/192.168.200.103/"));console.log("File download enabled for /uploads/192.168.200.103/");
-app.use("/uploads/192.168.200.104/",express.static(__dirname + "/uploads/192.168.200.104/"));console.log("File download enabled for /uploads/192.168.200.104/");
-app.use("/uploads/192.168.200.105/",express.static(__dirname + "/uploads/192.168.200.105/"));console.log("File download enabled for /uploads/192.168.200.105/");
-app.use("/uploads/192.168.200.106/",express.static(__dirname + "/uploads/192.168.200.106/"));console.log("File download enabled for /uploads/192.168.200.106/");
-app.use("/uploads/192.168.200.107/",express.static(__dirname + "/uploads/192.168.200.107/"));console.log("File download enabled for /uploads/192.168.200.107/");
-app.use("/uploads/192.168.200.108/",express.static(__dirname + "/uploads/192.168.200.108/"));console.log("File download enabled for /uploads/192.168.200.108/");
-app.use("/uploads/192.168.200.109/",express.static(__dirname + "/uploads/192.168.200.109/"));console.log("File download enabled for /uploads/192.168.200.109/");
-app.use("/uploads/192.168.200.110/",express.static(__dirname + "/uploads/192.168.200.110/"));console.log("File download enabled for /uploads/192.168.200.110/");
-app.use("/uploads/192.168.200.111/",express.static(__dirname + "/uploads/192.168.200.111/"));console.log("File download enabled for /uploads/192.168.200.111/");
-app.use("/uploads/192.168.200.112/",express.static(__dirname + "/uploads/192.168.200.112/"));console.log("File download enabled for /uploads/192.168.200.112/");
-app.use("/uploads/192.168.200.113/",express.static(__dirname + "/uploads/192.168.200.113/"));console.log("File download enabled for /uploads/192.168.200.113/");
-app.use("/uploads/192.168.200.114/",express.static(__dirname + "/uploads/192.168.200.114/"));console.log("File download enabled for /uploads/192.168.200.114/");
-app.use("/uploads/192.168.200.115/",express.static(__dirname + "/uploads/192.168.200.115/"));console.log("File download enabled for /uploads/192.168.200.115/");
-app.use("/uploads/192.168.200.116/",express.static(__dirname + "/uploads/192.168.200.116/"));console.log("File download enabled for /uploads/192.168.200.116/");
-app.use("/uploads/192.168.200.117/",express.static(__dirname + "/uploads/192.168.200.117/"));console.log("File download enabled for /uploads/192.168.200.117/");
-app.use("/uploads/192.168.200.118/",express.static(__dirname + "/uploads/192.168.200.118/"));console.log("File download enabled for /uploads/192.168.200.118/");
-app.use("/uploads/192.168.200.119/",express.static(__dirname + "/uploads/192.168.200.119/"));console.log("File download enabled for /uploads/192.168.200.119/");
-app.use("/uploads/192.168.200.120/",express.static(__dirname + "/uploads/192.168.200.120/"));console.log("File download enabled for /uploads/192.168.200.120/");
-app.use("/uploads/192.168.200.121/",express.static(__dirname + "/uploads/192.168.200.121/"));console.log("File download enabled for /uploads/192.168.200.121/");
-app.use("/uploads/192.168.200.122/",express.static(__dirname + "/uploads/192.168.200.122/"));console.log("File download enabled for /uploads/192.168.200.122/");
-app.use("/uploads/192.168.200.123/",express.static(__dirname + "/uploads/192.168.200.123/"));console.log("File download enabled for /uploads/192.168.200.123/");
-app.use("/uploads/192.168.200.124/",express.static(__dirname + "/uploads/192.168.200.124/"));console.log("File download enabled for /uploads/192.168.200.124/");
-app.use("/uploads/192.168.200.125/",express.static(__dirname + "/uploads/192.168.200.125/"));console.log("File download enabled for /uploads/192.168.200.125/");
-app.use("/uploads/192.168.200.126/",express.static(__dirname + "/uploads/192.168.200.126/"));console.log("File download enabled for /uploads/192.168.200.126/");
-app.use("/uploads/192.168.200.127/",express.static(__dirname + "/uploads/192.168.200.127/"));console.log("File download enabled for /uploads/192.168.200.127/");
-app.use("/uploads/192.168.200.128/",express.static(__dirname + "/uploads/192.168.200.128/"));console.log("File download enabled for /uploads/192.168.200.128/");
-app.use("/uploads/192.168.200.129/",express.static(__dirname + "/uploads/192.168.200.129/"));console.log("File download enabled for /uploads/192.168.200.129/");
+app.use("/uploads/::ffff:192.168.200.101/",express.static(__dirname + "/uploads/::ffff:192.168.200.101/"));console.log("File download enabled for /uploads/::ffff:192.168.200.101/");
+app.use("/uploads/::ffff:192.168.200.102/",express.static(__dirname + "/uploads/::ffff:192.168.200.102/"));console.log("File download enabled for /uploads/::ffff:192.168.200.102/");
+app.use("/uploads/::ffff:192.168.200.103/",express.static(__dirname + "/uploads/::ffff:192.168.200.103/"));console.log("File download enabled for /uploads/::ffff:192.168.200.103/");
+app.use("/uploads/::ffff:192.168.200.105/",express.static(__dirname + "/uploads/::ffff:192.168.200.105/"));console.log("File download enabled for /uploads/::ffff:192.168.200.105/");
+app.use("/uploads/::ffff:192.168.200.106/",express.static(__dirname + "/uploads/::ffff:192.168.200.106/"));console.log("File download enabled for /uploads/::ffff:192.168.200.106/");
+app.use("/uploads/::ffff:192.168.200.107/",express.static(__dirname + "/uploads/::ffff:192.168.200.107/"));console.log("File download enabled for /uploads/::ffff:192.168.200.107/");
+app.use("/uploads/::ffff:192.168.200.108/",express.static(__dirname + "/uploads/::ffff:192.168.200.108/"));console.log("File download enabled for /uploads/::ffff:192.168.200.108/");
+app.use("/uploads/::ffff:192.168.200.109/",express.static(__dirname + "/uploads/::ffff:192.168.200.109/"));console.log("File download enabled for /uploads/::ffff:192.168.200.109/");
+app.use("/uploads/::ffff:192.168.200.110/",express.static(__dirname + "/uploads/::ffff:192.168.200.110/"));console.log("File download enabled for /uploads/::ffff:192.168.200.110/");
+app.use("/uploads/::ffff:192.168.200.112/",express.static(__dirname + "/uploads/::ffff:192.168.200.112/"));console.log("File download enabled for /uploads/::ffff:192.168.200.112/");
+app.use("/uploads/::ffff:192.168.200.113/",express.static(__dirname + "/uploads/::ffff:192.168.200.113/"));console.log("File download enabled for /uploads/::ffff:192.168.200.113/");
+app.use("/uploads/::ffff:192.168.200.114/",express.static(__dirname + "/uploads/::ffff:192.168.200.114/"));console.log("File download enabled for /uploads/::ffff:192.168.200.114/");
+app.use("/uploads/::ffff:192.168.200.115/",express.static(__dirname + "/uploads/::ffff:192.168.200.115/"));console.log("File download enabled for /uploads/::ffff:192.168.200.115/");
+app.use("/uploads/::ffff:192.168.200.116/",express.static(__dirname + "/uploads/::ffff:192.168.200.116/"));console.log("File download enabled for /uploads/::ffff:192.168.200.116/");
+app.use("/uploads/::ffff:192.168.200.117/",express.static(__dirname + "/uploads/::ffff:192.168.200.117/"));console.log("File download enabled for /uploads/::ffff:192.168.200.117/");
+app.use("/uploads/::ffff:192.168.200.118/",express.static(__dirname + "/uploads/::ffff:192.168.200.118/"));console.log("File download enabled for /uploads/::ffff:192.168.200.118/");
+app.use("/uploads/::ffff:192.168.200.119/",express.static(__dirname + "/uploads/::ffff:192.168.200.119/"));console.log("File download enabled for /uploads/::ffff:192.168.200.119/");
+app.use("/uploads/::ffff:192.168.200.120/",express.static(__dirname + "/uploads/::ffff:192.168.200.120/"));console.log("File download enabled for /uploads/::ffff:192.168.200.120/");
+app.use("/uploads/::ffff:192.168.200.121/",express.static(__dirname + "/uploads/::ffff:192.168.200.121/"));console.log("File download enabled for /uploads/::ffff:192.168.200.121/");
+app.use("/uploads/::ffff:192.168.200.122/",express.static(__dirname + "/uploads/::ffff:192.168.200.122/"));console.log("File download enabled for /uploads/::ffff:192.168.200.122/");
+app.use("/uploads/::ffff:192.168.200.123/",express.static(__dirname + "/uploads/::ffff:192.168.200.123/"));console.log("File download enabled for /uploads/::ffff:192.168.200.123/");
+app.use("/uploads/::ffff:192.168.200.124/",express.static(__dirname + "/uploads/::ffff:192.168.200.124/"));console.log("File download enabled for /uploads/::ffff:192.168.200.124/");
+app.use("/uploads/::ffff:192.168.200.125/",express.static(__dirname + "/uploads/::ffff:192.168.200.125/"));console.log("File download enabled for /uploads/::ffff:192.168.200.125/");
+app.use("/uploads/::ffff:192.168.200.126/",express.static(__dirname + "/uploads/::ffff:192.168.200.126/"));console.log("File download enabled for /uploads/::ffff:192.168.200.126/");
+app.use("/uploads/::ffff:192.168.200.127/",express.static(__dirname + "/uploads/::ffff:192.168.200.127/"));console.log("File download enabled for /uploads/::ffff:192.168.200.127/");
+app.use("/uploads/::ffff:192.168.200.128/",express.static(__dirname + "/uploads/::ffff:192.168.200.128/"));console.log("File download enabled for /uploads/::ffff:192.168.200.128/");
+app.use("/uploads/::ffff:192.168.200.129/",express.static(__dirname + "/uploads/::ffff:192.168.200.129/"));console.log("File download enabled for /uploads/::ffff:192.168.200.129/");
+app.use("/uploads/::ffff:192.168.200.130/",express.static(__dirname + "/uploads/::ffff:192.168.200.130/"));console.log("File download enabled for /uploads/::ffff:192.168.200.130/");
+app.use("/uploads/::ffff:192.168.200.131/",express.static(__dirname + "/uploads/::ffff:192.168.200.131/"));console.log("File download enabled for /uploads/::ffff:192.168.200.131/");
+app.use("/uploads/::ffff:192.168.200.132/",express.static(__dirname + "/uploads/::ffff:192.168.200.132/"));console.log("File download enabled for /uploads/::ffff:192.168.200.132/");
+app.use("/uploads/::ffff:192.168.200.133/",express.static(__dirname + "/uploads/::ffff:192.168.200.133/"));console.log("File download enabled for /uploads/::ffff:192.168.200.133/");
+app.use("/uploads/::ffff:192.168.200.134/",express.static(__dirname + "/uploads/::ffff:192.168.200.134/"));console.log("File download enabled for /uploads/::ffff:192.168.200.134/");
+app.use("/uploads/::ffff:192.168.200.135/",express.static(__dirname + "/uploads/::ffff:192.168.200.135/"));console.log("File download enabled for /uploads/::ffff:192.168.200.135/");
+app.use("/uploads/::ffff:192.168.200.136/",express.static(__dirname + "/uploads/::ffff:192.168.200.136/"));console.log("File download enabled for /uploads/::ffff:192.168.200.136/");
+app.use("/uploads/::ffff:192.168.200.137/",express.static(__dirname + "/uploads/::ffff:192.168.200.137/"));console.log("File download enabled for /uploads/::ffff:192.168.200.137/");
+app.use("/uploads/::ffff:192.168.200.138/",express.static(__dirname + "/uploads/::ffff:192.168.200.138/"));console.log("File download enabled for /uploads/::ffff:192.168.200.138/");
+app.use("/uploads/::ffff:192.168.200.139/",express.static(__dirname + "/uploads/::ffff:192.168.200.139/"));console.log("File download enabled for /uploads/::ffff:192.168.200.139/");
+app.use("/uploads/::ffff:192.168.200.140/",express.static(__dirname + "/uploads/::ffff:192.168.200.140/"));console.log("File download enabled for /uploads/::ffff:192.168.200.140/");
+app.use("/uploads/::ffff:192.168.200.141/",express.static(__dirname + "/uploads/::ffff:192.168.200.141/"));console.log("File download enabled for /uploads/::ffff:192.168.200.141/");
+app.use("/uploads/::ffff:192.168.200.142/",express.static(__dirname + "/uploads/::ffff:192.168.200.142/"));console.log("File download enabled for /uploads/::ffff:192.168.200.142/");
+app.use("/uploads/::ffff:192.168.200.143/",express.static(__dirname + "/uploads/::ffff:192.168.200.143/"));console.log("File download enabled for /uploads/::ffff:192.168.200.143/");
+app.use("/uploads/::ffff:192.168.200.144/",express.static(__dirname + "/uploads/::ffff:192.168.200.144/"));console.log("File download enabled for /uploads/::ffff:192.168.200.144/");
+app.use("/uploads/::ffff:192.168.200.145/",express.static(__dirname + "/uploads/::ffff:192.168.200.145/"));console.log("File download enabled for /uploads/::ffff:192.168.200.145/");
+app.use("/uploads/::ffff:192.168.200.146/",express.static(__dirname + "/uploads/::ffff:192.168.200.146/"));console.log("File download enabled for /uploads/::ffff:192.168.200.146/");
+app.use("/uploads/::ffff:192.168.200.147/",express.static(__dirname + "/uploads/::ffff:192.168.200.147/"));console.log("File download enabled for /uploads/::ffff:192.168.200.147/");
+app.use("/uploads/::ffff:192.168.200.148/",express.static(__dirname + "/uploads/::ffff:192.168.200.148/"));console.log("File download enabled for /uploads/::ffff:192.168.200.148/");
+app.use("/uploads/::ffff:192.168.200.149/",express.static(__dirname + "/uploads/::ffff:192.168.200.149/"));console.log("File download enabled for /uploads/::ffff:192.168.200.149/");
+app.use("/uploads/::ffff:192.168.200.150/",express.static(__dirname + "/uploads/::ffff:192.168.200.150/"));console.log("File download enabled for /uploads/::ffff:192.168.200.150/");
+app.use("/uploads/::ffff:192.168.200.151/",express.static(__dirname + "/uploads/::ffff:192.168.200.151/"));console.log("File download enabled for /uploads/::ffff:192.168.200.151/");
+app.use("/uploads/::ffff:192.168.200.152/",express.static(__dirname + "/uploads/::ffff:192.168.200.152/"));console.log("File download enabled for /uploads/::ffff:192.168.200.152/");
+app.use("/uploads/::ffff:192.168.200.153/",express.static(__dirname + "/uploads/::ffff:192.168.200.153/"));console.log("File download enabled for /uploads/::ffff:192.168.200.153/");
+app.use("/uploads/::ffff:192.168.200.154/",express.static(__dirname + "/uploads/::ffff:192.168.200.154/"));console.log("File download enabled for /uploads/::ffff:192.168.200.154/");
+app.use("/uploads/::ffff:192.168.200.155/",express.static(__dirname + "/uploads/::ffff:192.168.200.155/"));console.log("File download enabled for /uploads/::ffff:192.168.200.155/");
+app.use("/uploads/::ffff:192.168.200.156/",express.static(__dirname + "/uploads/::ffff:192.168.200.156/"));console.log("File download enabled for /uploads/::ffff:192.168.200.156/");
+app.use("/uploads/::ffff:192.168.200.157/",express.static(__dirname + "/uploads/::ffff:192.168.200.157/"));console.log("File download enabled for /uploads/::ffff:192.168.200.157/");
+app.use("/uploads/::ffff:192.168.200.158/",express.static(__dirname + "/uploads/::ffff:192.168.200.158/"));console.log("File download enabled for /uploads/::ffff:192.168.200.158/");
+app.use("/uploads/::ffff:192.168.200.159/",express.static(__dirname + "/uploads/::ffff:192.168.200.159/"));console.log("File download enabled for /uploads/::ffff:192.168.200.159/");
+app.use("/uploads/::ffff:192.168.200.160/",express.static(__dirname + "/uploads/::ffff:192.168.200.160/"));console.log("File download enabled for /uploads/::ffff:192.168.200.160/");
+app.use("/uploads/::ffff:192.168.200.161/",express.static(__dirname + "/uploads/::ffff:192.168.200.161/"));console.log("File download enabled for /uploads/::ffff:192.168.200.161/");
+app.use("/uploads/::ffff:192.168.200.162/",express.static(__dirname + "/uploads/::ffff:192.168.200.162/"));console.log("File download enabled for /uploads/::ffff:192.168.200.162/");
+app.use("/uploads/::ffff:192.168.200.163/",express.static(__dirname + "/uploads/::ffff:192.168.200.163/"));console.log("File download enabled for /uploads/::ffff:192.168.200.163/");
+app.use("/uploads/::ffff:192.168.200.164/",express.static(__dirname + "/uploads/::ffff:192.168.200.164/"));console.log("File download enabled for /uploads/::ffff:192.168.200.164/");
+app.use("/uploads/::ffff:192.168.200.165/",express.static(__dirname + "/uploads/::ffff:192.168.200.165/"));console.log("File download enabled for /uploads/::ffff:192.168.200.165/");
+app.use("/uploads/::ffff:192.168.200.166/",express.static(__dirname + "/uploads/::ffff:192.168.200.166/"));console.log("File download enabled for /uploads/::ffff:192.168.200.166/");
+app.use("/uploads/::ffff:192.168.200.167/",express.static(__dirname + "/uploads/::ffff:192.168.200.167/"));console.log("File download enabled for /uploads/::ffff:192.168.200.167/");
+app.use("/uploads/::ffff:192.168.200.168/",express.static(__dirname + "/uploads/::ffff:192.168.200.168/"));console.log("File download enabled for /uploads/::ffff:192.168.200.168/");
+app.use("/uploads/::ffff:192.168.200.169/",express.static(__dirname + "/uploads/::ffff:192.168.200.169/"));console.log("File download enabled for /uploads/::ffff:192.168.200.169/");
+app.use("/uploads/::ffff:192.168.200.170/",express.static(__dirname + "/uploads/::ffff:192.168.200.170/"));console.log("File download enabled for /uploads/::ffff:192.168.200.170/");
+app.use("/uploads/::ffff:192.168.200.171/",express.static(__dirname + "/uploads/::ffff:192.168.200.171/"));console.log("File download enabled for /uploads/::ffff:192.168.200.171/");
+app.use("/uploads/::ffff:192.168.200.172/",express.static(__dirname + "/uploads/::ffff:192.168.200.172/"));console.log("File download enabled for /uploads/::ffff:192.168.200.172/");
+app.use("/uploads/::ffff:192.168.200.173/",express.static(__dirname + "/uploads/::ffff:192.168.200.173/"));console.log("File download enabled for /uploads/::ffff:192.168.200.173/");
+app.use("/uploads/::ffff:192.168.200.174/",express.static(__dirname + "/uploads/::ffff:192.168.200.174/"));console.log("File download enabled for /uploads/::ffff:192.168.200.174/");
+app.use("/uploads/::ffff:192.168.200.175/",express.static(__dirname + "/uploads/::ffff:192.168.200.175/"));console.log("File download enabled for /uploads/::ffff:192.168.200.175/");
+app.use("/uploads/::ffff:192.168.200.176/",express.static(__dirname + "/uploads/::ffff:192.168.200.176/"));console.log("File download enabled for /uploads/::ffff:192.168.200.176/");
+app.use("/uploads/::ffff:192.168.200.177/",express.static(__dirname + "/uploads/::ffff:192.168.200.177/"));console.log("File download enabled for /uploads/::ffff:192.168.200.177/");
+app.use("/uploads/::ffff:192.168.200.178/",express.static(__dirname + "/uploads/::ffff:192.168.200.178/"));console.log("File download enabled for /uploads/::ffff:192.168.200.178/");
+app.use("/uploads/::ffff:192.168.200.179/",express.static(__dirname + "/uploads/::ffff:192.168.200.179/"));console.log("File download enabled for /uploads/::ffff:192.168.200.179/");
+app.use("/uploads/::ffff:192.168.200.180/",express.static(__dirname + "/uploads/::ffff:192.168.200.180/"));console.log("File download enabled for /uploads/::ffff:192.168.200.180/");
+app.use("/uploads/::ffff:192.168.200.181/",express.static(__dirname + "/uploads/::ffff:192.168.200.181/"));console.log("File download enabled for /uploads/::ffff:192.168.200.181/");
+app.use("/uploads/::ffff:192.168.200.182/",express.static(__dirname + "/uploads/::ffff:192.168.200.182/"));console.log("File download enabled for /uploads/::ffff:192.168.200.182/");
+app.use("/uploads/::ffff:192.168.200.183/",express.static(__dirname + "/uploads/::ffff:192.168.200.183/"));console.log("File download enabled for /uploads/::ffff:192.168.200.183/");
+app.use("/uploads/::ffff:192.168.200.184/",express.static(__dirname + "/uploads/::ffff:192.168.200.184/"));console.log("File download enabled for /uploads/::ffff:192.168.200.184/");
+app.use("/uploads/::ffff:192.168.200.185/",express.static(__dirname + "/uploads/::ffff:192.168.200.185/"));console.log("File download enabled for /uploads/::ffff:192.168.200.185/");
+app.use("/uploads/::ffff:192.168.200.186/",express.static(__dirname + "/uploads/::ffff:192.168.200.186/"));console.log("File download enabled for /uploads/::ffff:192.168.200.186/");
+app.use("/uploads/::ffff:192.168.200.187/",express.static(__dirname + "/uploads/::ffff:192.168.200.187/"));console.log("File download enabled for /uploads/::ffff:192.168.200.187/");
+app.use("/uploads/::ffff:192.168.200.190/",express.static(__dirname + "/uploads/::ffff:192.168.200.190/"));console.log("File download enabled for /uploads/::ffff:192.168.200.190/");
+app.use("/uploads/::ffff:192.168.200.191/",express.static(__dirname + "/uploads/::ffff:192.168.200.191/"));console.log("File download enabled for /uploads/::ffff:192.168.200.191/");
+app.use("/uploads/::ffff:192.168.200.192/",express.static(__dirname + "/uploads/::ffff:192.168.200.192/"));console.log("File download enabled for /uploads/::ffff:192.168.200.192/");
+app.use("/uploads/::ffff:192.168.200.193/",express.static(__dirname + "/uploads/::ffff:192.168.200.193/"));console.log("File download enabled for /uploads/::ffff:192.168.200.193/");
+app.use("/uploads/::ffff:192.168.200.194/",express.static(__dirname + "/uploads/::ffff:192.168.200.194/"));console.log("File download enabled for /uploads/::ffff:192.168.200.194/");
+app.use("/uploads/::ffff:192.168.200.195/",express.static(__dirname + "/uploads/::ffff:192.168.200.195/"));console.log("File download enabled for /uploads/::ffff:192.168.200.195/");
+app.use("/uploads/::ffff:192.168.200.196/",express.static(__dirname + "/uploads/::ffff:192.168.200.196/"));console.log("File download enabled for /uploads/::ffff:192.168.200.196/");
+app.use("/uploads/::ffff:192.168.200.201/",express.static(__dirname + "/uploads/::ffff:192.168.200.201/"));console.log("File download enabled for /uploads/::ffff:192.168.200.201/");
+app.use("/uploads/::ffff:192.168.200.202/",express.static(__dirname + "/uploads/::ffff:192.168.200.202/"));console.log("File download enabled for /uploads/::ffff:192.168.200.202/");
+app.use("/uploads/::ffff:192.168.200.203/",express.static(__dirname + "/uploads/::ffff:192.168.200.203/"));console.log("File download enabled for /uploads/::ffff:192.168.200.203/");
+app.use("/uploads/::ffff:127.0.0.1/",express.static(__dirname + "/uploads/::ffff:127.0.0.1/"));console.log("File download enabled for /uploads/::ffff:127.0.0.1/");
 app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");

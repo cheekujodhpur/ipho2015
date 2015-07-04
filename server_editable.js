@@ -1,4 +1,4 @@
-#!/usr/bin/env nodejs
+#!/usr/bin/env node
 /*
 server.js file of the Server system for IPhO-2015 India
 
