@@ -2216,6 +2216,157 @@ io.on('connection',function(socket)
             });
         }); 
 
+		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+        {
+		    if(err)
+		    {
+			    console.log(err);
+			    return 0;
+		    }
+            if(directory_path == "/uploads")
+            {
+                directory_path = __dirname + "/uploads/" + username + "/";
+                console.log("uhlalaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallalla" + directory_path);
+            }
+            else
+            {
+                directory_path = __dirname + "/downloads";
+            }
+            fs.readdir(directory_path, function(err,files)
+            {
+                if(err)
+                {
+                    console.log(err);
+                }
+            files.map(function(file)
+            {
+                return path.join(directory_path,file);
+            }).filter(function(file)
+            {
+                return fs.statSync(file).isFile();
+            });
+            
+            if(directory_path == __dirname + "/downloads")
+            {
+                
+                //filtering of filenames to show only country specific files
+                MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+                {
+                    if(err)
+                    {
+                        console.log(err);
+                        return 0;
+                    }
+                    console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+                    var collection = db.collection('users');
+                    
+                    collection.find({"ip":ip}).toArray(function(err,items)
+                    {
+                        if(items == null)
+                        {
+                            console.log(err);
+                            console.log("Something went wrong in list-dir signal. Pray to the Gods and carry on!");
+                            return;
+                        }
+                        if(items[0].type == 0)
+                        {
+                            id = "download";
+                            directory_path = "/downloads/";
+                            socket.emit('listed-dir',id,directory_path,files);
+                            db.close();       
+                            return;    
+                        }
+                        else
+                        {
+                            collection.find({}).toArray(function(err,items)
+                            {
+                                if(items == null)
+                                {
+                                    console.log(err);
+                                    console.log("Something went wrong in list-dir signal. Pray to the Gods and carry on!");
+                                    return;
+                                }
+                                for (i in items)
+                                {
+                                    //default file name is Marks_country_code.xls
+                                    var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
+                                    if(country_index > -1 && items[i].ip != ip)
+                                    {
+                                        //console.log("splicing");
+                                        files.splice(country_index,1);
+                                    }
+                                }
+                                id = "download";
+                                directory_path = "/downloads/";
+                                socket.emit('listed-dir',id,directory_path,files);
+                                db.close();           
+                            });
+
+                        }
+                    });
+
+
+                }); 
+            }
+            else
+            {
+                MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+                {
+                    if(err)
+                    {
+                        console.log(err);
+                        return 0;
+                    }
+                    console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+                    var uploads = db.collection('uploads');
+                    
+                    uploads.find({"ip":ip}).toArray(function(err,items){
+
+                        if(err)
+                        {
+                             console.log(err);
+                        }
+                        if(items[0].T1_printed)socket.emit('T1_printed');
+                        if(items[0].T2_printed)socket.emit('T2_printed');
+                        if(items[0].T3_printed)socket.emit('T3_printed');
+                        if(items[0].E1_printed)socket.emit('E1_printed');
+                        if(items[0].E2_printed)socket.emit('E2_printed');
+
+                        if(items[0].T1_alert)
+                        {
+                            uploads.update({"ip":ip},{$set:{"T1_alert":false}},function(err,result){});
+                            socket.emit('T1-alert');
+                        }
+                        if(items[0].T2_alert)
+                        {
+                            uploads.update({"ip":ip},{$set:{"T2_alert":false}},function(err,result){});
+                            socket.emit('T2-alert');
+                        }
+                        if(items[0].T3_alert)
+                        {
+                            uploads.update({"ip":ip},{$set:{"T3_alert":false}},function(err,result){});
+                            socket.emit('T3-alert');
+                        }
+                        if(items[0].E1_alert)
+                        {
+                            uploads.update({"ip":ip},{$set:{"E_alert":false}},function(err,result){});
+                            socket.emit('E1-alert');
+                        }
+                        if(items[0].E2_alert)
+                        {
+                            uploads.update({"ip":ip},{$set:{"E_alert":false}},function(err,result){});
+                            socket.emit('E2-alert');
+                        }
+                        db.close();
+                    });
+                });
+                id = "upload";
+                directory_path = "/uploads/" + ip.toString() + "/";
+                socket.emit('listed-dir',id,directory_path,files);
+            }
+            console.log("'listed-dir' signal emmited from server in response to " + ip.toString());
+            });
+        });
         if(directory_path == "/uploads")
         {
             directory_path = __dirname + "/uploads/" + username + "/";
