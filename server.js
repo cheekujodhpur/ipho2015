@@ -29,6 +29,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 //load the required modules
 var express = require('express')
   , app = express()
+  , bodyParser = require('body-parser')
+  , cookieParser = require('cookie-parser')
+  , session = require('express-session')
   , http = require('http')
   , MongoClient = require('mongodb').MongoClient
   , server = http.createServer(app)
@@ -38,6 +41,11 @@ var express = require('express')
   , fs = require("fs-extra")
   , log_timestamp = require('log-timestamp')(function() { return '[ ' + (new Date).toLocaleString() + ' ] %s'});
 var io = require('socket.io').listen(server);
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended:true
+}));
 
 
 var ObjectID = require('mongodb').ObjectID;
@@ -80,8 +88,8 @@ app.use(multer(
     }
 }));
 
-app.use(express.cookieParser());
-app.use(expres.session({secret: 'neemkapattakadwahai'}));
+app.use(cookieParser());
+app.use(session({secret: 'neemkapattakadwahai'}));
 
 //tell node to send the required files when requested
 //static files
@@ -235,6 +243,51 @@ app.get('/chpass.html',function(req,res)
 });
 
 //homepage
+app.post('/', function(req, res)
+{
+    var user = req.body.user;
+    var pass = req.body.pass;
+    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+    {
+        if(err)
+        {
+            console.log(err);
+            return 0;
+        }
+        //console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+        var collection = db.collection('users');
+        var uploads = db.collection('uploads');
+        collection.find({"ip":user}).toArray(function(err,items)
+        {
+            if(typeof items[0]!=="undefined")
+            {
+                if(items[0].pass == pass)
+                {
+        
+                    collection.update({"ip":user},{$set:{"logged":true}},function(err,result){});
+                    uploads.update({"ip":user},{$set:{"logged":true}},function(err,result){});
+                    //socket.emit('fin');
+                    //console.log("'fin' signal emitted from server in response to " + ip.toString());
+                    req.session.user = user;
+                    res.redirect('/');
+                }
+                else
+                {
+                    res.redirect('/');
+                    //socket.emit('syn-err');
+                    //console.log("'syn-err' signal emitted from server in response to " + ip.toString());
+                }
+            }
+            else
+            {
+                res.redirect('/');
+                //socket.emit('syn-err');
+                //console.log("'syn-err' signal emitted from server in response to " + ip.toString());
+            }
+        db.close();
+        });
+    });
+});
 app.get('/', function (req, res)
 {
     MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -244,9 +297,9 @@ app.get('/', function (req, res)
             console.log(err);
             return;
         }
-        if(req.ip != null)
+        if(req.session.user != null)
         {
-            var ip = req.ip.toString();
+            var ip = req.session.user;
         }
         else
         {
@@ -256,56 +309,54 @@ app.get('/', function (req, res)
         var collection = db.collection('users');
         collection.find({"ip":ip}).toArray(function(err,items)
         {
-            if(items.length == 0)
-            {
-                return;
-            }
-            if(items[0].logged)
-            {
-                //if client is not logged in send him to chpass.html
-                if(!items[0].first)
+            if(items.length!=0){
+                if(items[0].logged)
                 {
-                    res.redirect('/chpass.html');
-                }
+                    //if client is not logged in send him to chpass.html
+                    if(!items[0].first)
+                    {
+                        res.redirect('/chpass.html');
+                    }
 
-                //if client is logged in then determine his type and send him to the corresponding page
-                var type = items[0].type;
-                if(type == 0)
-                {
-                    res.sendFile(__dirname + '/su/index.html');				
-                }
-                else if(type == 1)
-                {
-                    res.sendFile(__dirname + '/u/index.html');
-                }
-                else if(type == 2)
-                {
-                    res.sendFile(__dirname + '/pr/index.html');
-                }
-                else if(type == 3)
-                {
-                    res.sendFile(__dirname + '/mk/index.html');
-                }
-                else if(type == 4)
-                {
-                    res.sendFile(__dirname + '/exec/index.html');
-                }
-                else if(type == 5)
-                {
-                    res.sendFile(__dirname + '/cr/index.html');
-                }
-                else if(type == 6)
-                {
-                    res.sendFile(__dirname + '/disp/index.html');
-                }
-                else if(type == 7)
-                {
-                    res.sendFile(__dirname + '/god/index.html');
-                }
-                else
-                {
-                    res.sendFile('/chpass.html');
-                    console.log("User type not recognised for the " + ip);
+                    //if client is logged in then determine his type and send him to the corresponding page
+                    var type = items[0].type;
+                    if(type == 0)
+                    {
+                        res.sendFile(__dirname + '/su/index.html');				
+                    }
+                    else if(type == 1)
+                    {
+                        res.sendFile(__dirname + '/u/index.html');
+                    }
+                    else if(type == 2)
+                    {
+                        res.sendFile(__dirname + '/pr/index.html');
+                    }
+                    else if(type == 3)
+                    {
+                        res.sendFile(__dirname + '/mk/index.html');
+                    }
+                    else if(type == 4)
+                    {
+                        res.sendFile(__dirname + '/exec/index.html');
+                    }
+                    else if(type == 5)
+                    {
+                        res.sendFile(__dirname + '/cr/index.html');
+                    }
+                    else if(type == 6)
+                    {
+                        res.sendFile(__dirname + '/disp/index.html');
+                    }
+                    else if(type == 7)
+                    {
+                        res.sendFile(__dirname + '/god/index.html');
+                    }
+                    else
+                    {
+                        res.sendFile('/chpass.html');
+                        console.log("User type not recognised for the " + ip);
+                    }
                 }
             }
             else
@@ -2486,7 +2537,6 @@ io.on('connection',function(socket)
     //login
 	socket.on('syn',function(user,pass)
     {
-        
 		console.log("'syn' signal received from " + ip.toString());
 		// Connect to the db
 		MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
@@ -2905,3 +2955,4 @@ app.use("/uploads/192.168.200.202/",express.static(__dirname + "/uploads/192.168
 app.use("/uploads/192.168.200.203/",express.static(__dirname + "/uploads/192.168.200.203/"));console.log("File download enabled for /uploads/192.168.200.203/");
 app.use("/downloads/",express.static(__dirname + "/downloads/"));console.log("File download enabled for /downloads/");
 app.use("/uploads/127.0.0.1/",express.static(__dirname + "/uploads/127.0.0.1/"));console.log("File download enabled for /uploads/127.0.0.1/");
+app.use("/uploads/ayush/",express.static(__dirname + "/uploads/ayush/"));console.log("File download enabled for /uploads/ayush/");

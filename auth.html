@@ -33,7 +33,7 @@
 			</div>
 		</div>
 		<div style = "width:100%" id = "document">
-			<form id="form-auth">
+            <form id="form-auth" action="/" method="POST">
                 <div class="form-group">
                     <label for="username" class="control-label">Username</label>
                     <input type="text" name="user" class="form-control" id="form-auth-user" /><br />
@@ -67,23 +67,23 @@
                 $("#form-auth-pass").focus(); 
             });
 
-            var socket = io();
-			socket.on('syn-err',function(){
-				$("#form-auth-pass").parent().addClass("has-error");
-			});
+            //var socket = io();
+			//socket.on('syn-err',function(){
+			//	$("#form-auth-pass").parent().addClass("has-error");
+			//});
 
-			socket.on('fin',function(){
-				window.location = "/";
-			});
-			
-			$("#form-auth").submit(function()
-            {
-				$("#form-auth-pass").parent().removeClass("has-error");
-				$("#form-auth-user").parent().removeClass("has-error");
-				socket.emit('syn',$("#form-auth-user").val(),$("#form-auth-pass").val());
-				$("#form-auth-pass").val('');
-				return false;
-			});
+			//socket.on('fin',function(){
+			//	window.location = "/";
+			//});
+			//
+			//$("#form-auth").submit(function()
+            //{
+			//	$("#form-auth-pass").parent().removeClass("has-error");
+			//	$("#form-auth-user").parent().removeClass("has-error");
+			//	socket.emit('syn',$("#form-auth-user").val(),$("#form-auth-pass").val());
+			//	$("#form-auth-pass").val('');
+			//	return false;
+			//});
 		</script>
 	</body>
 </html>
