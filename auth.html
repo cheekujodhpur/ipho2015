@@ -34,6 +34,10 @@
 		</div>
 		<div style = "width:100%" id = "document">
 			<form id="form-auth">
+                <div class="form-group">
+                    <label for="username" class="control-label">Username</label>
+                    <input type="text" name="user" class="form-control" id="form-auth-user" /><br />
+                </div>
 				<div class="form-group">
 					<label for="pass" class = "control-label">Password</label>
 					<input type = "password" name="pass" class="form-control" id = "form-auth-pass" /><br />
@@ -75,7 +79,8 @@
 			$("#form-auth").submit(function()
             {
 				$("#form-auth-pass").parent().removeClass("has-error");
-				socket.emit('syn',$("#form-auth-pass").val());
+				$("#form-auth-user").parent().removeClass("has-error");
+				socket.emit('syn',$("#form-auth-user").val(),$("#form-auth-pass").val());
 				$("#form-auth-pass").val('');
 				return false;
 			});

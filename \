@@ -80,9 +80,6 @@ app.use(multer(
     }
 }));
 
-app.use(express.cookieParser());
-app.use(expres.session({secret: 'neemkapattakadwahai'}));
-
 //tell node to send the required files when requested
 //static files
 app.get('/static/css/bootstrap.min.css', function(req,res){res.sendFile(__dirname+'/static/css/bootstrap.min.css');});
@@ -2501,7 +2498,7 @@ io.on('connection',function(socket)
 		    var uploads = db.collection('uploads');
             collection.find({"ip":user}).toArray(function(err,items)
 		    {
-			    if(typeof items[0]!=="undefined")
+			    if(items[0]!='undefined')
 			    {
                     if(items[0].pass == pass)
                     {
