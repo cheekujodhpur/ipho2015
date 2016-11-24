@@ -759,167 +759,166 @@ app.post('/list_dir',function(req,res)
 		    var uploads = db.collection('uploads');
             collection.find({"ip":ip}).toArray(function(err,items)
             {
-                if(items != null  && typeof items[0]!=="undefined")
-                    username = items[0].user;
-            });
-            db.close();
-        }); 
-       
-        if(directory_path=='uploads')
-       {
-            directory_path = __dirname + "/uploads/" + username + "/";
-       }
-       else if(directory_path=='downloads')
-       {
-            directory_path = __dirname + "/downloads";
-       }
-        fs.readdir(directory_path, function(err,files)
-        {
-           if(err)
-            {
-                console.log(err);
-            } 
-
-        files.map(function(file)
-        {
-            return path.join(directory_path,file);
-        }).filter(function(file)
-        {
-            return fs.statSync(file).isFile();
-        });
-        
-        if(directory_path == __dirname + "/downloads")
-        {
-            
-            //filtering of filenames to show only country specific files
-            MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-            {
-                if(err)
+                username = items[0].user;
+                if(directory_path=='uploads')
+               {
+                    directory_path = __dirname + "/uploads/" + username + "/";
+               }
+               else if(directory_path=='downloads')
+               {
+                    directory_path = __dirname + "/downloads";
+               }
+                fs.readdir(directory_path, function(err,files)
                 {
-                    console.log(err);
-                    return 0;
-                }
-                console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-                var collection = db.collection('users');
-                
-                collection.find({"ip":ip}).toArray(function(err,items)
-                {
-                    if(items == null)
+                   if(err)
                     {
                         console.log(err);
-                        console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
-                        return;
-                    }
-                    if(items[0].logged == true)
+                    } 
+
+                files.map(function(file)
+                {
+                    return path.join(directory_path,file);
+                }).filter(function(file)
+                {
+                    return fs.statSync(file).isFile();
+                });
+                
+                if(directory_path == __dirname + "/downloads")
+                {
+                    
+                    //filtering of filenames to show only country specific files
+                    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
                     {
-                        if(items[0].type == 0)
+                        if(err)
                         {
-                            id = "download";
-                            directory_path = "/downloads/";
-                            var result = {};
-                            result['id'] = id;
-                            result['directory_path'] = directory_path;
-                            result['files'] = files;
-                            res.json(result);
-                            console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
-                            db.close();       
-                            return;    
+                            console.log(err);
+                            return 0;
                         }
-                        else
+                        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+                        var collection = db.collection('users');
+                        
+                        collection.find({"ip":ip}).toArray(function(err,items)
                         {
-                            collection.find({}).toArray(function(err,items)
+                            if(items == null)
                             {
-                                if(items == null)
+                                console.log(err);
+                                console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                                return;
+                            }
+                            if(items[0].logged == true)
+                            {
+                                if(items[0].type == 0)
                                 {
-                                    console.log(err);
-                                    console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
-                                    return;
+                                    id = "download";
+                                    directory_path = "/downloads/";
+                                    var result = {};
+                                    result['id'] = id;
+                                    result['directory_path'] = directory_path;
+                                    result['files'] = files;
+                                    res.json(result);
+                                    console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
+                                    db.close();       
+                                    return;    
                                 }
-                                for (i in items)
+                                else
                                 {
-                                    //default file name is Marks_country_code.xls
-                                    var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
-                                    if(country_index > -1 && items[i].ip != ip)
+                                    collection.find({}).toArray(function(err,items)
                                     {
-                                        //console.log("splicing");
-                                        files.splice(country_index,1);
-                                    }
+                                        if(items == null)
+                                        {
+                                            console.log(err);
+                                            console.log("Something went wrong in list-dir signal.Pray to the Gods and carry on!");
+                                            return;
+                                        }
+                                        for (i in items)
+                                        {
+                                            //default file name is Marks_country_code.xls
+                                            var country_index = files.indexOf("Marks_" + items[i].country_code.toString() + ".xls")
+                                            if(country_index > -1 && items[i].ip != ip)
+                                            {
+                                                //console.log("splicing");
+                                                files.splice(country_index,1);
+                                            }
+                                        }
+                                        id = "download";
+                                        directory_path = "/downloads/";
+                                        var result = {};
+                                        result['id'] = id;
+                                        result['directory_path'] = directory_path;
+                                        result['files'] = files;
+                                        res.json(result);
+                                        console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
+                                        db.close();           
+                                    });
+
                                 }
-                                id = "download";
-                                directory_path = "/downloads/";
-                                var result = {};
+                             }
+                             else
+                             {
+                                 console.log("Request rejected!");
+                                 db.close();
+                             }
+                            
+                        });
+                    }); 
+                }
+                else
+                {
+                    MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
+                    {
+                        if(err)
+                        {
+                            console.log(err);
+                            return 0;
+                        }
+                        console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
+                        var uploads = db.collection('uploads');
+                        
+                        uploads.find({"ip":ip}).toArray(function(err,items){
+                        
+                            var result = {};
+                            
+                            if(err)
+                            {
+                                 console.log(err);
+                            }
+                            if(items[0].logged == true)
+                            {
+                                if(items[0].T1_printed)result['T1_printed']=true;else result['T1_printed']=false;
+                                if(items[0].T2_printed)result['T2_printed']=true;else result['T2_printed']=false;
+                                if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
+                                if(items[0].E1_printed)result['E1_printed']=true;else result['E1_printed']=false;
+                                if(items[0].E2_printed)result['E2_printed']=true;else result['E2_printed']=false;
+                                if(items[0].E1a_printed)result['E1a_printed']=true;else result['E1a_printed']=false;
+                                if(items[0].E2a_printed)result['E2a_printed']=true;else result['E2a_printed']=false;
+                                if(items[0].C1_printed)result['C1_printed']=true;else result['C1_printed']=false;
+                                if(items[0].C2_printed)result['C2_printed']=true;else result['C2_printed']=false;
+                                if(items[0].T1_packed)result['T1_packed']=true;else result['T1_packed']=false;
+                                if(items[0].T2_packed)result['T2_packed']=true;else result['T2_packed']=false;
+                                if(items[0].T3_packed)result['T3_packed']=true;else result['T3_packed']=false;
+                                if(items[0].E1_packed)result['E1_packed']=true;else result['E1_packed']=false;
+                                if(items[0].E2_packed)result['E2_packed']=true;else result['E2_packed']=false;
+                                if(items[0].E1a_packed)result['E1a_packed']=true;else result['E1a_packed']=false;
+                                if(items[0].E2a_packed)result['E2a_packed']=true;else result['E2a_packed']=false;
+                                if(items[0].C1_packed)result['C1_packed']=true;else result['C1_packed']=false;
+                                if(items[0].C2_packed)result['C2_packed']=true;else result['C2_packed']=false;
+
+                                id = "upload";
+                                directory_path = "/uploads/" + username + "/";
                                 result['id'] = id;
                                 result['directory_path'] = directory_path;
                                 result['files'] = files;
                                 res.json(result);
-                                console.log("Response to '/list_dir' sent in response to request from " + ip.toString());  
-                                db.close();           
-                            });
-
-                        }
-                     }
-                     else
-                     {
-                         console.log("Request rejected!");
-                         db.close();
-                     }
-                    
-                });
-            }); 
-        }
-        else
-        {
-            MongoClient.connect("mongodb://localhost:27017/test",function(err,db)
-            {
-                if(err)
-                {
-                    console.log(err);
-                    return 0;
+                            }
+                            db.close();
+                        });
+                    });
                 }
-                console.log("Connection established to the server at mongodb://localhost:27017/test in response to " + ip.toString());
-                var uploads = db.collection('uploads');
-                
-                uploads.find({"ip":ip}).toArray(function(err,items){
-                
-                    var result = {};
-                    
-                    if(err)
-                    {
-                         console.log(err);
-                    }
-                    if(items[0].logged == true)
-                    {
-                        if(items[0].T1_printed)result['T1_printed']=true;else result['T1_printed']=false;
-                        if(items[0].T2_printed)result['T2_printed']=true;else result['T2_printed']=false;
-                        if(items[0].T3_printed)result['T3_printed']=true;else result['T3_printed']=false;
-                        if(items[0].E1_printed)result['E1_printed']=true;else result['E1_printed']=false;
-                        if(items[0].E2_printed)result['E2_printed']=true;else result['E2_printed']=false;
-                        if(items[0].E1a_printed)result['E1a_printed']=true;else result['E1a_printed']=false;
-                        if(items[0].E2a_printed)result['E2a_printed']=true;else result['E2a_printed']=false;
-                        if(items[0].C1_printed)result['C1_printed']=true;else result['C1_printed']=false;
-                        if(items[0].C2_printed)result['C2_printed']=true;else result['C2_printed']=false;
-                        if(items[0].T1_packed)result['T1_packed']=true;else result['T1_packed']=false;
-                        if(items[0].T2_packed)result['T2_packed']=true;else result['T2_packed']=false;
-                        if(items[0].T3_packed)result['T3_packed']=true;else result['T3_packed']=false;
-                        if(items[0].E1_packed)result['E1_packed']=true;else result['E1_packed']=false;
-                        if(items[0].E2_packed)result['E2_packed']=true;else result['E2_packed']=false;
-                        if(items[0].E1a_packed)result['E1a_packed']=true;else result['E1a_packed']=false;
-                        if(items[0].E2a_packed)result['E2a_packed']=true;else result['E2a_packed']=false;
-                        if(items[0].C1_packed)result['C1_packed']=true;else result['C1_packed']=false;
-                        if(items[0].C2_packed)result['C2_packed']=true;else result['C2_packed']=false;
-
-                        id = "upload";
-                        directory_path = "/uploads/" + username + "/";
-                        result['id'] = id;
-                        result['directory_path'] = directory_path;
-                        result['files'] = files;
-                        res.json(result);
-                    }
-                    db.close();
-                });
+               });  
+                db.close();
             });
-        }
-       });  
+        }); 
+       
     });
 });
 //receive request for fb
@@ -2219,7 +2218,6 @@ io.on('connection',function(socket)
         if(directory_path == "/uploads")
         {
             directory_path = __dirname + "/uploads/" + username + "/";
-            console.log("uhlalaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallaallalla" + directory_path);
         }
         else
         {
